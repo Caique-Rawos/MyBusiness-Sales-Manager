@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 #others
-.dtmp
-.bkp
+*.dtmp
+*.bkp
