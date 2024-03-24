@@ -3,9 +3,9 @@ Projeto Integrador da Faculdade Univesp para a criação de um aplicativo inform
 
 <details open> 
   <summary><h2>🛠️ Tecnologias Utilizadas</h2></summary>
-  <!-- Some badges are from https://github.com/Ileriayo/markdown-badges -->
+  <!-- badges are from https://github.com/Ileriayo/markdown-badges -->
 
-  <h3>👨‍💻 Programming Languages</h3>
+  <h3>👨‍💻 Linguagens de programação</h3>
 
   <p>
       <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white"></a>
@@ -16,7 +16,7 @@ Projeto Integrador da Faculdade Univesp para a criação de um aplicativo inform
       <a href="https://www.javascript.com/"><img alt="JavaScript" src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E"></a>
   </p>
 
-  <h3>🧰 Frameworks and Libraries</h3>
+  <h3>🧰 Frameworks e bibliotecas</h3>
 
   <p>
       <a href="https://nestjs.com/"><img alt="NestJS" src="https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white"></a>
@@ -24,14 +24,14 @@ Projeto Integrador da Faculdade Univesp para a criação de um aplicativo inform
       <a href="https://jquery.com/"><img alt="Jquery" src="https://img.shields.io/badge/jquery-%230769AD.svg?style=for-the-badge&logo=jquery&logoColor=white"></a>
   </p>
 
-  <h3>🗄️ Databases and Cloud Hosting</h3>
+  <h3>🗄️ Bancos de dados e hospedagem em nuvem</h3>
 
   <p>
       <a href="https://www.postgresql.org/"><img alt="Postgres" src="https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white"></a>
       <a href="https://www.oracle.com/br/cloud/"><img alt="Oracle Cloud" src="https://img.shields.io/badge/Oracle-F80000?style=for-the-badge&logo=oracle&logoColor=white"></a>
   </p>
 
-  <h3>💻 Software and Tools</h3>
+  <h3>💻 Softwares e Ferramentas</h3>
 
   <p>
       <a href="https://git-scm.com/"><img alt="Git" src="https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white"></a>
