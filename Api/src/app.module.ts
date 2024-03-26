@@ -8,13 +8,13 @@ import { PaginasModule } from './app/paginas/paginas.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
+      host: 'roundhouse.proxy.rlwy.net',
+      port: 47653,
       username: 'postgres',
-      password: 'postgres',
-      database: 'my_business_sales_manager',
+      password: 'yFWpBWJjFLSeSGQhArpUrZSUHWNqDJLC',
+      database: 'railway',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: false,
     }),
     PaginasModule,
   ],
