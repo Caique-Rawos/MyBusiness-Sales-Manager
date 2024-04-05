@@ -8,6 +8,9 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
+          <a class="nav-link" href="?r=cliente">Cliente</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" aria-current="page" href="?r=produto">Produto</a>
         </li>
         <li class="nav-item">
