@@ -1,0 +1,11 @@
+.page-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-bottom: 30px;
+}
+
+label {
+  font-weight: bold;
+  color: #333;
+}
