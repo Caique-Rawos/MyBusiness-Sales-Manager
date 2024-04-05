@@ -14,15 +14,13 @@
 
     if ($response !== false) {
         $data = json_decode($response);
-    
-        if ($data !== null) {
-            if (isset($data->arquivo)) {
-                return strval($data->arquivo);
-            }
+
+        if ($data !== null && isset($data->arquivo)) {
+            return strval($data->arquivo);
         }
     }
 
-    return 'dashboard/dashboard.php';
+    return null;
 
     curl_close($curl);
 ?>
