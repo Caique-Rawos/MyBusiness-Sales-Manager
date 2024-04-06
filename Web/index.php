@@ -23,12 +23,16 @@
   </head>
   <body>
 
-    <?php include_once 'navbar/navbar.php';?>
+    <?php include_once 'navbar/navbar.html';?>
 
     <div id="Body">
       <?php
         $local = include_once 'api/requisicao/paginas.php';
-        include_once($local);
+        if(isset($local) && file_exists($local)) {
+          include_once($local);
+        }else{
+          include_once('dashboard/dashboard.html');
+        }
       ?>
     </div>
     
