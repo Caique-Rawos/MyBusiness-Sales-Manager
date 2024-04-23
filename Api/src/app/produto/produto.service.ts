@@ -7,10 +7,15 @@ import { Repository } from 'typeorm';
 export class ProdutoService {
   constructor(
     @InjectRepository(ProdutoEntity)
-    private produtoRepository: Repository<ProdutoEntity>,
+    private repository: Repository<ProdutoEntity>,
   ) {}
 
+  async create(data: ProdutoEntity): Promise<ProdutoEntity> {
+    const object = await this.repository.create(data);
+    return this.repository.save(object);
+  }
+
   async findAll(): Promise<ProdutoEntity[]> {
-    return this.produtoRepository.find({ relations: ['categoria'] });
+    return this.repository.find({ relations: ['categoria'] });
   }
 }
