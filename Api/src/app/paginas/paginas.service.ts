@@ -7,10 +7,10 @@ import { Repository } from 'typeorm';
 export class PaginasService {
   constructor(
     @InjectRepository(PaginasEntity)
-    private paginasRepository: Repository<PaginasEntity>,
+    private repository: Repository<PaginasEntity>,
   ) {}
 
   async getPaginaByAlias(alias: string): Promise<PaginasEntity> {
-    return await this.paginasRepository.findOne({ where: { alias: alias } });
+    return await this.repository.findOne({ where: { alias: alias } });
   }
 }
