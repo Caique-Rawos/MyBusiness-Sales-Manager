@@ -3,7 +3,7 @@
 $host = 'localhost';
 $dbname = 'pagamentos';
 $username = 'root';
-password = ' ';
+$password = ' ';
 
 // Conectar ao banco de dados com tratamento de exceções
 try {
