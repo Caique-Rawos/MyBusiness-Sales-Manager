@@ -20,6 +20,45 @@
           confirmButtonText: "Ok",
         });
       }
+
+      function excluir(idCliente) {
+        if (confirm("Você Realmente deseja excluir este Cliente?")) {
+          alert("cliente excluido: " + idCliente);
+        }
+      }
+
+      $(document).ready(function () {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/cliente/buscaClientes.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((cliente) => {
+              $("#listaClientesCadastrados").html(
+                $("#listaClientesCadastrados").html() +
+                  "" +
+                  "<tr>" +
+                  '    <th scope="row">' +
+                  cliente.id +
+                  "</th>" +
+                  "    <td>" +
+                  cliente.nome +
+                  "</td>" +
+                  "    <td>" +
+                  cliente.cpfCnpj +
+                  "</td>" +
+                  "</tr>" +
+                  ""
+              );
+            });
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            mensagemErro("Erro ao Carregar Clientes");
+          },
+          dataType: "json",
+        });
+      });
     </script>
   </head>
   <body>
@@ -86,6 +125,21 @@
         </div>
         <button type="submit" class="btn btn-primary">Cadastrar</button>
       </form>
+    </div>
+
+    <div class="container mt-5">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Nome</th>
+            <th scope="col">CPF/CNPJ</th>
+          </tr>
+        </thead>
+        <tbody id="listaClientesCadastrados">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
     </div>
 
     <script>
