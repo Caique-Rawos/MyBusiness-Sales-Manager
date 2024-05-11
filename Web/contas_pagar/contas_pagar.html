@@ -2,8 +2,291 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+
+    <script>
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function aplicarMascara(input) {
+        input.value = input.value.replace(/\D/g, "");
+        const valorPago = (parseFloat(input.value) / 100).toFixed(2);
+        input.value = !isNaN(valorPago) ? valorPago : (0.0).toFixed(2);
+      }
+
+      function carregaFormaPagamento() {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/forma_pagamento/buscaFormaPagamento.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((pagamento) => {
+              $("#id_forma_pagamento").html(
+                $("#id_forma_pagamento").html() +
+                  '<option value="' +
+                  pagamento.id +
+                  '">' +
+                  pagamento.descricao +
+                  "</option>"
+              );
+            });
+
+            $("#id_forma_pagamento").val(1);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Erro ao Carregar Forma De Pagamento");
+          },
+          dataType: "json",
+        });
+      }
+
+      function carregaStatusPagamento() {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/status_pagamento/buscaStatusPagamento.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((statusPagamento) => {
+              $("#id_status_pagamento").html(
+                $("#id_status_pagamento").html() +
+                  '<option value="' +
+                  statusPagamento.id +
+                  '">' +
+                  statusPagamento.descricao +
+                  "</option>"
+              );
+            });
+
+            $("#id_status_pagamento").val(1);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            mensagemErro("Erro ao Carregar Status de Pagamento");
+          },
+          dataType: "json",
+        });
+      }
+
+      function carregaListaContasPagar() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url: "./api/requisicao/contas_pagar/buscaContasPagar.php",
+            success: function (data) {
+              const jsonData = JSON.parse(data);
+
+              jsonData.forEach((contasPagar) => {
+                const data = new Date(contasPagar.dataVencimento);
+
+                const dia = String(data.getDate()).padStart(2, "0");
+                const mes = String(data.getMonth() + 1).padStart(2, "0");
+                const ano = data.getFullYear();
+
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                $("#listaContasPagarCadastrados").html(
+                  $("#listaContasPagarCadastrados").html() +
+                    "" +
+                    "<tr>" +
+                    '<th scope="row">' +
+                    contasPagar.id +
+                    "</th>" +
+                    "<td>" +
+                    contasPagar.descricao +
+                    "</td>" +
+                    "<td>" +
+                    contasPagar.valorTotal.replace(".", ",") +
+                    "</td>" +
+                    "<td style='color: " +
+                    contasPagar.statusPagamento.cor +
+                    "'>" +
+                    contasPagar.statusPagamento.descricao +
+                    "</td>" +
+                    "<td>" +
+                    dataFormatada +
+                    "</td>" +
+                    "</tr>" +
+                    ""
+                );
+              });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              mensagemErro("Erro ao Carregar Contas a pagar");
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      $(document).ready(function () {
+        carregaFormaPagamento();
+        carregaStatusPagamento();
+        carregaListaContasPagar();
+
+        $("#formularioContasPagar").submit(function (e) {
+          e.preventDefault();
+
+          $.ajax({
+            type: "POST",
+            url: "./api/requisicao/contas_pagar/cadastroAtualizarContasPagar.php",
+            data: $(this).serialize(),
+            success: function (response) {
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Salvo Com Sucesso",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+
+              setTimeout(function () {
+                location.reload();
+              }, 1500);
+            },
+            error: function (xhr, status, error) {
+              mensagemErro(xhr.responseText);
+            },
+          });
+        });
+      });
+    </script>
   </head>
   <body>
-    <h1>Contas Pagar</h1>
+    <div class="container">
+      <h1 class="text-center mt-3 page-title">Contas a Pagar</h1>
+      <form id="formularioContasPagar">
+        <div class="row">
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="codigo" class="form-label">Código</label>
+              <input
+                type="text"
+                class="form-control"
+                id="codigo"
+                name="codigo"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-9">
+            <div class="mb-3 form-group">
+              <label for="descricao" class="form-label">Descrição</label>
+              <input
+                type="text"
+                class="form-control"
+                id="descricao"
+                name="descricao"
+                maxlength="150"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-md-4">
+            <div class="mb-3 form-group">
+              <label for="valorTotal" class="form-label">Valor Total</label>
+              <input
+                type="text"
+                class="form-control"
+                id="valorTotal"
+                name="valorTotal"
+                value="0.00"
+                oninput="aplicarMascara(this)"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <div class="mb-3 form-group">
+              <label for="valorPago" class="form-label">Valor Pago</label>
+              <input
+                type="text"
+                class="form-control"
+                id="valorPago"
+                name="valorPago"
+                value="0.00"
+                oninput="aplicarMascara(this)"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-4">
+            <div class="mb-3 form-group">
+              <label for="dataVencimento" class="form-label"
+                >Data de Vencimento</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="dataVencimento"
+                name="dataVencimento"
+                required
+              />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-md-6">
+            <div class="mb-3 form-group">
+              <label for="id_status_pagamento" class="form-label"
+                >Status do Pagamento</label
+              >
+              <select
+                class="form-select form-control"
+                id="id_status_pagamento"
+                name="id_status_pagamento"
+              >
+                <!-- Montado no .ready da pagina -->
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6">
+            <div class="mb-3 form-group">
+              <label for="id_forma_pagamento" class="form-label"
+                >Forma de Pagamento</label
+              >
+              <select
+                class="form-select form-control"
+                id="id_forma_pagamento"
+                name="id_forma_pagamento"
+              >
+                <!-- Montado no .ready da pagina -->
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-md-2">
+          <div class="mt-3 form-group">
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="container mt-5">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Descrição</th>
+            <th scope="col">Valor Total</th>
+            <th scope="col">Status</th>
+            <th scope="col">Vencimento</th>
+          </tr>
+        </thead>
+        <tbody id="listaContasPagarCadastrados">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
