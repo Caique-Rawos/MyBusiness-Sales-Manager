@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity({ name: 'produto' })
@@ -70,7 +71,7 @@ export class ProdutoEntity {
   })
   idCategoria!: number;
 
-  @OneToOne(() => CategoriaEntity)
+  @ManyToOne(() => CategoriaEntity)
   @JoinColumn({ name: 'id_categoria' })
   categoria: CategoriaEntity;
 }

@@ -9,6 +9,8 @@ import {
   OneToOne,
   JoinColumn,
   CreateDateColumn,
+  OneToMany,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity({ name: 'contas_receber' })
@@ -53,7 +55,7 @@ export class ContasReceberEntity {
   })
   idPagamento!: number;
 
-  @OneToOne(() => PagamentoEntity)
+  @ManyToOne(() => PagamentoEntity)
   @JoinColumn({ name: 'id_pagamento' })
   pagamento: PagamentoEntity;
 
@@ -64,7 +66,7 @@ export class ContasReceberEntity {
   })
   idStatusPagamento!: number;
 
-  @OneToOne(() => StatusPagamentoEntity)
+  @ManyToOne(() => StatusPagamentoEntity)
   @JoinColumn({ name: 'id_status_pagamento' })
   statusPagamento: StatusPagamentoEntity;
 
