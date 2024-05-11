@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   OneToOne,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity({ name: 'venda' })
@@ -38,7 +39,7 @@ export class VendaEntity {
   })
   idCliente!: number;
 
-  @OneToOne(() => ClienteEntity)
+  @ManyToOne(() => ClienteEntity)
   @JoinColumn({ name: 'id_cliente' })
   cliente: ClienteEntity;
 }
