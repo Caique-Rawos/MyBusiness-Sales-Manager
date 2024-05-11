@@ -7,6 +7,12 @@ import { PaginasModule } from './app/paginas/paginas.module';
 import { ProdutoModule } from './app/produto/produto.module';
 import { CategoriaModule } from './app/categoria/categoria.module';
 import { ClienteModule } from './app/cliente/cliente.module';
+import { VendaModule } from './app/venda/venda.module';
+import { VendaItemModule } from './app/venda_item/venda_item.module';
+import { PagamentoModule } from './app/pagamento/pagamento.module';
+import { StatusPagamentoModule } from './app/status_pagamento/status_pagamento.module';
+import { ContasPagarModule } from './app/contas_pagar/contas_pagar.module';
+import { ContasReceberModule } from './app/contas_receber/contas_receber.module';
 
 @Module({
   imports: [
@@ -25,6 +31,12 @@ import { ClienteModule } from './app/cliente/cliente.module';
     ProdutoModule,
     CategoriaModule,
     ClienteModule,
+    VendaModule,
+    VendaItemModule,
+    PagamentoModule,
+    StatusPagamentoModule,
+    ContasPagarModule,
+    ContasReceberModule,
   ],
   controllers: [AppController],
   providers: [AppService],
