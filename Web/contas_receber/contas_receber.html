@@ -1,9 +1,96 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-  </head>
-  <body>
-    <h1>Contas Receber</h1>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contas a Receber</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1 class="text-center mt-3 page-title">Contas a receber</h1>
+    <form class="needs-validation mt-5" id="contasReceberForm" novalidate>
+        <div class="row">
+            <div class="col-sm-12 col-md-2">
+                <div class="mb-3 form-group">
+                    <label for="codigo" class="form-label">Código</label>
+                    <input type="text" class="form-control" id="codigo" name="codigo" readonly>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-10">
+                <div class="mb-3 form-group">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <input type="text" class="form-control" id="descricao" name="descricao" placeholder="Digite a conta que será recebida">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-5">
+                <div class="mb-3 form-group">
+                    <label for="valorTotal" class="form-label">Valor Total</label>
+                    <input type="text" class="form-control" id="valorTotal" name="valorTotal">
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-3">
+                <div class="mb-3 form-group">
+                    <label for="valorPago" class="form-label">Valor Pago</label>
+                    <input type="text" class="form-control" id="valorPago" name="valorPago">
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-4">
+                <div class="mb-3 form-group">
+                    <label for="dataVencimento" class="form-label">Data de Vencimento</label>
+                    <input type="date" class="form-control" id="dataVencimento" name="dataVencimento">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-6">
+                <div class="mb-3 form-group">
+                    <label for="idPagamento" class="form-label">Pagamento</label>
+                    <input type="text" class="form-control" id="idPagamento" name="idPagamento">
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <div class="mb-3 form-group">
+                    <label for="idStatusPagamento" class="form-label">Status de Pagamento</label>
+                    <input type="text" class="form-control" id="idStatusPagamento" name="idStatusPagamento">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="mb-3 form-group">
+                    <label for="idVenda" class="form-label">Venda</label>
+                    <input type="text" class="form-control" id="idVenda" name="idVenda">
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+</div>
+
+<script>
+    // JSON fornecido
+    var json = {
+        "descricao": "Venda de produtos",
+        "valorTotal": 1199.99,
+        "valorPago": 0,
+        "dataVencimento": "2024-04-22",
+        "idPagamento": 1,
+        "idStatusPagamento": 1,
+        "idVenda": null
+    };
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
 </html>
