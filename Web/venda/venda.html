@@ -1,16 +1,76 @@
 <!DOCTYPE html>
 <html lang="PT-BR">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="venda.css">
-    <title>Vendas</title>
-</head>
-<body>
-    <h1>Vendas</h1>
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Texto cabeçalho (TITULO) -->
+      <h1 class="text-center mt-3 page-title">Controle de Vendas</h1>
+      <form class="needs-validation mt-5" novalidate>
+        <div class="row">
+          <div class="col-sm-12 col-md-2">
+            <div class="mb-3 form-group">
+              <!-- CODIGO da compra -->
+              <label for="codigo" class="form-label">Código</label>
+              <input
+                type="text"
+                class="form-control"
+                id="codigo"
+                name="codigo"
+                readonly
+              />
+            </div>
+          </div>
 
-    
+          <!-- select cliente -->
+          <div class="col-sm-12 col-md-5">
+            <div class="mb-3 form-group">
+              <label for="select" class="form-label">Selecionar Cliente</label>
+              <select
+                class="form-select form-select-mb"
+                name="SelecionarCliente"
+                id="SelecionarCliente"
+              >
+                <option selected>Cliente</option>
+                <option value="">Romário</option>
+                <option value="">Caíque</option>
+                <option value="">Jonas</option>
+                <option value="">Raquel</option>
+              </select>
+            </div>
+          </div>
 
-    
-  
-</body>
+          <!-- CALENDARIO -->
+
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="dataVenda" class="form-label">Data da Venda</label>
+              <input
+                type="date"
+                class="form-control"
+                id="dataVenda"
+                name="dataVenda"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-2">
+            <div class="mb-3 form-group">
+              <label for="ValorTotal" class="form-label">Valor Total</label>
+              <input
+                type="text"
+                class="form-control"
+                id="ValorTotal"
+                name="ValorTotal"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Adicionar Item</button>
+      </form>
+    </div>
+  </body>
 </html>
