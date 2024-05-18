@@ -18,6 +18,9 @@ export class ContasPagarService {
   async findAll(): Promise<ContasPagarEntity[]> {
     return this.repository.find({
       relations: ['pagamento', 'statusPagamento'],
+      order: {
+        id: 'DESC',
+      },
     });
   }
 }

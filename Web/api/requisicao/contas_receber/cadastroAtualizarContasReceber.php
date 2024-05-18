@@ -11,8 +11,9 @@ exit;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $codigo = isset($_POST["codigo"]) ? $_POST['codigo'] : '';
+    $idVenda = isset($_POST["idVenda"]) && floatval($_POST["idVenda"]) > 0 ? $_POST['idVenda'] : null;
     $descricao = isset($_POST["descricao"]) && trim($_POST['descricao']) != '' ? $_POST['descricao'] : msgHttpCode(400, 'Descrição não pode estar vazio');
-    $valorTotal = isset($_POST["valorTotal"]) && floatval($_POST["valorTotal"]) > 0 ? $_POST["valorTotal"] : msgHttpCode(400, 'Valor Total precisa ser maior que 0');
+    $valorTotal = isset($_POST["valorTotal"]) && floatval($_POST["valorTotal"]) > 0 ? $_POST["valorTotal"] : (isset($_POST["ignoraZero"]) &&  $_POST["ignoraZero"] == true ? $_POST["valorTotal"] : msgHttpCode(400, 'Valor Total precisa ser maior que 0'));
     $valorPago = isset($_POST["valorPago"]) ? $_POST["valorPago"] : msgHttpCode(400, 'Valor Pago não pode estar vazio');
     $dataVencimento = isset($_POST["dataVencimento"]) && trim($_POST['dataVencimento']) != '' ? $_POST["dataVencimento"] : msgHttpCode(400, 'Data Vencimento não pode estar vazia');
     $id_forma_pagamento = isset($_POST["id_forma_pagamento"]) ? intval($_POST["id_forma_pagamento"]) : msgHttpCode(400, 'Forma Pagamento não pode estar vazia');
@@ -25,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'dataVencimento' => $dataVencimento,
         'idPagamento' => $id_forma_pagamento,
         'idStatusPagamento' => $id_status_pagamento,
-        'idVenda' => null
+        'idVenda' => $idVenda
       );
     
       $json_data = json_encode($data);
