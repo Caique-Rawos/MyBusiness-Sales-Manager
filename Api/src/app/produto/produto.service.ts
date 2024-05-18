@@ -23,4 +23,15 @@ export class ProdutoService {
       },
     });
   }
+
+  async atualizaEstoque(id_produto: number, quantidade: number) {
+    const produto = await this.repository.findOne({
+      where: { id: id_produto },
+    });
+
+    produto.estoque = produto.estoque - quantidade;
+    await this.repository.save(produto);
+
+    return;
+  }
 }

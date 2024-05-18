@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { VendaItemEntity } from './entity/venda_item.entity';
 import { Repository } from 'typeorm';
 import { VendaService } from '../venda/venda.service';
+import { ProdutoService } from '../produto/produto.service';
 
 @Injectable()
 export class VendaItemService {
@@ -10,6 +11,7 @@ export class VendaItemService {
     @InjectRepository(VendaItemEntity)
     private repository: Repository<VendaItemEntity>,
     private vendaService: VendaService,
+    private produtoService: ProdutoService,
   ) {}
 
   async create(data: VendaItemEntity): Promise<VendaItemEntity> {
@@ -33,23 +35,24 @@ export class VendaItemService {
     });
   }
 
-  async NovoTotalVenda(id_venda: number): Promise<number> {
+  async novoTotalVenda(id_venda: number): Promise<void> {
     const vendaItens = await this.findByIdVenda(id_venda);
     let totalSubtotais: number = 0;
-
-    console.log(vendaItens);
 
     vendaItens.forEach((vendaItem) => {
       totalSubtotais += Number(vendaItem.subTotal);
     });
 
-    console.log(totalSubtotais);
-
     this.vendaService.atualizaTotal({
       id_venda: id_venda,
       total: totalSubtotais,
     });
+  }
 
-    return totalSubtotais;
+  async atualizaEstoqueProduto(
+    id_produto: number,
+    quantidade: number,
+  ): Promise<void> {
+    this.produtoService.atualizaEstoque(id_produto, quantidade);
   }
 }
