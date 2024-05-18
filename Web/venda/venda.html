@@ -1,9 +1,242 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="PT-BR">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function carregaClientes() {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/cliente/buscaClientes.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((cliente) => {
+              $("#selecionarCliente").html(
+                $("#selecionarCliente").html() +
+                  '<option value="' +
+                  cliente.id +
+                  '">' +
+                  cliente.nome +
+                  "</option>"
+              );
+            });
+
+            $("#selecionarCliente").val(0);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Erro ao Carregar Clientes");
+          },
+          dataType: "json",
+        });
+      }
+
+      function carregaListaVendas() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url: "./api/requisicao/vendas/buscaVendas.php",
+            success: function (data) {
+              const jsonData = JSON.parse(data);
+
+              jsonData.forEach((vendas) => {
+                const data = new Date(vendas.dataVenda);
+
+                const dia = String(data.getDate()).padStart(2, "0");
+                const mes = String(data.getMonth() + 1).padStart(2, "0");
+                const ano = data.getFullYear();
+
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                $("#listaVendasCadastradas").html(
+                  $("#listaVendasCadastradas").html() +
+                    "" +
+                    "<tr>" +
+                    '<th scope="row">' +
+                    vendas.id +
+                    "</th>" +
+                    "<td>" +
+                    vendas.cliente.nome +
+                    "</td>" +
+                    "<td>" +
+                    vendas.totalVenda.replace(".", ",") +
+                    "</td>" +
+                    "<td>" +
+                    dataFormatada +
+                    "</td>" +
+                    "<td>" +
+                    "<button class='btn btn-success' onclick='telaItem(" +
+                    vendas.id +
+                    ")'><i class='fa-solid fa-square-plus' style='color: white'></i></button>" +
+                    "</td>" +
+                    "</tr>" +
+                    ""
+                );
+              });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              mensagemErro("Erro ao Carregar Contas a pagar");
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      function telaItem(idVenda) {
+        var baseUrl = window.location.origin + window.location.pathname;
+        var newUrl = baseUrl + "?r=venda_item&id_venda=" + idVenda;
+        window.location.href = newUrl;
+      }
+
+      $(document).ready(function () {
+        carregaClientes();
+        carregaListaVendas();
+
+        $("#formularioVendas").submit(function (e) {
+          e.preventDefault();
+
+          $.ajax({
+            type: "POST",
+            url: "./api/requisicao/vendas/cadastroAtualizarVendas.php",
+            data: $(this).serialize(),
+            success: function (response) {
+              if (response.id > 0) {
+                const dados = {
+                  codigo: "",
+                  descricao: "Lançamento de Venda",
+                  idVenda: response.id,
+                  valorTotal: "0.00",
+                  valorPago: "0.00",
+                  dataVencimento: response.dataVenda,
+                  id_forma_pagamento: 1,
+                  id_status_pagamento: 1,
+                  ignoraZero: true,
+                };
+
+                $.ajax({
+                  type: "POST",
+                  url: "./api/requisicao/contas_receber/cadastroAtualizarContasReceber.php",
+                  data: dados,
+                  success: function (response) {},
+                  error: function (xhr, status, error) {},
+                });
+              }
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Salvo Com Sucesso",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+
+              setTimeout(function () {
+                location.reload();
+              }, 1500);
+            },
+            error: function (xhr, status, error) {
+              mensagemErro(xhr.responseText);
+            },
+            dataType: "json",
+          });
+        });
+      });
+    </script>
   </head>
   <body>
-    <h1>Venda</h1>
+    <div class="container">
+      <!-- Texto cabeçalho (TITULO) -->
+      <h1 class="text-center mt-3 page-title">Vendas</h1>
+      <form class="needs-validation mt-5" id="formularioVendas" novalidate>
+        <div class="row">
+          <div class="col-sm-12 col-md-2">
+            <div class="mb-3 form-group">
+              <!-- CODIGO da compra -->
+              <label for="codigo" class="form-label">Código</label>
+              <input
+                type="text"
+                class="form-control"
+                id="codigo"
+                name="codigo"
+                readonly
+              />
+            </div>
+          </div>
+
+          <!-- select cliente -->
+          <div class="col-sm-12 col-md-5">
+            <div class="mb-3 form-group">
+              <label for="selecionarCliente" class="form-label"
+                >Selecionar Cliente</label
+              >
+              <select
+                class="form-select form-select-mb"
+                name="selecionarCliente"
+                id="selecionarCliente"
+              >
+                <!-- Montado no .ready da pagina -->
+              </select>
+            </div>
+          </div>
+
+          <!-- CALENDARIO -->
+
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="dataVenda" class="form-label">Data da Venda</label>
+              <input
+                type="date"
+                class="form-control"
+                id="dataVenda"
+                name="dataVenda"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-2">
+            <div class="mb-3 form-group">
+              <label for="valorTotal" class="form-label">Valor Total</label>
+              <input
+                type="text"
+                class="form-control"
+                id="valorTotal"
+                name="valorTotal"
+                value="0.00"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+      </form>
+    </div>
+
+    <div class="container mt-5">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Valor Total</th>
+            <th scope="col">Data</th>
+            <th scope="col">Itens</th>
+          </tr>
+        </thead>
+        <tbody id="listaVendasCadastradas">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>

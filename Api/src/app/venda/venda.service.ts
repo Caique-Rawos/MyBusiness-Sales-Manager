@@ -4,13 +4,14 @@ import { VendaEntity } from './entity/venda.entity';
 import { Repository } from 'typeorm';
 import { ContasReceberService } from '../contas_receber/contas_receber.service';
 import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.entity';
+import { VendaUpdateDto } from './dto/atualizaTotalVenda.dto';
 
 @Injectable()
 export class VendaService {
   constructor(
     @InjectRepository(VendaEntity)
     private repository: Repository<VendaEntity>,
-    private serviceContasReceber: ContasReceberService,
+    private contasReceberService: ContasReceberService,
   ) {}
 
   async create(data: VendaEntity): Promise<VendaEntity> {
@@ -19,6 +20,22 @@ export class VendaService {
   }
 
   async findAll(): Promise<VendaEntity[]> {
-    return this.repository.find({ relations: ['cliente'] });
+    return this.repository.find({
+      relations: ['cliente'],
+      order: {
+        id: 'DESC',
+      },
+    });
+  }
+
+  async atualizaTotal(vendaUpdateDto: VendaUpdateDto) {
+    const venda = await this.repository.findOne({
+      where: { id: vendaUpdateDto.id_venda },
+    });
+    venda.totalVenda = vendaUpdateDto.total;
+    await this.repository.save(venda);
+
+    this.contasReceberService.atualizaTotal(vendaUpdateDto);
+    return;
   }
 }

@@ -16,6 +16,11 @@ export class ProdutoService {
   }
 
   async findAll(): Promise<ProdutoEntity[]> {
-    return this.repository.find({ relations: ['categoria'] });
+    return this.repository.find({
+      relations: ['categoria'],
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 }

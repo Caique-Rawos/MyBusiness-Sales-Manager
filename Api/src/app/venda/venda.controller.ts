@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { VendaService } from './venda.service';
 import { VendaEntity } from './entity/venda.entity';
+import { VendaUpdateDto } from './dto/atualizaTotalVenda.dto';
+import { ContasReceberService } from '../contas_receber/contas_receber.service';
 
 @Controller('venda')
 export class VendaController {
@@ -8,7 +10,8 @@ export class VendaController {
 
   @Post()
   async create(@Body() vendaData: VendaEntity): Promise<VendaEntity> {
-    return this.vendaService.create(vendaData);
+    const result = await this.vendaService.create(vendaData);
+    return result;
   }
 
   @Get()

@@ -16,6 +16,10 @@ export class ClienteService {
   }
 
   async findAll(): Promise<ClienteEntity[]> {
-    return this.repository.find();
+    return this.repository.find({
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 }

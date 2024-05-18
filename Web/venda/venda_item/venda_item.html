@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      function getValue(paramName) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(paramName);
+      }
+
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function aplicarMascara(input) {
+        input.value = input.value.replace(/\D/g, "");
+        const valorPago = (parseFloat(input.value) / 100).toFixed(2);
+        input.value = !isNaN(valorPago) ? valorPago : (0.0).toFixed(2);
+      }
+
+      function aplicarMascaraInteiro(input) {
+        input.value = input.value.replace(/\D/g, "");
+      }
+
+      function carregaProduto() {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/produto/buscaProduto.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((cliente) => {
+              $("#selecionarProduto").html(
+                $("#selecionarProduto").html() +
+                  '<option value="' +
+                  cliente.id +
+                  '">' +
+                  cliente.descricao +
+                  "</option>"
+              );
+            });
+
+            $("#selecionarProduto").val(0);
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log("Erro ao Carregar Produtos");
+          },
+          dataType: "json",
+        });
+      }
+
+      function carregaListaVendasItem() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url:
+              "./api/requisicao/vendas/venda_item/buscaVendaItem.php?id_venda=" +
+              getValue("id_venda"),
+            success: function (data) {
+              const jsonData = JSON.parse(data);
+
+              jsonData.forEach((vendaitem) => {
+                $("#listaVendaItemCadastrados").html(
+                  $("#listaVendaItemCadastrados").html() +
+                    "" +
+                    "<tr>" +
+                    '<th scope="row">' +
+                    vendaitem.id +
+                    "</th>" +
+                    "<td>" +
+                    vendaitem.produto.descricao +
+                    "</td>" +
+                    "<td>" +
+                    vendaitem.precoUnitario.replace(".", ",") +
+                    "</td>" +
+                    "<td>" +
+                    vendaitem.desconto.replace(".", ",") +
+                    "</td>" +
+                    "<td>" +
+                    vendaitem.quantidade.replace(".", ",") +
+                    "</td>" +
+                    "<td>" +
+                    vendaitem.subTotal.replace(".", ",") +
+                    "</td>" +
+                    "</tr>" +
+                    ""
+                );
+              });
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              mensagemErro("Erro ao Carregar Contas a pagar");
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      function atualizaSubTotal() {
+        $("#quantidade, #valor_desconto, #valor_venda").on(
+          "input",
+          function () {
+            if ($("#quantidade").val() > 0 && $("#valor_venda").val() > 0) {
+              $("#subTotal").val(
+                (
+                  ($("#valor_venda").val() - $("#valor_desconto").val()) *
+                  $("#quantidade").val()
+                ).toFixed(2)
+              );
+            }
+          }
+        );
+      }
+
+      $(document).ready(function () {
+        carregaProduto();
+        carregaListaVendasItem();
+        atualizaSubTotal();
+
+        var inputElement = document.getElementById("id_venda");
+        inputElement.value = getValue("id_venda");
+
+        $("#formularioVendasItem").submit(function (e) {
+          e.preventDefault();
+
+          $.ajax({
+            type: "POST",
+            url: "./api/requisicao/vendas/venda_item/cadastroAtualizarVendaItem.php",
+            data: $(this).serialize(),
+            success: function (response) {
+              Swal.fire({
+                position: "top-end",
+                icon: "success",
+                title: "Salvo Com Sucesso",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+
+              setTimeout(function () {
+                location.reload();
+              }, 1500);
+            },
+            error: function (xhr, status, error) {
+              mensagemErro(xhr.responseText);
+            },
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Texto cabeçalho (TITULO) -->
+      <h1 class="text-center mt-3 page-title">Itens</h1>
+      <form class="needs-validation mt-5" id="formularioVendasItem" novalidate>
+        <div class="row">
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="codigo" class="form-label">Código do Item</label>
+              <input
+                type="text"
+                class="form-control"
+                id="codigo"
+                name="codigo"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="codigo" class="form-label">Código da venda</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_venda"
+                name="id_venda"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-12 col-md-6">
+            <div class="mb-3 form-group">
+              <label for="selecionarProduto" class="form-label">Produto</label>
+              <select
+                class="form-select form-select-mb"
+                name="selecionarProduto"
+                id="selecionarProduto"
+              >
+                <!-- Montado no .ready da pagina -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="valor_venda" class="form-label"
+                >Valor de Venda (unitario)</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="valor_venda"
+                name="valor_venda"
+                oninput="aplicarMascara(this)"
+                value="0"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="valor_desconto" class="form-label"
+                >Valor de Desconto (unitario)</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="valor_desconto"
+                name="valor_desconto"
+                oninput="aplicarMascara(this)"
+                value="0"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="quantidade" class="form-label">Quantidade</label>
+              <input
+                type="text"
+                class="form-control"
+                id="quantidade"
+                name="quantidade"
+                oninput="aplicarMascaraInteiro(this)"
+                value="0"
+                required
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="subTotal" class="form-label">Sub Total</label>
+              <input
+                type="text"
+                class="form-control"
+                id="subTotal"
+                name="subTotal"
+                oninput="aplicarMascara(this)"
+                value="0"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+      </form>
+    </div>
+
+    <div class="container mt-5">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Produto</th>
+            <th scope="col">Valor Unitario</th>
+            <th scope="col">Desconto Unitario</th>
+            <th scope="col">Quantidade</th>
+            <th scope="col">Sub Total</th>
+          </tr>
+        </thead>
+        <tbody id="listaVendaItemCadastrados">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>
