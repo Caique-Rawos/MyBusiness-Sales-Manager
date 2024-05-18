@@ -8,6 +8,8 @@ import { VendaService } from '../venda/venda.service';
 import { VendaEntity } from '../venda/entity/venda.entity';
 import { ContasReceberService } from '../contas_receber/contas_receber.service';
 import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.entity';
+import { ProdutoService } from '../produto/produto.service';
+import { ProdutoEntity } from '../produto/entity/produtos.entity';
 
 @Module({
   imports: [
@@ -15,10 +17,16 @@ import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.ent
       VendaItemEntity,
       VendaEntity,
       ContasReceberEntity,
+      ProdutoEntity,
     ]),
     VendaModule,
   ],
-  providers: [VendaItemService, VendaService, ContasReceberService],
+  providers: [
+    VendaItemService,
+    VendaService,
+    ContasReceberService,
+    ProdutoService,
+  ],
   controllers: [VendaItemController],
 })
 export class VendaItemModule {}
