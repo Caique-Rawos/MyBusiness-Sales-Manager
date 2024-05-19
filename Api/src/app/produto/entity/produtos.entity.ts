@@ -1,4 +1,4 @@
-import { CategoriaEntity } from 'src/app/categoria/entity/categoria.entity';
+import { CategoriaEntity } from '../../categoria/entity/categoria.entity';
 import {
   Entity,
   Column,
