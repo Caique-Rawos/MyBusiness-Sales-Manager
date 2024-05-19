@@ -9,5 +9,5 @@ export class StatusPagamentoEntity {
   descricao!: string;
 
   @Column({ name: 'cor', type: 'varchar', length: 50, nullable: false })
-  cor!: number;
+  cor!: string;
 }

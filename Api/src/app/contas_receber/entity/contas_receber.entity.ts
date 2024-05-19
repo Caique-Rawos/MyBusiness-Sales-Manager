@@ -1,7 +1,6 @@
-import { PagamentoEntity } from 'src/app/pagamento/entity/pagamento.entity';
-import { ProdutoEntity } from 'src/app/produto/entity/produtos.entity';
-import { StatusPagamentoEntity } from 'src/app/status_pagamento/entity/status_pagamento.entity';
-import { VendaEntity } from 'src/app/venda/entity/venda.entity';
+import { PagamentoEntity } from '../../pagamento/entity/pagamento.entity';
+import { StatusPagamentoEntity } from '../../status_pagamento/entity/status_pagamento.entity';
+import { VendaEntity } from '../../venda/entity/venda.entity';
 import {
   Entity,
   Column,
@@ -9,7 +8,6 @@ import {
   OneToOne,
   JoinColumn,
   CreateDateColumn,
-  OneToMany,
   ManyToOne,
 } from 'typeorm';
 

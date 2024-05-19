@@ -1,11 +1,9 @@
-import { ClienteEntity } from 'src/app/cliente/entity/cliente.entity';
-import { ProdutoEntity } from 'src/app/produto/entity/produtos.entity';
-import { VendaEntity } from 'src/app/venda/entity/venda.entity';
+import { ProdutoEntity } from '../../produto/entity/produtos.entity';
+import { VendaEntity } from '../../venda/entity/venda.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToOne,
   JoinColumn,
   ManyToOne,
 } from 'typeorm';

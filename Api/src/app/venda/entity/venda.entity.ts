@@ -1,4 +1,4 @@
-import { ClienteEntity } from 'src/app/cliente/entity/cliente.entity';
+import { ClienteEntity } from '../../cliente/entity/cliente.entity';
 import {
   Entity,
   Column,
@@ -30,7 +30,7 @@ export class VendaEntity {
     nullable: true,
     default: () => 'CURRENT_TIMESTAMP',
   })
-  dataVenda: Date;
+  dataVenda?: Date;
 
   @Column({
     name: 'id_cliente',

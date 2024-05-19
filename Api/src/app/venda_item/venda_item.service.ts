@@ -37,13 +37,9 @@ export class VendaItemService {
     const vendaItens = await this.findByIdVenda(id_venda);
     let totalSubtotais: number = 0;
 
-    console.log(vendaItens);
-
     vendaItens.forEach((vendaItem) => {
       totalSubtotais += Number(vendaItem.subTotal);
     });
-
-    console.log(totalSubtotais);
 
     this.vendaService.atualizaTotal({
       id_venda: id_venda,
