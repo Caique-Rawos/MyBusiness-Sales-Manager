@@ -1,4 +1,4 @@
 <?php 
-$apiPath = 'localhost:3000/';
+$apiPath = 'https://mybusiness-api.caiquerawos.com/';
 define("API_PATH", $apiPath);
 ?>
