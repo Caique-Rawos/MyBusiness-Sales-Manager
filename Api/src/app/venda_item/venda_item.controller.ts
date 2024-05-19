@@ -11,7 +11,11 @@ export class VendaItemController {
     @Body() vendaItemData: VendaItemEntity,
   ): Promise<VendaItemEntity> {
     const result = await this.vendaItemService.create(vendaItemData);
-    await this.vendaItemService.NovoTotalVenda(vendaItemData.idVenda);
+    await this.vendaItemService.novoTotalVenda(vendaItemData.idVenda);
+    await this.vendaItemService.atualizaEstoqueProduto(
+      vendaItemData.idProduto,
+      vendaItemData.quantidade,
+    );
     return result;
   }
 
