@@ -84,4 +84,28 @@ describe('ProdutoService', () => {
     expect(result).toEqual(produtos);
     expect(repository.find).toHaveBeenCalled();
   });
+
+  describe('atualizaEstoque', () => {
+    it('should update the stock of the product', async () => {
+      const idProduto = 1;
+      const quantidade = 5;
+
+      const produtoMock = {
+        id: idProduto,
+        estoque: 10,
+      };
+
+      jest
+        .spyOn(repository, 'findOne')
+        .mockResolvedValue(produtoMock as ProdutoEntity);
+      const saveSpy = jest
+        .spyOn(repository, 'save')
+        .mockResolvedValue(produtoMock as ProdutoEntity);
+
+      await service.atualizaEstoque(idProduto, quantidade);
+
+      expect(produtoMock.estoque).toBe(5);
+      expect(saveSpy).toHaveBeenCalledWith(produtoMock);
+    });
+  });
 });

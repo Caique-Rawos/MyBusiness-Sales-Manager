@@ -18,7 +18,8 @@ describe('VendaItemController', () => {
             create: jest.fn(),
             findAll: jest.fn(),
             findByIdVenda: jest.fn(),
-            NovoTotalVenda: jest.fn(),
+            novoTotalVenda: jest.fn(),
+            atualizaEstoqueProduto: jest.fn(),
           },
         },
       ],
@@ -40,7 +41,8 @@ describe('VendaItemController', () => {
               create: jest.fn(),
               findAll: jest.fn(),
               findByIdVenda: jest.fn(),
-              NovoTotalVenda: jest.fn(),
+              novoTotalVenda: jest.fn(),
+              atualizaEstoqueProduto: jest.fn(),
             },
           },
         ],
@@ -85,15 +87,13 @@ describe('VendaItemController', () => {
     };
 
     jest.spyOn(service, 'create').mockResolvedValue(vendaItemData);
-    jest
-      .spyOn(service, 'NovoTotalVenda')
-      .mockResolvedValue(vendaItemData.idVenda);
+    jest.spyOn(service, 'novoTotalVenda').mockResolvedValue();
 
     const result = await controller.create(vendaItemData);
 
     expect(result).toBe(vendaItemData);
     expect(service.create).toHaveBeenCalledWith(vendaItemData);
-    expect(service.NovoTotalVenda).toHaveBeenCalledWith(vendaItemData.idVenda);
+    expect(service.novoTotalVenda).toHaveBeenCalledWith(vendaItemData.idVenda);
   });
 
   it('should find all venda items', async () => {

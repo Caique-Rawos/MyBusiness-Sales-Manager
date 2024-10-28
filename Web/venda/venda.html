@@ -103,6 +103,25 @@
         carregaClientes();
         carregaListaVendas();
 
+        $("#gerarRelatorioBtn").click(function () {
+          const dataInicio = $("#dataInicio").val();
+          const dataFinal = $("#dataFinal").val();
+          const tipoRelatorio = $("#tipoRelatorio").val();
+          const tela =
+            tipoRelatorio == "1" ? "relatorio_venda" : "relatorio_cliente";
+          const url = `?r=${tela}&dataInicio=${dataInicio}&dataFinal=${dataFinal}`;
+
+          if (!dataInicio || !dataFinal || !tipoRelatorio) {
+            Swal.fire({
+              icon: "error",
+              title: "Atenção!",
+              text: "Por favor, preencha todos os campos antes de gerar o relatório.",
+            });
+            return;
+          }
+          window.location.href = url;
+        });
+
         $("#formularioVendas").submit(function (e) {
           e.preventDefault();
 
@@ -218,7 +237,20 @@
             </div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary mt-3" title="Cadastrar">
+            Cadastrar
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary mt-3"
+            data-bs-toggle="modal"
+            data-bs-target="#relatorioModal"
+            title="Relatório"
+          >
+            <i class="fas fa-file-alt"></i>
+          </button>
+        </div>
       </form>
     </div>
 
@@ -240,3 +272,53 @@
     </div>
   </body>
 </html>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="relatorioModal"
+  tabindex="-1"
+  aria-labelledby="relatorioModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="relatorioModalLabel">
+          Selecionar Relatório
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="dataInicio">Data de Início</label>
+          <input type="date" class="form-control" id="dataInicio" />
+        </div>
+        <div class="form-group">
+          <label for="dataFinal">Data Final</label>
+          <input type="date" class="form-control" id="dataFinal" />
+        </div>
+        <div class="form-group">
+          <label for="tipoRelatorio">Tipo de Relatório</label>
+          <select class="form-control" id="tipoRelatorio">
+            <option value="1">Relatório de Venda</option>
+            <option value="2">Relatório por Cliente</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Fechar
+        </button>
+        <button type="button" id="gerarRelatorioBtn" class="btn btn-primary">
+          Gerar Relatório
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

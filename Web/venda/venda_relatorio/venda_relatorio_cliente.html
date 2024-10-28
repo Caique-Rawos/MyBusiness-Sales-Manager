@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      function getValue(paramName) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(paramName);
+      }
+
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function zerado() {
+        $(".existeVendas").html("");
+        $("#naoExisteVendas").html("Nenhuma Venda Encontrada nesse periodo");
+      }
+
+      function carregaListaVendasRelatorio() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url:
+              "./api/requisicao/vendas/venda_relatorio/buscaVendaRelatorioCliente.php?dataInicio=" +
+              getValue("dataInicio") +
+              "&dataFinal=" +
+              getValue("dataFinal"),
+            success: function (data) {
+              let jsonData;
+
+              jsonData = typeof data === "string" ? JSON.parse(data) : data;
+
+              const vendas = jsonData.vendas;
+
+              if (vendas.length === 0) {
+                zerado();
+                return;
+              }
+
+              vendas.forEach((venda) => {
+                const valorVendaFormatado = `R$ ${parseFloat(venda.valorVendas)
+                  .toFixed(2)
+                  .replace(".", ",")}`;
+
+                $("#listaVendaRelatorio").html(
+                  $("#listaVendaRelatorio").html() +
+                    "" +
+                    "<tr>" +
+                    '<th scope="row">' +
+                    venda.idCliente +
+                    "</th>" +
+                    "<td>" +
+                    venda.nomeCliente +
+                    "</td>" +
+                    "<td>" +
+                    venda.quantidadeVendas +
+                    "</td>" +
+                    "<td>" +
+                    valorVendaFormatado +
+                    "</td>" +
+                    "</tr>" +
+                    ""
+                );
+              });
+
+              $("#total").html(
+                `R$ ${parseFloat(jsonData.totalVendas)
+                  .toFixed(2)
+                  .replace(".", ",")}`
+              );
+
+              $("#quantidade").html(`${parseInt(jsonData.quantidadeTotal)}`);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              mensagemErro("Erro ao Carregar Relatorio");
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      $(document).ready(function () {
+        carregaListaVendasRelatorio();
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container mt-5 existeVendas">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Quantidade Vendas</th>
+            <th scope="col">Valor Total</th>
+          </tr>
+        </thead>
+        <tbody id="listaVendaRelatorio">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="container mt-5 existeVendas">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 35%">Total</th>
+            <td scope="col" style="width: 40.5%" id="quantidade"></td>
+            <td scope="col" style="width: 24.5%" id="total"></td>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div id="naoExisteVendas" class="text-center" style="color: red"></div>
+  </body>
+</html>
