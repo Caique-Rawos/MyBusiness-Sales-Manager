@@ -99,12 +99,6 @@
         window.location.href = newUrl;
       }
 
-      function relatorio() {
-        var baseUrl = window.location.origin + window.location.pathname;
-        var newUrl = baseUrl + "?r=venda_item&id_venda=" + idVenda;
-        window.location.href = newUrl;
-      }
-
       $(document).ready(function () {
         carregaClientes();
         carregaListaVendas();
