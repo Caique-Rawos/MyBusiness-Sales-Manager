@@ -13,6 +13,7 @@ import { PagamentoModule } from './app/pagamento/pagamento.module';
 import { StatusPagamentoModule } from './app/status_pagamento/status_pagamento.module';
 import { ContasPagarModule } from './app/contas_pagar/contas_pagar.module';
 import { ContasReceberModule } from './app/contas_receber/contas_receber.module';
+import { VendaRelatorioModule } from './app/venda_relatorio/venda_relatorio.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ContasReceberModule } from './app/contas_receber/contas_receber.module'
     StatusPagamentoModule,
     ContasPagarModule,
     ContasReceberModule,
+    VendaRelatorioModule,
   ],
   controllers: [AppController],
   providers: [AppService],

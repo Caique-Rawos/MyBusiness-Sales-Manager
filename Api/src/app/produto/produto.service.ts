@@ -24,14 +24,12 @@ export class ProdutoService {
     });
   }
 
-  async atualizaEstoque(id_produto: number, quantidade: number) {
+  async atualizaEstoque(id_produto: number, quantidade: number): Promise<void> {
     const produto = await this.repository.findOne({
       where: { id: id_produto },
     });
 
     produto.estoque = produto.estoque - quantidade;
     await this.repository.save(produto);
-
-    return;
   }
 }

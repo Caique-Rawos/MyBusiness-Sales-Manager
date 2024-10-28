@@ -7,10 +7,13 @@ import { VendaService } from '../venda/venda.service';
 import { VendaEntity } from '../venda/entity/venda.entity';
 import { ContasReceberService } from '../contas_receber/contas_receber.service';
 import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.entity';
+import { ProdutoService } from '../produto/produto.service';
+import { ProdutoEntity } from '../produto/entity/produtos.entity';
 
 describe('VendaItemService', () => {
   let service: VendaItemService;
   let vendaService: VendaService;
+  let produtoService: ProdutoService;
   let repository: Repository<VendaItemEntity>;
 
   beforeEach(async () => {
@@ -19,6 +22,7 @@ describe('VendaItemService', () => {
         VendaItemService,
         VendaService,
         ContasReceberService,
+        ProdutoService,
         {
           provide: getRepositoryToken(VendaItemEntity),
           useClass: Repository,
@@ -31,11 +35,16 @@ describe('VendaItemService', () => {
           provide: getRepositoryToken(ContasReceberEntity),
           useClass: Repository,
         },
+        {
+          provide: getRepositoryToken(ProdutoEntity),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
     service = module.get<VendaItemService>(VendaItemService);
     vendaService = module.get<VendaService>(VendaService);
+    produtoService = module.get<ProdutoService>(ProdutoService);
     repository = module.get<Repository<VendaItemEntity>>(
       getRepositoryToken(VendaItemEntity),
     );
@@ -150,7 +159,7 @@ describe('VendaItemService', () => {
   });
 
   it('should return a list of venda items by venda id', async () => {
-    const idVenda = 1; // Preencha com o ID da venda
+    const idVenda = 1;
     const vendaItems: VendaItemEntity[] = [
       {
         id: 1,
@@ -286,10 +295,24 @@ describe('VendaItemService', () => {
     jest.spyOn(service, 'findByIdVenda').mockResolvedValue(vendaItems);
     jest.spyOn(vendaService, 'atualizaTotal').mockResolvedValue();
 
-    const result = await service.NovoTotalVenda(idVenda);
+    await service.novoTotalVenda(idVenda);
 
     expect(service.findByIdVenda).toHaveBeenCalledWith(idVenda);
     expect(vendaService.atualizaTotal).toHaveBeenCalled();
-    expect(result).toBe(62.97);
+  });
+
+  describe('atualizaEstoqueProduto', () => {
+    it('should call atualizaEstoque with correct parameters', async () => {
+      const idProduto = 1;
+      const quantidade = 5;
+
+      const atualizaEstoqueSpy = jest
+        .spyOn(produtoService, 'atualizaEstoque')
+        .mockResolvedValue(undefined);
+
+      await service.atualizaEstoqueProduto(idProduto, quantidade);
+
+      expect(atualizaEstoqueSpy).toHaveBeenCalledWith(idProduto, quantidade);
+    });
   });
 });
