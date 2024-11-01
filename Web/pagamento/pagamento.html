@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      .is-invalid {
+        border-color: #dc3545 !important;
+      }
+    </style>
+
+    <script>
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      $(document).ready(function () {
+        $.ajax({
+          type: "GET",
+          url: "./api/requisicao/forma_pagamento/buscaFormaPagamento.php",
+          success: function (data) {
+            const jsonData = JSON.parse(data);
+
+            jsonData.forEach((cliente) => {
+              $("#listaPagamentoCadastrados").html(
+                $("#listaPagamentoCadastrados").html() +
+                  "" +
+                  "<tr>" +
+                  '<th scope="row">' +
+                  cliente.id +
+                  "</th>" +
+                  "<td>" +
+                  cliente.descricao +
+                  "</td>" +
+                  "</tr>" +
+                  ""
+              );
+            });
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            mensagemErro("Erro ao Carregar Forma De Pagamento");
+          },
+          dataType: "json",
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-center mt-3 page-title">Pagamentos</h1>
+      <form class="needs-validation mt-5" novalidate>
+        <div class="row">
+          <div class="col-sm-12 col-md-3">
+            <div class="mb-3 form-group">
+              <label for="codigo" class="form-label">Código</label>
+              <input
+                type="text"
+                class="form-control"
+                id="codigo"
+                name="codigo"
+                readonly
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-9">
+            <div class="mb-3 form-group">
+              <label for="nome" class="form-label">Descricao</label>
+              <input
+                type="text"
+                class="form-control"
+                id="descricao"
+                name="descricao"
+                placeholder="Descricao"
+                required
+              />
+              <div class="invalid-feedback">
+                Por favor, insira a descricao da Forma de Pagamento.
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Cadastrar</button>
+      </form>
+    </div>
+
+    <div class="container mt-5">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">Codigo</th>
+            <th scope="col">Descricao</th>
+          </tr>
+        </thead>
+        <tbody id="listaPagamentoCadastrados">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var forms = document.querySelectorAll(".needs-validation");
+
+        Array.prototype.slice.call(forms).forEach(function (form) {
+          form.addEventListener(
+            "submit",
+            function (event) {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              } else {
+                event.preventDefault();
+                var formData = $(form).serialize();
+
+                $.ajax({
+                  type: "POST",
+                  url: "./api/requisicao/forma_pagamento/cadastroAtualizarFormaPagamento.php",
+                  data: formData,
+                  success: function (data) {
+                    data = JSON.parse(data);
+
+                    Swal.fire({
+                      position: "top-end",
+                      icon: "success",
+                      title: "Salvo Com Sucesso",
+                      showConfirmButton: false,
+                      timer: 1500,
+                    });
+
+                    if (data.id) {
+                      setTimeout(function () {
+                        location.reload();
+                      }, 1500);
+                    }
+                  },
+                  error: function (jqXHR, textStatus, errorThrown) {
+                    mensagemErro(jqXHR.responseText);
+                  },
+                });
+              }
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+      })();
+    </script>
+  </body>
+</html>
