@@ -86,11 +86,9 @@
 
               jsonData.forEach((contasPagar) => {
                 const data = new Date(contasPagar.dataVencimento);
-
-                const dia = String(data.getDate()).padStart(2, "0");
-                const mes = String(data.getMonth() + 1).padStart(2, "0");
-                const ano = data.getFullYear();
-
+                const dia = String(data.getUTCDate()).padStart(2, "0");
+                const mes = String(data.getUTCMonth() + 1).padStart(2, "0");
+                const ano = data.getUTCFullYear();
                 const dataFormatada = `${dia}/${mes}/${ano}`;
 
                 let lancamento = "Manual";

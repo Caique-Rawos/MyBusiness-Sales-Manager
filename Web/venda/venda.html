@@ -51,12 +51,13 @@
               const jsonData = JSON.parse(data);
 
               jsonData.forEach((vendas) => {
-                const data = new Date(vendas.dataVenda);
-
-                const dia = String(data.getDate()).padStart(2, "0");
-                const mes = String(data.getMonth() + 1).padStart(2, "0");
-                const ano = data.getFullYear();
-
+                const dataVenda = new Date(vendas.dataVenda);
+                const dia = String(dataVenda.getUTCDate()).padStart(2, "0");
+                const mes = String(dataVenda.getUTCMonth() + 1).padStart(
+                  2,
+                  "0"
+                );
+                const ano = dataVenda.getUTCFullYear();
                 const dataFormatada = `${dia}/${mes}/${ano}`;
 
                 $("#listaVendasCadastradas").html(
