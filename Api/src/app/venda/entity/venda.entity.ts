@@ -1,3 +1,4 @@
+import { VendaItemEntity } from 'src/app/venda_item/entity/venda_item.entity';
 import { ClienteEntity } from '../../cliente/entity/cliente.entity';
 import {
   Entity,
@@ -7,6 +8,7 @@ import {
   OneToOne,
   JoinColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'venda' })
@@ -42,4 +44,7 @@ export class VendaEntity {
   @ManyToOne(() => ClienteEntity)
   @JoinColumn({ name: 'id_cliente' })
   cliente: ClienteEntity;
+
+  @OneToMany(() => VendaItemEntity, (item) => item.venda)
+  itens: VendaItemEntity[];
 }

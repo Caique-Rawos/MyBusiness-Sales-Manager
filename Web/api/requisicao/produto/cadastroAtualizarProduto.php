@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $estoque = isset($_POST["estoque"]) && floatval($_POST["estoque"]) > 0 ? $_POST["estoque"] : msgHttpCode(400, 'Estoque precisa ser maior que 0');
     $unidade = isset($_POST["unidade"]) ? intval($_POST["unidade"]) : msgHttpCode(400, 'Unidade não pode estar vazia');
     $idCategoria = isset($_POST["idCategoria"]) ? intval($_POST["idCategoria"]) : msgHttpCode(400, 'Categoria não pode estar vazia');
+    $idRegraFiscal = isset($_POST["idRegraFiscal"]) ? intval($_POST["idRegraFiscal"]) : msgHttpCode(400, 'Regra Fiscal não pode estar vazia');
     
     $data = array(
         'descricao' => $descricao,
@@ -26,7 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         'valorVenda' => $precoVenda,
         'estoque' => $estoque,
         'unidade' => $unidade,
-        'idCategoria' => $idCategoria
+        'idCategoria' => $idCategoria,
+        'idRegraFiscal' => $idRegraFiscal
       );
     
       $json_data = json_encode($data);

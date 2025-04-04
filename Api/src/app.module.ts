@@ -14,6 +14,8 @@ import { StatusPagamentoModule } from './app/status_pagamento/status_pagamento.m
 import { ContasPagarModule } from './app/contas_pagar/contas_pagar.module';
 import { ContasReceberModule } from './app/contas_receber/contas_receber.module';
 import { VendaRelatorioModule } from './app/venda_relatorio/venda_relatorio.module';
+import { RegraFiscalModule } from './app/regra_fiscal/regra_fiscal.module';
+import { LojaModule } from './app/loja/loja.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { VendaRelatorioModule } from './app/venda_relatorio/venda_relatorio.modu
     ContasPagarModule,
     ContasReceberModule,
     VendaRelatorioModule,
+    RegraFiscalModule,
+    LojaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

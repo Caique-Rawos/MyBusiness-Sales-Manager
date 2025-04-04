@@ -18,13 +18,16 @@ export class VendaRelatorioController {
   }
 
   @Post('cliente')
-  findAllGroupByCliente(
-    @Body() filtro: IFiltroRelatorio,
-  ): Promise<{
+  findAllGroupByCliente(@Body() filtro: IFiltroRelatorio): Promise<{
     vendas: IVendaClienteRelatorio[];
     totalVendas: number;
     quantidadeTotal: number;
   }> {
     return this.vendaRelatorioService.findAllGroupByCliente(filtro);
+  }
+
+  @Post('cupom_fiscal')
+  generateCupomFiscal(@Body() filtro: { idVenda: number }) {
+    return this.vendaRelatorioService.generateCupomFiscal(filtro);
   }
 }

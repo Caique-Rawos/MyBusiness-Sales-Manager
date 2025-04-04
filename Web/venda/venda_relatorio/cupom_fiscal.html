@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      .div-centralizada {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        width: 400px;
+        padding: 20px;
+        background-color: #f5f5f5;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+
+    <script>
+      function getValue(paramName) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(paramName);
+      }
+
+      function zerado() {
+        $(".existeVendas").html("");
+        $("#naoExisteVendas").html("Nenhuma Item encontado nessa Venda");
+      }
+
+      function quatroDigitos() {
+        return Math.floor(1000 + Math.random() * 9000);
+      }
+      function doisDigitos() {
+        return Math.floor(10 + Math.random() * 90);
+      }
+
+      function formatarDataAtual() {
+        const agora = new Date();
+
+        const dia = String(agora.getDate()).padStart(2, "0");
+        const mes = String(agora.getMonth() + 1).padStart(2, "0");
+        const ano = agora.getFullYear();
+
+        const hora = String(agora.getHours()).padStart(2, "0");
+        const minuto = String(agora.getMinutes()).padStart(2, "0");
+        const segundo = String(agora.getSeconds()).padStart(2, "0");
+
+        $("#dataHoje").html(
+          `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`
+        );
+      }
+
+      function gerarNumeros() {
+        $("#numeroNfc").html(`${quatroDigitos()}${doisDigitos()}`);
+        $("#chaveAcesso").html(
+          `${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${quatroDigitos()} ${doisDigitos()}`
+        );
+      }
+
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function imprimirDiv(idDiv) {
+        const conteudo = document.getElementById(idDiv).innerHTML;
+
+        const janela = window.open("", "", "height=600,width=800");
+        janela.document.write(`
+      <html>
+        <head>
+          <title>Impressão</title>
+          <style>
+            /* Você pode adicionar estilos aqui */
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          ${conteudo}
+        </body>
+      </html>
+    `);
+        janela.document.close();
+        janela.focus();
+        janela.print();
+        janela.close();
+      }
+
+      function carregaCupomFiscal() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url:
+              "./api/requisicao/vendas/venda_relatorio/buscaCupomFiscal.php?id_venda=" +
+              getValue("id_venda"),
+            success: function (data) {
+              let jsonData;
+
+              jsonData = typeof data === "string" ? JSON.parse(data) : data;
+
+              const produtos = jsonData.cupomItens;
+
+              if (produtos.length === 0 || jsonData.loja === null) {
+                zerado();
+                return;
+              }
+
+              produtos.forEach((item) => {
+                $("#cupomFiscalProdutos").html(
+                  $("#cupomFiscalProdutos").html() +
+                    parseFloat(item.quantidade).toFixed(0) +
+                    "x " +
+                    item.descricao +
+                    "<br />" +
+                    "NCM: " +
+                    item.ncm +
+                    "<br />" +
+                    "Vlr Unit: R$ " +
+                    item.precounitario.replace(".", ",") +
+                    " | Total: R$ " +
+                    item.subtotal.replace(".", ",") +
+                    "<br />" +
+                    "ICMS: " +
+                    item.icms.replace(".", ",") +
+                    "% | PIS: " +
+                    item.pis.replace(".", ",") +
+                    "% | COFINS: " +
+                    item.cofins.replace(".", ",") +
+                    "% | IPI: " +
+                    item.ipi.replace(".", ",") +
+                    "%<br /><br />"
+                );
+              });
+
+              $("#totalTributado").html(
+                `${parseFloat(jsonData.tributosAproximados)
+                  .toFixed(2)
+                  .replace(".", ",")}`
+              );
+              $("#totalVendas").html(
+                `${parseFloat(jsonData.totalVendas)
+                  .toFixed(2)
+                  .replace(".", ",")}`
+              );
+
+              $("#nomeFantasia").html(`${jsonData.loja.nomeFantasia}`);
+              $("#cpfCnpj").html(`${jsonData.loja.cpfCnpj}`);
+              $("#ie").html(`${jsonData.loja.ie}`);
+              $("#endereco").html(`${jsonData.loja.endereco}`);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              zerado();
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      $(document).ready(function () {
+        carregaCupomFiscal();
+        gerarNumeros();
+        formatarDataAtual();
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container my-4 existeVendas">
+      <div class="d-flex justify-content-end mb-3">
+        <button
+          class="btn btn-success"
+          title="Imprimir"
+          onclick="imprimirDiv('cupomFiscal')"
+        >
+          <i class="fa-solid fa-print"></i>
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="existeVendas div-centralizada"
+      id="cupomFiscal"
+      style="font-family: monospace; font-size: 12px"
+    >
+      <h3 style="text-align: center"><span id="nomeFantasia"></span></h3>
+      <p style="text-align: center">
+        CNPJ: <span id="cpfCnpj"></span><br />
+        IE: <span id="ie"></span><br />
+        <span id="endereco"></span>
+      </p>
+      <hr />
+
+      <div id="cupomFiscalProdutos"></div>
+      <hr />
+
+      <strong>Subtotal:</strong> R$ <span id="totalVendas"></span><br />
+      <hr />
+
+      <strong>Tributos aproximados:</strong> R$
+      <span id="totalTributado"></span> (Fonte: IBPT)<br /><br />
+
+      NFC-e nº <span id="numeroNfc"></span><br />
+      Chave de Acesso: <span id="chaveAcesso"></span><br />
+
+      <img
+        src="img/qrCode.png"
+        alt="QR Code"
+        style="display: block; margin: auto; width: 150px"
+      />
+
+      <p style="text-align: center">Emitido em: <span id="dataHoje"></span></p>
+    </div>
+
+    <div id="naoExisteVendas" class="text-center" style="color: red"></div>
+  </body>
+</html>
