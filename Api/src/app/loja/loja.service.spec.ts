@@ -1,30 +1,37 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CategoriaService } from './loja.service';
-import { CategoriaEntity } from './entity/loja.entity';
+import { LojaEntity } from './entity/loja.entity';
+import { LojaService } from './loja.service';
 
-// Mock do repositório CategoriaEntity
-const categoriaRepositoryMock = {
+const lojaRepositoryMock = {
   create: jest.fn().mockReturnValue({}),
   save: jest.fn().mockReturnValue({}),
-  find: jest.fn().mockReturnValue([]),
+  findOne: jest.fn().mockReturnValue({}),
 };
 
-describe('CategoriaService', () => {
-  let service: CategoriaService;
+const lojaData: LojaEntity = {
+  id: 1,
+  nomeFantasia: 'teste',
+  cpfCnpj: '1231323',
+  ie: '12321',
+  endereco: 'teste',
+};
+
+describe('LojaService', () => {
+  let service: LojaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        CategoriaService,
+        LojaService,
         {
-          provide: getRepositoryToken(CategoriaEntity),
-          useValue: categoriaRepositoryMock,
+          provide: getRepositoryToken(LojaEntity),
+          useValue: lojaRepositoryMock,
         },
       ],
     }).compile();
 
-    service = module.get<CategoriaService>(CategoriaService);
+    service = module.get<LojaService>(LojaService);
   });
 
   afterEach(() => {
@@ -35,22 +42,21 @@ describe('CategoriaService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a new categoria', async () => {
-    const categoriaData: CategoriaEntity = {
-      id: 1,
-      descricao: 'teste',
-    };
+  it('should create a new loja', async () => {
+    await service.create(lojaData);
 
-    await service.create(categoriaData);
-
-    expect(categoriaRepositoryMock.create).toHaveBeenCalledWith(categoriaData);
-    expect(categoriaRepositoryMock.save).toHaveBeenCalled();
+    expect(lojaRepositoryMock.create).toHaveBeenCalledWith(lojaData);
+    expect(lojaRepositoryMock.save).toHaveBeenCalled();
   });
 
-  it('should return all categorias', async () => {
-    const result = await service.findAll();
+  it('should return all lojas', async () => {
+    const result = await service.findOnly();
 
-    expect(categoriaRepositoryMock.find).toHaveBeenCalled();
-    expect(result).toEqual([]);
+    expect(lojaRepositoryMock.findOne).toHaveBeenCalled();
+    expect(result).toEqual({});
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

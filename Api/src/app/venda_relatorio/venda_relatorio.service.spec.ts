@@ -1,13 +1,36 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VendaRelatorioService } from './venda_relatorio.service';
-import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { LojaService } from '../loja/loja.service';
 import { VendaEntity } from '../venda/entity/venda.entity';
 import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
+import { VendaRelatorioService } from './venda_relatorio.service';
+
+const mockLoja = {
+  findOnly: jest.fn().mockResolvedValue({
+    id: 1,
+    nomeFantasia: 'teste',
+    cpfCnpj: '1231323',
+    ie: '12321',
+    endereco: 'teste',
+  }),
+};
+
+const repositoryMock = {
+  find: jest.fn().mockReturnValue([]),
+  createQueryBuilder: jest.fn().mockReturnValue({
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    addSelect: jest.fn().mockReturnThis(),
+    where: jest.fn().mockReturnThis(),
+    groupBy: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    getRawMany: jest.fn().mockResolvedValue({}),
+  }),
+};
 
 describe('VendaService', () => {
   let service: VendaRelatorioService;
-  let repository: Repository<VendaEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -15,15 +38,16 @@ describe('VendaService', () => {
         VendaRelatorioService,
         {
           provide: getRepositoryToken(VendaEntity),
-          useClass: Repository,
+          useValue: repositoryMock,
+        },
+        {
+          provide: LojaService,
+          useValue: mockLoja,
         },
       ],
     }).compile();
 
     service = module.get<VendaRelatorioService>(VendaRelatorioService);
-    repository = module.get<Repository<VendaEntity>>(
-      getRepositoryToken(VendaEntity),
-    );
   });
 
   it('should be defined', () => {
@@ -52,7 +76,7 @@ describe('VendaService', () => {
         },
       ];
 
-      jest.spyOn(repository, 'find').mockResolvedValue(mockVendas as any);
+      jest.spyOn(repositoryMock, 'find').mockResolvedValue(mockVendas as any);
 
       const resultado = await service.findAll(filtro);
 
@@ -99,7 +123,7 @@ describe('VendaService', () => {
         },
       ];
 
-      jest.spyOn(repository, 'createQueryBuilder').mockReturnValue({
+      jest.spyOn(repositoryMock, 'createQueryBuilder').mockReturnValue({
         leftJoinAndSelect: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
         addSelect: jest.fn().mockReturnThis(),
@@ -128,6 +152,46 @@ describe('VendaService', () => {
         ],
         totalVendas: 500,
         quantidadeTotal: 5,
+      });
+    });
+  });
+
+  describe('generateCupomFiscal', () => {
+    it('should return data to cupom fiscal', async () => {
+      const filtro = {
+        idVenda: 1,
+      };
+
+      const mockCupom = [
+        {
+          subtotal: 100,
+          icms: 12,
+          pis: 12,
+          cofins: 12,
+          ipi: 12,
+        },
+      ];
+
+      jest.spyOn(repositoryMock, 'createQueryBuilder').mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        getRawMany: jest.fn().mockResolvedValue(mockCupom),
+      } as any);
+
+      const resultado = await service.generateCupomFiscal(filtro);
+
+      expect(resultado).toEqual({
+        cupomItens: mockCupom,
+        tributosAproximados: 48,
+        totalVendas: 100,
+        loja: {
+          id: 1,
+          nomeFantasia: 'teste',
+          cpfCnpj: '1231323',
+          ie: '12321',
+          endereco: 'teste',
+        },
       });
     });
   });

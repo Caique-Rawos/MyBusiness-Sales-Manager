@@ -1,32 +1,21 @@
 import { Module } from '@nestjs/common';
-import { VendaItemService } from './venda_item.service';
-import { VendaItemController } from './venda_item.controller';
-import { VendaItemEntity } from './entity/venda_item.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ContasReceberModule } from '../contas_receber/contas_receber.module';
+import { ProdutoModule } from '../produto/produto.module';
 import { VendaModule } from '../venda/venda.module';
-import { VendaService } from '../venda/venda.service';
-import { VendaEntity } from '../venda/entity/venda.entity';
-import { ContasReceberService } from '../contas_receber/contas_receber.service';
-import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.entity';
-import { ProdutoService } from '../produto/produto.service';
-import { ProdutoEntity } from '../produto/entity/produtos.entity';
+import { VendaItemEntity } from './entity/venda_item.entity';
+import { VendaItemController } from './venda_item.controller';
+import { VendaItemService } from './venda_item.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      VendaItemEntity,
-      VendaEntity,
-      ContasReceberEntity,
-      ProdutoEntity,
-    ]),
+    TypeOrmModule.forFeature([VendaItemEntity]),
     VendaModule,
+    ContasReceberModule,
+    ProdutoModule,
   ],
-  providers: [
-    VendaItemService,
-    VendaService,
-    ContasReceberService,
-    ProdutoService,
-  ],
+  providers: [VendaItemService],
   controllers: [VendaItemController],
+  exports: [VendaItemService],
 })
 export class VendaItemModule {}

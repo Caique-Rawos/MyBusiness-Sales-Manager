@@ -1,15 +1,14 @@
 import { VendaItemEntity } from 'src/app/venda_item/entity/venda_item.entity';
-import { ClienteEntity } from '../../cliente/entity/cliente.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  OneToOne,
+  Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ClienteEntity } from '../../cliente/entity/cliente.entity';
 
 @Entity({ name: 'venda' })
 export class VendaEntity {

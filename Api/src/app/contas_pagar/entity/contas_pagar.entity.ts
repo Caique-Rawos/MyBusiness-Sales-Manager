@@ -1,13 +1,13 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { PagamentoEntity } from '../../pagamento/entity/pagamento.entity';
 import { StatusPagamentoEntity } from '../../status_pagamento/entity/status_pagamento.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  JoinColumn,
-  CreateDateColumn,
-  ManyToOne,
-} from 'typeorm';
 
 @Entity({ name: 'contas_pagar' })
 export class ContasPagarEntity {

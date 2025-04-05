@@ -1,49 +1,30 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriaController } from './loja.controller';
-import { CategoriaService } from './loja.service';
-import { CategoriaEntity } from './entity/loja.entity';
-import { CategoriaModule } from './loja.module';
+import { LojaEntity } from './entity/loja.entity';
+import { LojaController } from './loja.controller';
+import { LojaService } from './loja.service';
 
-describe('CategoriaController', () => {
-  let controller: CategoriaController;
-  let service: CategoriaService;
+const mockService = {
+  create: jest.fn(),
+  findOnly: jest.fn(),
+};
+
+const lojaData = {} as unknown as LojaEntity;
+
+describe('LojaController', () => {
+  let controller: LojaController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [CategoriaController],
+      controllers: [LojaController],
       providers: [
         {
-          provide: CategoriaService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-          },
+          provide: LojaService,
+          useValue: mockService,
         },
       ],
     }).compile();
 
-    controller = module.get<CategoriaController>(CategoriaController);
-    service = module.get<CategoriaService>(CategoriaService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [CategoriaModule],
-        controllers: [CategoriaController],
-        providers: [
-          {
-            provide: CategoriaService,
-            useValue: {
-              create: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
+    controller = module.get<LojaController>(LojaController);
   });
 
   it('should be defined', () => {
@@ -51,33 +32,32 @@ describe('CategoriaController', () => {
   });
 
   describe('create', () => {
-    it('should create a new category', async () => {
-      const categoryData: CategoriaEntity = {
-        id: 1,
-        descricao: 'teste',
-      };
+    it('should create a new loja', async () => {
+      const spyCreate = jest
+        .spyOn(mockService, 'create')
+        .mockResolvedValue(lojaData);
 
-      jest.spyOn(service, 'create').mockResolvedValue(categoryData);
+      const result = await controller.create(lojaData);
 
-      const result = await controller.create(categoryData);
-
-      expect(result).toEqual(categoryData);
-      expect(service.create).toHaveBeenCalledWith(categoryData);
+      expect(result).toEqual(lojaData);
+      expect(spyCreate).toHaveBeenCalledWith(lojaData);
     });
   });
 
-  describe('findAll', () => {
-    it('should return all categories', async () => {
-      const categories: CategoriaEntity[] = [
-        // Defina as categorias aqui
-      ];
+  describe('findOnly', () => {
+    it('should return only lojas', async () => {
+      const spyFindOnly = jest
+        .spyOn(mockService, 'findOnly')
+        .mockResolvedValue(lojaData);
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(categories);
+      const result = await controller.findOnly();
 
-      const result = await controller.findAll();
-
-      expect(result).toEqual(categories);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(result).toEqual(lojaData);
+      expect(spyFindOnly).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

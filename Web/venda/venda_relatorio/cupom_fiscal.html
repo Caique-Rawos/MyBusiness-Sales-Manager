@@ -14,6 +14,10 @@
         background-color: #f5f5f5;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
+
+      .ocultar {
+        display: none;
+      }
     </style>
 
     <script>
@@ -24,7 +28,16 @@
 
       function zerado() {
         $(".existeVendas").html("");
+        $("#cupomFiscal").removeClass("div-centralizada");
         $("#naoExisteVendas").html("Nenhuma Item encontado nessa Venda");
+      }
+
+      function lojaVazia() {
+        $(".existeVendas").html("");
+        $("#cupomFiscal").removeClass("div-centralizada");
+        $("#naoExisteVendas").html(
+          "Dados da Loja não cadastrados, <a href='?r=loja'>Cadastre aqui</a>"
+        );
       }
 
       function quatroDigitos() {
@@ -69,6 +82,16 @@
         });
       }
 
+      function formatPorcentagens(valor) {
+        const value = typeof valor === "string" ? parseFloat(valor) : valor;
+
+        if (Number.isInteger(value)) {
+          return value.toString().replace(".", ",");
+        } else {
+          return value.toFixed(2).replace(".", ",");
+        }
+      }
+
       function imprimirDiv(idDiv) {
         const conteudo = document.getElementById(idDiv).innerHTML;
 
@@ -110,8 +133,13 @@
 
               const produtos = jsonData.cupomItens;
 
-              if (produtos.length === 0 || jsonData.loja === null) {
+              if (produtos.length === 0) {
                 zerado();
+                return;
+              }
+
+              if (jsonData.loja === null) {
+                lojaVazia();
                 return;
               }
 
@@ -131,13 +159,13 @@
                     item.subtotal.replace(".", ",") +
                     "<br />" +
                     "ICMS: " +
-                    item.icms.replace(".", ",") +
+                    formatPorcentagens(item.icms) +
                     "% | PIS: " +
-                    item.pis.replace(".", ",") +
+                    formatPorcentagens(item.pis) +
                     "% | COFINS: " +
-                    item.cofins.replace(".", ",") +
+                    formatPorcentagens(item.cofins) +
                     "% | IPI: " +
-                    item.ipi.replace(".", ",") +
+                    formatPorcentagens(item.ipi) +
                     "%<br /><br />"
                 );
               });
@@ -157,6 +185,8 @@
               $("#cpfCnpj").html(`${jsonData.loja.cpfCnpj}`);
               $("#ie").html(`${jsonData.loja.ie}`);
               $("#endereco").html(`${jsonData.loja.endereco}`);
+
+              $("#cupomFiscal").removeClass("ocultar");
             },
             error: function (jqXHR, textStatus, errorThrown) {
               zerado();
@@ -187,7 +217,7 @@
     </div>
 
     <div
-      class="existeVendas div-centralizada"
+      class="existeVendas div-centralizada ocultar"
       id="cupomFiscal"
       style="font-family: monospace; font-size: 12px"
     >

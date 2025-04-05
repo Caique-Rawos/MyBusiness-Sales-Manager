@@ -3,7 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { CategoriaService } from './categoria.service';
 import { CategoriaEntity } from './entity/categoria.entity';
 
-// Mock do repositório CategoriaEntity
 const categoriaRepositoryMock = {
   create: jest.fn().mockReturnValue({}),
   save: jest.fn().mockReturnValue({}),
@@ -36,10 +35,7 @@ describe('CategoriaService', () => {
   });
 
   it('should create a new categoria', async () => {
-    const categoriaData: CategoriaEntity = {
-      id: 1,
-      descricao: 'teste',
-    };
+    const categoriaData = {} as unknown as CategoriaEntity;
 
     await service.create(categoriaData);
 
@@ -52,5 +48,9 @@ describe('CategoriaService', () => {
 
     expect(categoriaRepositoryMock.find).toHaveBeenCalled();
     expect(result).toEqual([]);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

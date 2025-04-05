@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { VendaRelatorioService } from './venda_relatorio.service';
+import { Body, Controller, Post } from '@nestjs/common';
+import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
 import {
   IVendaClienteRelatorio,
   IVendaRelatorio,
 } from './interface/venda_relatorio.interface';
-import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
+import { VendaRelatorioService } from './venda_relatorio.service';
 
 @Controller('venda_relatorio')
 export class VendaRelatorioController {

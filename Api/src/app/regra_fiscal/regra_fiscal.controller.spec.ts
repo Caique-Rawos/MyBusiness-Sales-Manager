@@ -1,49 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoriaController } from './regra_fiscal.controller';
-import { CategoriaService } from './regra_fiscal.service';
-import { CategoriaEntity } from './entity/regra_fiscal.entity';
-import { CategoriaModule } from './regra_fiscal.module';
+import { RegraFiscalEntity } from './entity/regra_fiscal.entity';
+import { RegraFiscalController } from './regra_fiscal.controller';
+import { RegraFiscalService } from './regra_fiscal.service';
 
-describe('CategoriaController', () => {
-  let controller: CategoriaController;
-  let service: CategoriaService;
+const mockService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+};
+
+describe('RegraFiscalController', () => {
+  let controller: RegraFiscalController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [CategoriaController],
+      controllers: [RegraFiscalController],
       providers: [
         {
-          provide: CategoriaService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-          },
+          provide: RegraFiscalService,
+          useValue: mockService,
         },
       ],
     }).compile();
 
-    controller = module.get<CategoriaController>(CategoriaController);
-    service = module.get<CategoriaService>(CategoriaService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [CategoriaModule],
-        controllers: [CategoriaController],
-        providers: [
-          {
-            provide: CategoriaService,
-            useValue: {
-              create: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
+    controller = module.get<RegraFiscalController>(RegraFiscalController);
   });
 
   it('should be defined', () => {
@@ -52,32 +31,35 @@ describe('CategoriaController', () => {
 
   describe('create', () => {
     it('should create a new category', async () => {
-      const categoryData: CategoriaEntity = {
-        id: 1,
-        descricao: 'teste',
-      };
+      const regraFiscalData = {} as unknown as RegraFiscalEntity;
 
-      jest.spyOn(service, 'create').mockResolvedValue(categoryData);
+      const spyCreate = jest
+        .spyOn(mockService, 'create')
+        .mockResolvedValue(regraFiscalData);
 
-      const result = await controller.create(categoryData);
+      const result = await controller.create(regraFiscalData);
 
-      expect(result).toEqual(categoryData);
-      expect(service.create).toHaveBeenCalledWith(categoryData);
+      expect(result).toEqual(regraFiscalData);
+      expect(spyCreate).toHaveBeenCalledWith(regraFiscalData);
     });
   });
 
   describe('findAll', () => {
     it('should return all categories', async () => {
-      const categories: CategoriaEntity[] = [
-        // Defina as categorias aqui
-      ];
+      const regraFiscais = [];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(categories);
+      const spyFindAll = jest
+        .spyOn(mockService, 'findAll')
+        .mockResolvedValue(regraFiscais);
 
       const result = await controller.findAll();
 
-      expect(result).toEqual(categories);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(result).toEqual(regraFiscais);
+      expect(spyFindAll).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

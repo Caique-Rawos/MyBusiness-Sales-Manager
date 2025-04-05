@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RegraFiscalEntity } from './entity/regra_fiscal.entity';
 import { Repository } from 'typeorm';
-import { ClienteEntity } from '../cliente/entity/cliente.entity';
+import { RegraFiscalEntity } from './entity/regra_fiscal.entity';
 
 @Injectable()
 export class RegraFiscalService {

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { LojaService } from '../loja/loja.service';
 import { VendaEntity } from '../venda/entity/venda.entity';
 import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
 import {
   IVendaClienteRelatorio,
   IVendaRelatorio,
 } from './interface/venda_relatorio.interface';
-import { LojaService } from '../loja/loja.service';
 
 @Injectable()
 export class VendaRelatorioService {

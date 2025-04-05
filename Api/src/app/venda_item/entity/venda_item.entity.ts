@@ -1,12 +1,12 @@
-import { ProdutoEntity } from '../../produto/entity/produtos.entity';
-import { VendaEntity } from '../../venda/entity/venda.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
+  Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProdutoEntity } from '../../produto/entity/produtos.entity';
+import { VendaEntity } from '../../venda/entity/venda.entity';
 
 @Entity({ name: 'venda_item' })
 export class VendaItemEntity {

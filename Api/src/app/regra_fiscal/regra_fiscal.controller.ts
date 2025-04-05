@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { RegraFiscalService } from './regra_fiscal.service';
 import { RegraFiscalEntity } from './entity/regra_fiscal.entity';
+import { RegraFiscalService } from './regra_fiscal.service';
 
 @Controller('regra_fiscal')
 export class RegraFiscalController {
