@@ -1,12 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProdutoService } from './produto.service';
-import { Repository } from 'typeorm';
-import { ProdutoEntity } from './entity/produtos.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ProdutoEntity } from './entity/produtos.entity';
+import { ProdutoService } from './produto.service';
+
+const repositoryMock = {
+  create: jest.fn().mockReturnValue({}),
+  save: jest.fn().mockReturnValue({}),
+  find: jest.fn().mockReturnValue([]),
+  findOne: jest.fn().mockReturnValue({}),
+};
 
 describe('ProdutoService', () => {
   let service: ProdutoService;
-  let repository: Repository<ProdutoEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,75 +19,42 @@ describe('ProdutoService', () => {
         ProdutoService,
         {
           provide: getRepositoryToken(ProdutoEntity),
-          useClass: Repository,
+          useValue: repositoryMock,
         },
       ],
     }).compile();
 
     service = module.get<ProdutoService>(ProdutoService);
-    repository = module.get<Repository<ProdutoEntity>>(
-      getRepositoryToken(ProdutoEntity),
-    );
   });
 
   it('should create a produto entity', async () => {
-    const produtoData: ProdutoEntity = {
-      id: 1,
-      descricao: 'Descrição do Produto',
-      codigoDeBarra: '1234567890123',
-      valorCusto: 50.0,
-      valorVenda: 80.0,
-      estoque: 100,
-      unidade: 'UN',
-      image: 'caminho/para/imagem.jpg',
-      idCategoria: 1,
-      categoria: { id: 1, descricao: 'produto' },
-    };
+    const produtoData = {} as unknown as ProdutoEntity;
 
-    jest.spyOn(repository, 'create').mockReturnValue(produtoData);
-    jest.spyOn(repository, 'save').mockResolvedValue(produtoData);
+    const spyCreate = jest
+      .spyOn(repositoryMock, 'create')
+      .mockReturnValue(produtoData);
+    const spySave = jest
+      .spyOn(repositoryMock, 'save')
+      .mockResolvedValue(produtoData);
 
     const result = await service.create(produtoData);
 
     expect(result).toEqual(produtoData);
-    expect(repository.create).toHaveBeenCalledWith(produtoData);
-    expect(repository.save).toHaveBeenCalledWith(produtoData);
+    expect(spyCreate).toHaveBeenCalledWith(produtoData);
+    expect(spySave).toHaveBeenCalledWith(produtoData);
   });
 
   it('should return a list of produtos', async () => {
-    const produtos: ProdutoEntity[] = [
-      {
-        id: 1,
-        descricao: 'Descrição do Produto',
-        codigoDeBarra: '1234567890123',
-        valorCusto: 50.0,
-        valorVenda: 80.0,
-        estoque: 100,
-        unidade: 'UN',
-        image: 'caminho/para/imagem.jpg',
-        idCategoria: 1,
-        categoria: { id: 1, descricao: 'produto' },
-      },
-      {
-        id: 2,
-        descricao: 'Descrição do Produto 2',
-        codigoDeBarra: '12345123120123',
-        valorCusto: 40.0,
-        valorVenda: 50.0,
-        estoque: 200,
-        unidade: 'UN',
-        image: '',
-        idCategoria: 1,
-        categoria: { id: 1, descricao: 'produto' },
-      },
-    ];
+    const produtos = [];
 
-    jest.spyOn(repository, 'find').mockResolvedValue(produtos);
+    const spyFind = jest
+      .spyOn(repositoryMock, 'find')
+      .mockResolvedValue(produtos);
 
     const result = await service.findAll();
 
     expect(result).toEqual(produtos);
-    expect(repository.find).toHaveBeenCalled();
+    expect(spyFind).toHaveBeenCalled();
   });
 
   describe('atualizaEstoque', () => {
@@ -96,10 +68,11 @@ describe('ProdutoService', () => {
       };
 
       jest
-        .spyOn(repository, 'findOne')
+        .spyOn(repositoryMock, 'findOne')
         .mockResolvedValue(produtoMock as ProdutoEntity);
+
       const saveSpy = jest
-        .spyOn(repository, 'save')
+        .spyOn(repositoryMock, 'save')
         .mockResolvedValue(produtoMock as ProdutoEntity);
 
       await service.atualizaEstoque(idProduto, quantidade);
@@ -107,5 +80,9 @@ describe('ProdutoService', () => {
       expect(produtoMock.estoque).toBe(5);
       expect(saveSpy).toHaveBeenCalledWith(produtoMock);
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

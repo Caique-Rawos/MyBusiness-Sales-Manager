@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VendaRelatorioController } from './venda_relatorio.controller';
 import { VendaRelatorioService } from './venda_relatorio.service';
-import { VendaRelatorioModule } from './venda_relatorio.module';
-import {
-  IVendaClienteRelatorio,
-  IVendaRelatorio,
-} from './interface/venda_relatorio.interface';
+
+const mockService = {
+  findAllGroupByCliente: jest.fn(),
+  findAll: jest.fn(),
+  generateCupomFiscal: jest.fn(),
+};
 
 describe('VendaRelatorioController', () => {
   let controller: VendaRelatorioController;
-  let service: VendaRelatorioService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -17,36 +17,12 @@ describe('VendaRelatorioController', () => {
       providers: [
         {
           provide: VendaRelatorioService,
-          useValue: {
-            findAllGroupByCliente: jest.fn(),
-            findAll: jest.fn(),
-          },
+          useValue: mockService,
         },
       ],
     }).compile();
 
     controller = module.get<VendaRelatorioController>(VendaRelatorioController);
-    service = module.get<VendaRelatorioService>(VendaRelatorioService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [VendaRelatorioModule],
-        controllers: [VendaRelatorioController],
-        providers: [
-          {
-            provide: VendaRelatorioService,
-            useValue: {
-              findAllGroupByCliente: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
   });
 
   it('should be defined', () => {
@@ -55,20 +31,11 @@ describe('VendaRelatorioController', () => {
 
   describe('findAll', () => {
     it('should findAll vendas', async () => {
-      const vendaData: { vendas: IVendaRelatorio[]; totalVendas: number } = {
-        vendas: [
-          {
-            idVenda: 1,
-            valorVenda: 12,
-            dataVenda: new Date('2024-10-27'),
-            nomeCliente: 'jorge',
-            idCliente: 1,
-          },
-        ],
-        totalVendas: 12,
-      };
+      const vendaData = {};
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(vendaData);
+      const spyFindAll = jest
+        .spyOn(mockService, 'findAll')
+        .mockResolvedValue(vendaData);
 
       const result = await controller.findAll({
         dataInicio: new Date('2024-10-27'),
@@ -76,7 +43,7 @@ describe('VendaRelatorioController', () => {
       });
 
       expect(result).toEqual(vendaData);
-      expect(service.findAll).toHaveBeenCalledWith({
+      expect(spyFindAll).toHaveBeenCalledWith({
         dataInicio: new Date('2024-10-27'),
         dataFim: new Date('2024-10-27'),
       });
@@ -85,23 +52,11 @@ describe('VendaRelatorioController', () => {
 
   describe('findAllGroupByCliente', () => {
     it('should return all vendas grouped by cliente', async () => {
-      const vendas: {
-        vendas: IVendaClienteRelatorio[];
-        totalVendas: number;
-        quantidadeTotal: number;
-      } = {
-        vendas: [
-          {
-            idCliente: 1,
-            nomeCliente: 'jorge',
-            valorVendas: 12,
-            quantidadeVendas: 1,
-          },
-        ],
-        totalVendas: 12,
-        quantidadeTotal: 1,
-      };
-      jest.spyOn(service, 'findAllGroupByCliente').mockResolvedValue(vendas);
+      const vendas = {};
+
+      const spyFindAllGroupByCliente = jest
+        .spyOn(mockService, 'findAllGroupByCliente')
+        .mockResolvedValue(vendas);
 
       const result = await controller.findAllGroupByCliente({
         dataInicio: new Date('2024-10-27'),
@@ -109,10 +64,33 @@ describe('VendaRelatorioController', () => {
       });
 
       expect(result).toEqual(vendas);
-      expect(service.findAllGroupByCliente).toHaveBeenCalledWith({
+      expect(spyFindAllGroupByCliente).toHaveBeenCalledWith({
         dataInicio: new Date('2024-10-27'),
         dataFim: new Date('2024-10-27'),
       });
     });
+  });
+
+  describe('generateCupomFiscal', () => {
+    it('should return data to cupom fiscal', async () => {
+      const cupomFiscal = {};
+
+      const spyGenerateCupomFiscal = jest
+        .spyOn(mockService, 'generateCupomFiscal')
+        .mockResolvedValue(cupomFiscal);
+
+      const result = await controller.generateCupomFiscal({
+        idVenda: 1,
+      });
+
+      expect(result).toEqual(cupomFiscal);
+      expect(spyGenerateCupomFiscal).toHaveBeenCalledWith({
+        idVenda: 1,
+      });
+    });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

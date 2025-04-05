@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { PaginasService } from './paginas.service';
 import { PaginasEntity } from './entity/paginas.entity';
-import { Repository } from 'typeorm';
+import { PaginasService } from './paginas.service';
+
+const repositoryMock = {
+  findOne: jest.fn().mockReturnValue({}),
+};
 
 describe('PaginasService', () => {
   let service: PaginasService;
-  let repository: Repository<PaginasEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,15 +16,12 @@ describe('PaginasService', () => {
         PaginasService,
         {
           provide: getRepositoryToken(PaginasEntity),
-          useClass: Repository,
+          useValue: repositoryMock,
         },
       ],
     }).compile();
 
     service = module.get<PaginasService>(PaginasService);
-    repository = module.get<Repository<PaginasEntity>>(
-      getRepositoryToken(PaginasEntity),
-    );
   });
 
   it('should be defined', () => {
@@ -39,12 +38,18 @@ describe('PaginasService', () => {
       ativo: true,
     };
 
-    jest.spyOn(repository, 'findOne').mockResolvedValue(expectedResult);
+    const spyFindOne = jest
+      .spyOn(repositoryMock, 'findOne')
+      .mockResolvedValue(expectedResult);
 
     const result = await service.getPaginaByAlias(alias);
     expect(result).toEqual(expectedResult);
-    expect(repository.findOne).toHaveBeenCalledWith({
+    expect(spyFindOne).toHaveBeenCalledWith({
       where: { alias: alias },
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

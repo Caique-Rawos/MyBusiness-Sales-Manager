@@ -1,12 +1,12 @@
-import { CategoriaEntity } from '../../categoria/entity/categoria.entity';
+import { RegraFiscalEntity } from 'src/app/regra_fiscal/entity/regra_fiscal.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
+  Entity,
   JoinColumn,
   ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CategoriaEntity } from '../../categoria/entity/categoria.entity';
 
 @Entity({ name: 'produto' })
 export class ProdutoEntity {
@@ -74,4 +74,15 @@ export class ProdutoEntity {
   @ManyToOne(() => CategoriaEntity)
   @JoinColumn({ name: 'id_categoria' })
   categoria: CategoriaEntity;
+
+  @Column({
+    name: 'id_regra_fiscal',
+    type: 'int',
+    nullable: true,
+  })
+  idRegraFiscal!: number;
+
+  @ManyToOne(() => RegraFiscalEntity)
+  @JoinColumn({ name: 'id_regra_fiscal' })
+  regraFiscal: RegraFiscalEntity;
 }

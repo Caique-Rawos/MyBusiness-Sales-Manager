@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 import { ClienteEntity } from './entity/cliente.entity';
 

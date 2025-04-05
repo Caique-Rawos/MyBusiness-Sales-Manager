@@ -1,10 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { VendaRelatorioService } from './venda_relatorio.service';
+import { Body, Controller, Post } from '@nestjs/common';
+import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
 import {
   IVendaClienteRelatorio,
   IVendaRelatorio,
 } from './interface/venda_relatorio.interface';
-import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
+import { VendaRelatorioService } from './venda_relatorio.service';
 
 @Controller('venda_relatorio')
 export class VendaRelatorioController {
@@ -18,13 +18,16 @@ export class VendaRelatorioController {
   }
 
   @Post('cliente')
-  findAllGroupByCliente(
-    @Body() filtro: IFiltroRelatorio,
-  ): Promise<{
+  findAllGroupByCliente(@Body() filtro: IFiltroRelatorio): Promise<{
     vendas: IVendaClienteRelatorio[];
     totalVendas: number;
     quantidadeTotal: number;
   }> {
     return this.vendaRelatorioService.findAllGroupByCliente(filtro);
+  }
+
+  @Post('cupom_fiscal')
+  generateCupomFiscal(@Body() filtro: { idVenda: number }) {
+    return this.vendaRelatorioService.generateCupomFiscal(filtro);
   }
 }

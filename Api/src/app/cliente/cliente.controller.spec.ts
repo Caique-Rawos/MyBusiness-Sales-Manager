@@ -2,11 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ClienteController } from './cliente.controller';
 import { ClienteService } from './cliente.service';
 import { ClienteEntity } from './entity/cliente.entity';
-import { ClienteModule } from './cliente.module';
+
+const mockService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+};
 
 describe('ClienteController', () => {
   let controller: ClienteController;
-  let service: ClienteService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,36 +17,12 @@ describe('ClienteController', () => {
       providers: [
         {
           provide: ClienteService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-          },
+          useValue: mockService,
         },
       ],
     }).compile();
 
     controller = module.get<ClienteController>(ClienteController);
-    service = module.get<ClienteService>(ClienteService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [ClienteModule],
-        controllers: [ClienteController],
-        providers: [
-          {
-            provide: ClienteService,
-            useValue: {
-              create: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
   });
 
   it('should be defined', () => {
@@ -52,33 +31,35 @@ describe('ClienteController', () => {
 
   describe('create', () => {
     it('should create a new client', async () => {
-      const clienteData: ClienteEntity = {
-        id: 1,
-        nome: 'Teste',
-        cpfCnpj: '123231123',
-      };
+      const clienteData = {} as unknown as ClienteEntity;
 
-      jest.spyOn(service, 'create').mockResolvedValue(clienteData);
+      const spyCreate = jest
+        .spyOn(mockService, 'create')
+        .mockResolvedValue(clienteData);
 
       const result = await controller.create(clienteData);
 
       expect(result).toEqual(clienteData);
-      expect(service.create).toHaveBeenCalledWith(clienteData);
+      expect(spyCreate).toHaveBeenCalledWith(clienteData);
     });
   });
 
   describe('findAll', () => {
     it('should return all clients', async () => {
-      const clients: ClienteEntity[] = [
-        // Defina os clientes aqui
-      ];
+      const clients = [];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(clients);
+      const spyFindAll = jest
+        .spyOn(mockService, 'findAll')
+        .mockResolvedValue(clients);
 
       const result = await controller.findAll();
 
       expect(result).toEqual(clients);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(spyFindAll).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

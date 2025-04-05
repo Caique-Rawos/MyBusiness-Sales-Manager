@@ -1,13 +1,14 @@
-import { ClienteEntity } from '../../cliente/entity/cliente.entity';
+import { VendaItemEntity } from 'src/app/venda_item/entity/venda_item.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
-  OneToOne,
+  Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ClienteEntity } from '../../cliente/entity/cliente.entity';
 
 @Entity({ name: 'venda' })
 export class VendaEntity {
@@ -42,4 +43,7 @@ export class VendaEntity {
   @ManyToOne(() => ClienteEntity)
   @JoinColumn({ name: 'id_cliente' })
   cliente: ClienteEntity;
+
+  @OneToMany(() => VendaItemEntity, (item) => item.venda)
+  itens: VendaItemEntity[];
 }

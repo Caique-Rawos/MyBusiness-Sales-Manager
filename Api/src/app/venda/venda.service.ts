@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VendaEntity } from './entity/venda.entity';
 import { Repository } from 'typeorm';
 import { ContasReceberService } from '../contas_receber/contas_receber.service';
-import { ContasReceberEntity } from '../contas_receber/entity/contas_receber.entity';
 import { VendaUpdateDto } from './dto/atualizaTotalVenda.dto';
+import { VendaEntity } from './entity/venda.entity';
 
 @Injectable()
 export class VendaService {

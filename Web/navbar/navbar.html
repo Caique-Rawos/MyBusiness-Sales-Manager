@@ -1,62 +1,85 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <style>
-    .dropdown-menu {
-      display: none;
-    }
-
-    .dropdown.show .dropdown-menu {
-      display: block;
-    }
-
-    .image-container {
-      margin-top: 0;
-      transition: margin-top 0.3s ease-in-out;
-    }
-
-    .dropdown.show ~ .image-container {
-      margin-top: 150px;
-    }
-  </style>
-
+<nav
+  class="navbar navbar-expand-lg bg-light navbar-light"
+  style="font-size: larger"
+>
   <div class="container-fluid">
-    <a class="navbar-brand" href="index.php"
-      ><i class="fa-solid fa-house"></i
+    <a style="margin-left: 1.5%" class="navbar-brand" href="index.php"
+      ><i class="fa-solid fa-house fa-lg"></i
     ></a>
     <button
       class="navbar-toggler"
       type="button"
       data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-      aria-controls="navbarNav"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
       aria-expanded="false"
       aria-label="Toggle navigation"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="?r=cliente">Cliente</a>
+          <a class="nav-link" aria-current="page" href="?r=cliente">Cliente</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="?r=produto">Produto</a>
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Produto
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="?r=produto">Cadastro</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="?r=regra_fiscal">Regra Fiscal</a>
+            </li>
+          </ul>
         </li>
+
         <li class="nav-item">
           <a class="nav-link" href="?r=venda">Venda</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="?r=contas_receber">Contas a Receber</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="?r=contas_pagar">Contas a Pagar</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="?r=pagamento">Pagamento</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="?r=status_pagamento">Status Pagamento</a>
+
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            Financeiro
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="?r=contas_receber"
+                >Contas a Receber</a
+              >
+            </li>
+            <li>
+              <a class="dropdown-item" href="?r=contas_pagar">Contas a Pagar</a>
+            </li>
+            <li><a class="dropdown-item" href="?r=pagamento">Pagamento</a></li>
+            <li>
+              <a class="dropdown-item" href="?r=status_pagamento"
+                >Status Pagamento</a
+              >
+            </li>
+          </ul>
         </li>
       </ul>
+      <div class="d-flex" style="margin-right: 1.5%">
+        <a class="navbar-brand" href="?r=loja"
+      ><i class="fa-solid fa-address-card fa-lg"></i></i
+    ></a>
+        
+      </div>
     </div>
   </div>
 </nav>

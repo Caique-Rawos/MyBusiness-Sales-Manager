@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { ProdutoEntity } from './entity/produtos.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ProdutoEntity } from './entity/produtos.entity';
 
 @Injectable()
 export class ProdutoService {
@@ -10,14 +10,14 @@ export class ProdutoService {
     private repository: Repository<ProdutoEntity>,
   ) {}
 
-  async create(data: ProdutoEntity): Promise<ProdutoEntity> {
-    const object = await this.repository.create(data);
+  create(data: ProdutoEntity): Promise<ProdutoEntity> {
+    const object = this.repository.create(data);
     return this.repository.save(object);
   }
 
-  async findAll(): Promise<ProdutoEntity[]> {
+  findAll(): Promise<ProdutoEntity[]> {
     return this.repository.find({
-      relations: ['categoria'],
+      relations: ['categoria', 'regraFiscal'],
       order: {
         id: 'DESC',
       },

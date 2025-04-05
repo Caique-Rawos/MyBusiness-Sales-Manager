@@ -1,15 +1,15 @@
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { PagamentoEntity } from '../../pagamento/entity/pagamento.entity';
 import { StatusPagamentoEntity } from '../../status_pagamento/entity/status_pagamento.entity';
 import { VendaEntity } from '../../venda/entity/venda.entity';
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
-  CreateDateColumn,
-  ManyToOne,
-} from 'typeorm';
 
 @Entity({ name: 'contas_receber' })
 export class ContasReceberEntity {

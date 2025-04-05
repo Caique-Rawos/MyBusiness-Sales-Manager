@@ -1,12 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PagamentoService } from './pagamento.service';
-import { Repository } from 'typeorm';
-import { PagamentoEntity } from './entity/pagamento.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { PagamentoEntity } from './entity/pagamento.entity';
+import { PagamentoService } from './pagamento.service';
+
+const repositoryMock = {
+  create: jest.fn().mockReturnValue({}),
+  save: jest.fn().mockReturnValue({}),
+  find: jest.fn().mockReturnValue([]),
+};
 
 describe('PagamentoService', () => {
   let service: PagamentoService;
-  let repository: Repository<PagamentoEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,15 +18,12 @@ describe('PagamentoService', () => {
         PagamentoService,
         {
           provide: getRepositoryToken(PagamentoEntity),
-          useClass: Repository,
+          useValue: repositoryMock,
         },
       ],
     }).compile();
 
     service = module.get<PagamentoService>(PagamentoService);
-    repository = module.get<Repository<PagamentoEntity>>(
-      getRepositoryToken(PagamentoEntity),
-    );
   });
 
   it('should be defined', () => {
@@ -36,36 +37,37 @@ describe('PagamentoService', () => {
         descricao: 'Dinheiro',
       };
 
-      jest.spyOn(repository, 'create').mockReturnValue(pagamentoData);
-      jest.spyOn(repository, 'save').mockResolvedValue(pagamentoData);
+      const spyCreate = jest
+        .spyOn(repositoryMock, 'create')
+        .mockReturnValue(pagamentoData);
+      const spySave = jest
+        .spyOn(repositoryMock, 'save')
+        .mockResolvedValue(pagamentoData);
 
       const result = await service.create(pagamentoData);
 
       expect(result).toEqual(pagamentoData);
-      expect(repository.create).toHaveBeenCalledWith(pagamentoData);
-      expect(repository.save).toHaveBeenCalledWith(pagamentoData);
+      expect(spyCreate).toHaveBeenCalledWith(pagamentoData);
+      expect(spySave).toHaveBeenCalledWith(pagamentoData);
     });
   });
 
   describe('findAll', () => {
     it('should return all payments', async () => {
-      const payments: PagamentoEntity[] = [
-        {
-          id: 1,
-          descricao: 'Dinheiro',
-        },
-        {
-          id: 2,
-          descricao: 'Cartao',
-        },
-      ];
+      const payments = [];
 
-      jest.spyOn(repository, 'find').mockResolvedValue(payments);
+      const spyFind = jest
+        .spyOn(repositoryMock, 'find')
+        .mockResolvedValue(payments);
 
       const result = await service.findAll();
 
       expect(result).toEqual(payments);
-      expect(repository.find).toHaveBeenCalled();
+      expect(spyFind).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

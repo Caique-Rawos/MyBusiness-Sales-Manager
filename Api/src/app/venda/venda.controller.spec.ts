@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { VendaEntity } from './entity/venda.entity';
 import { VendaController } from './venda.controller';
 import { VendaService } from './venda.service';
-import { VendaEntity } from './entity/venda.entity';
-import { VendaModule } from './venda.module';
+
+const mockService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+};
 
 describe('VendaController', () => {
   let controller: VendaController;
-  let service: VendaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,36 +17,12 @@ describe('VendaController', () => {
       providers: [
         {
           provide: VendaService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-          },
+          useValue: mockService,
         },
       ],
     }).compile();
 
     controller = module.get<VendaController>(VendaController);
-    service = module.get<VendaService>(VendaService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [VendaModule],
-        controllers: [VendaController],
-        providers: [
-          {
-            provide: VendaService,
-            useValue: {
-              create: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
   });
 
   it('should be defined', () => {
@@ -52,48 +31,35 @@ describe('VendaController', () => {
 
   describe('create', () => {
     it('should create a new venda', async () => {
-      const vendaData: VendaEntity = {
-        id: 1,
-        totalVenda: 123,
-        dataVenda: new Date(),
-        idCliente: 1,
-        cliente: { id: 1, nome: 'teste', cpfCnpj: '3213213211' },
-      };
+      const vendaData = {} as unknown as VendaEntity;
 
-      jest.spyOn(service, 'create').mockResolvedValue(vendaData);
+      const spyCreate = jest
+        .spyOn(mockService, 'create')
+        .mockResolvedValue(vendaData);
 
       const result = await controller.create(vendaData);
 
       expect(result).toEqual(vendaData);
-      expect(service.create).toHaveBeenCalledWith(vendaData);
+      expect(spyCreate).toHaveBeenCalledWith(vendaData);
     });
   });
 
   describe('findAll', () => {
     it('should return all vendas', async () => {
-      const vendas: VendaEntity[] = [
-        {
-          id: 1,
-          totalVenda: 123,
-          dataVenda: new Date(),
-          idCliente: 1,
-          cliente: { id: 1, nome: 'teste', cpfCnpj: '3213213211' },
-        },
-        {
-          id: 2,
-          totalVenda: 321,
-          dataVenda: new Date(),
-          idCliente: 2,
-          cliente: { id: 2, nome: 'teste 2', cpfCnpj: '31232113211' },
-        },
-      ];
+      const vendas = [];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(vendas);
+      const spyFindAll = jest
+        .spyOn(mockService, 'findAll')
+        .mockResolvedValue(vendas);
 
       const result = await controller.findAll();
 
       expect(result).toEqual(vendas);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(spyFindAll).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

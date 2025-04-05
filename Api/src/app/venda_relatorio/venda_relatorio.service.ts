@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { LojaService } from '../loja/loja.service';
 import { VendaEntity } from '../venda/entity/venda.entity';
 import { IFiltroRelatorio } from './interface/filtro_relatorio.interface';
 import {
@@ -13,6 +14,7 @@ export class VendaRelatorioService {
   constructor(
     @InjectRepository(VendaEntity)
     private repository: Repository<VendaEntity>,
+    private lojaService: LojaService,
   ) {}
 
   async findAll(
@@ -85,5 +87,49 @@ export class VendaRelatorioService {
     );
 
     return { vendas: clienteRelatorio, totalVendas, quantidadeTotal };
+  }
+
+  async generateCupomFiscal(filtro: { idVenda: number }) {
+    const loja = await this.lojaService.findOnly();
+
+    const result = await this.repository
+      .createQueryBuilder('venda')
+      .innerJoin('venda.itens', 'vi')
+      .innerJoin('vi.produto', 'p')
+      .innerJoin('p.regraFiscal', 'rf')
+      .select([
+        'vi.precoUnitario - vi.desconto as precoUnitario',
+        'vi.quantidade as quantidade',
+        'vi.desconto as desconto',
+        'vi.subTotal as subTotal',
+        'p.codigoDeBarra as codigoDeBarra',
+        'p.descricao as descricao',
+        'rf.ncm as ncm',
+        'rf.icms as icms',
+        'rf.pis as pis',
+        'rf.cofins as cofins',
+        'rf.ipi as ipi',
+      ])
+      .where('venda.id = :id', { id: filtro.idVenda })
+      .getRawMany();
+
+    let tributosAproximados = 0;
+
+    result.forEach((item) => {
+      const base = parseFloat(item.subtotal);
+      const icms = (base * parseFloat(item.icms)) / 100;
+      const pis = (base * parseFloat(item.pis)) / 100;
+      const cofins = (base * parseFloat(item.cofins)) / 100;
+      const ipi = (base * parseFloat(item.ipi)) / 100;
+
+      tributosAproximados += icms + pis + cofins + ipi;
+    });
+
+    const totalVendas = result.reduce(
+      (sum, itens) => sum + parseFloat(itens.subtotal),
+      0,
+    );
+
+    return { cupomItens: result, tributosAproximados, totalVendas, loja };
   }
 }

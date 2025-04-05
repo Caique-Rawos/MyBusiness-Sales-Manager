@@ -77,9 +77,12 @@
                     dataFormatada +
                     "</td>" +
                     "<td>" +
-                    "<button class='btn btn-success' onclick='telaItem(" +
+                    "<button title='Adicionar Produtos' style='margin-right: 10%;' class='btn btn-success' onclick='telaItem(" +
                     vendas.id +
                     ")'><i class='fa-solid fa-square-plus' style='color: white'></i></button>" +
+                    "<button title='Cupom Fiscal' class='btn btn-success' onclick='gerarCupomFiscal(" +
+                    vendas.id +
+                    ")'><i class='fa-solid fa-receipt' style='color: white'></i></button>" +
                     "</td>" +
                     "</tr>" +
                     ""
@@ -97,6 +100,12 @@
       function telaItem(idVenda) {
         var baseUrl = window.location.origin + window.location.pathname;
         var newUrl = baseUrl + "?r=venda_item&id_venda=" + idVenda;
+        window.location.href = newUrl;
+      }
+
+      function gerarCupomFiscal(idVenda) {
+        var baseUrl = window.location.origin + window.location.pathname;
+        var newUrl = baseUrl + "?r=cupom_fiscal&id_venda=" + idVenda;
         window.location.href = newUrl;
       }
 
@@ -263,7 +272,7 @@
             <th scope="col">Cliente</th>
             <th scope="col">Valor Total</th>
             <th scope="col">Data</th>
-            <th scope="col">Itens</th>
+            <th scope="col">Ações</th>
           </tr>
         </thead>
         <tbody id="listaVendasCadastradas">

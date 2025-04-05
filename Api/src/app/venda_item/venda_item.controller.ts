@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { VendaItemService } from './venda_item.service';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { VendaItemEntity } from './entity/venda_item.entity';
+import { VendaItemService } from './venda_item.service';
 
 @Controller('venda_item')
 export class VendaItemController {

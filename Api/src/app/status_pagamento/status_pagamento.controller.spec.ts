@@ -1,12 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { StatusPagamentoEntity } from './entity/status_pagamento.entity';
 import { StatusPagamentoController } from './status_pagamento.controller';
 import { StatusPagamentoService } from './status_pagamento.service';
-import { StatusPagamentoEntity } from './entity/status_pagamento.entity';
-import { StatusPagamentoModule } from './status_pagamento.module';
+
+const mockService = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+};
 
 describe('StatusPagamentoController', () => {
   let controller: StatusPagamentoController;
-  let service: StatusPagamentoService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,10 +17,7 @@ describe('StatusPagamentoController', () => {
       providers: [
         {
           provide: StatusPagamentoService,
-          useValue: {
-            create: jest.fn(),
-            findAll: jest.fn(),
-          },
+          useValue: mockService,
         },
       ],
     }).compile();
@@ -25,27 +25,6 @@ describe('StatusPagamentoController', () => {
     controller = module.get<StatusPagamentoController>(
       StatusPagamentoController,
     );
-    service = module.get<StatusPagamentoService>(StatusPagamentoService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [StatusPagamentoModule],
-        controllers: [StatusPagamentoController],
-        providers: [
-          {
-            provide: StatusPagamentoService,
-            useValue: {
-              create: jest.fn(),
-              findAll: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
   });
 
   it('should be defined', () => {
@@ -60,36 +39,33 @@ describe('StatusPagamentoController', () => {
         cor: 'green',
       };
 
-      jest.spyOn(service, 'create').mockResolvedValue(statusPagamentoData);
+      const spyCreate = jest
+        .spyOn(mockService, 'create')
+        .mockResolvedValue(statusPagamentoData);
 
       const result = await controller.create(statusPagamentoData);
 
       expect(result).toEqual(statusPagamentoData);
-      expect(service.create).toHaveBeenCalledWith(statusPagamentoData);
+      expect(spyCreate).toHaveBeenCalledWith(statusPagamentoData);
     });
   });
 
   describe('findAll', () => {
     it('should return all status pagamentos', async () => {
-      const statusPagamentos: StatusPagamentoEntity[] = [
-        {
-          id: 1,
-          descricao: 'Pago',
-          cor: 'green',
-        },
-        {
-          id: 2,
-          descricao: 'Em Aberto',
-          cor: 'orange',
-        },
-      ];
+      const statusPagamentos = [];
 
-      jest.spyOn(service, 'findAll').mockResolvedValue(statusPagamentos);
+      const spyFindAll = jest
+        .spyOn(mockService, 'findAll')
+        .mockResolvedValue(statusPagamentos);
 
       const result = await controller.findAll();
 
       expect(result).toEqual(statusPagamentos);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(spyFindAll).toHaveBeenCalled();
     });
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });

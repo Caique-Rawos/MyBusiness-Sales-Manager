@@ -1,12 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { PaginasEntity } from './entity/paginas.entity';
 import { PaginasController } from './paginas.controller';
 import { PaginasService } from './paginas.service';
-import { PaginasEntity } from './entity/paginas.entity';
-import { PaginasModule } from './paginas.module';
+
+const mockService = {
+  getPaginaByAlias: jest.fn(),
+};
 
 describe('PaginasController', () => {
   let controller: PaginasController;
-  let service: PaginasService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -14,34 +16,12 @@ describe('PaginasController', () => {
       providers: [
         {
           provide: PaginasService,
-          useValue: {
-            getPaginaByAlias: jest.fn(),
-          },
+          useValue: mockService,
         },
       ],
     }).compile();
 
     controller = module.get<PaginasController>(PaginasController);
-    service = module.get<PaginasService>(PaginasService);
-  });
-
-  afterAll(async () => {
-    try {
-      await Test.createTestingModule({
-        imports: [PaginasModule],
-        controllers: [PaginasController],
-        providers: [
-          {
-            provide: PaginasService,
-            useValue: {
-              getPaginaByAlias: jest.fn(),
-            },
-          },
-        ],
-      }).compile();
-    } catch (error) {
-      /* EMPTY */
-    }
   });
 
   it('should be defined', () => {
@@ -58,10 +38,16 @@ describe('PaginasController', () => {
       ativo: true,
     };
 
-    jest.spyOn(service, 'getPaginaByAlias').mockResolvedValue(expectedResult);
+    const spyGetPaginaByAlias = jest
+      .spyOn(mockService, 'getPaginaByAlias')
+      .mockResolvedValue(expectedResult);
 
     const result = await controller.getPagina(alias);
     expect(result).toEqual(expectedResult);
-    expect(service.getPaginaByAlias).toHaveBeenCalledWith(alias);
+    expect(spyGetPaginaByAlias).toHaveBeenCalledWith(alias);
+  });
+
+  afterAll(() => {
+    jest.restoreAllMocks();
   });
 });
