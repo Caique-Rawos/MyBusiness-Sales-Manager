@@ -2,15 +2,425 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Vendas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="dashboard/style.css" />
   </head>
   <body>
-    <div class="center">
-      <img
-        src="img/MyBusinessSalesManager.png"
-        width="100%"
-        alt="Logo da MyBusiness Sales Manager"
-      />
+    <div class="container">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Carregando dashboard...</p>
+      </div>
+
+      <div id="dashboard" style="display: none">
+        <div class="stats-grid" id="statsContainer"></div>
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <h2 class="chart-title">Histórico e Previsão de Vendas</h2>
+            <p class="chart-description">
+              Acompanhe o desempenho das vendas e as projeções para os próximos
+              meses
+            </p>
+          </div>
+          <div class="chart-canvas">
+            <canvas id="salesChart"></canvas>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>
+            Dashboard atualizado em tempo real • Dados históricos e previsões
+          </p>
+        </div>
+      </div>
     </div>
+
+    <script>
+      let salesData = [{ mes: "-", valorTotal: 0, quantidadeVendas: 0 }];
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+          minimumFractionDigits: 0,
+        }).format(value);
+      }
+
+      function formatNumber(value) {
+        return new Intl.NumberFormat("pt-BR").format(value);
+      }
+
+      function calculateGrowth(current, previous) {
+        if (!previous) return 0;
+        return ((current - previous) / previous) * 100;
+      }
+
+      async function carregaPrevisaoVenda() {
+        return new Promise((resolve, reject) => {
+          $.ajax({
+            type: "GET",
+            url: "./api/requisicao/vendas/buscaPrevisaoVenda.php",
+            dataType: "json",
+            success: function (data) {
+              const jsonData = JSON.parse(data);
+              console.log("jsonData.length", jsonData.length);
+              if (jsonData.length > 0) {
+                console.log("jsonData", jsonData);
+                salesData = jsonData;
+              }
+              resolve();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              Swal.fire({
+                title: "Erro!",
+                text: "Erro ao Carregar Dados de venda",
+                icon: "error",
+                confirmButtonText: "Ok",
+              });
+              reject(errorThrown);
+            },
+          });
+        });
+      }
+
+      function generateStatsCards() {
+        const historicalData = salesData.filter((item) => !item.isPrevisao);
+        const predictionsData = salesData.filter((item) => item.isPrevisao);
+
+        const totalRevenue = historicalData.reduce(
+          (sum, item) => sum + item.valorTotal,
+          0
+        );
+        const totalSales = historicalData.reduce(
+          (sum, item) => sum + item.quantidadeVendas,
+          0
+        );
+
+        const lastMonth = historicalData[historicalData.length - 1];
+        const previousMonth = historicalData[historicalData.length - 2];
+
+        const revenueGrowth = calculateGrowth(
+          lastMonth.valorTotal,
+          previousMonth?.valorTotal
+        );
+        const salesGrowth = calculateGrowth(
+          lastMonth.quantidadeVendas,
+          previousMonth?.quantidadeVendas
+        );
+
+        const nextMonthPrediction = predictionsData[0];
+        const predictionGrowth = nextMonthPrediction
+          ? calculateGrowth(
+              nextMonthPrediction.valorTotal,
+              lastMonth.valorTotal
+            )
+          : 0;
+
+        const stats = [
+          {
+            title: "Receita Total",
+            value: formatCurrency(totalRevenue),
+            icon: "fas fa-dollar-sign",
+            change: revenueGrowth,
+            description: "Total histórico",
+          },
+          {
+            title: "Último Mês",
+            value: formatCurrency(lastMonth?.valorTotal || 0),
+            icon: "fas fa-chart-line",
+            change: revenueGrowth,
+            description: lastMonth?.mes || "-",
+          },
+          {
+            title: "Previsão Próximo Mês",
+            value: formatCurrency(nextMonthPrediction?.valorTotal || 0),
+            icon: "fas fa-eye",
+            change: predictionGrowth,
+            description: nextMonthPrediction?.mes || "N/A",
+          },
+        ];
+
+        const container = document.getElementById("statsContainer");
+        container.innerHTML = stats
+          .map(
+            (stat) => `
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon">
+                                <i class="${stat.icon}"></i>
+                            </div>
+                            <div class="stat-change ${
+                              stat.change >= 0 ? "positive" : "negative"
+                            }">
+                                <i class="fas fa-${
+                                  stat.change >= 0 ? "arrow-up" : "arrow-down"
+                                }"></i>
+                                ${Math.abs(stat.change).toFixed(1)}%
+                            </div>
+                        </div>
+                        <div>
+                            <div class="stat-value">${stat.value}</div>
+                            <div class="stat-title">${stat.title}</div>
+                            <div class="stat-description">${
+                              stat.description
+                            }</div>
+                        </div>
+                    </div>
+                `
+          )
+          .join("");
+      }
+
+      function createSalesChart() {
+        const ctx = document.getElementById("salesChart").getContext("2d");
+
+        const labels = salesData.map((item) => item.mes);
+        const valores = salesData.map((item) => item.valorTotal);
+        const quantidades = salesData.map((item) => item.quantidadeVendas);
+
+        const previsaoStartIndexBase = salesData.findIndex(
+          (item) => item.isPrevisao
+        );
+
+        const previsaoStartIndex =
+          previsaoStartIndexBase === -1 ? 100 : previsaoStartIndexBase;
+
+        const valoresHistorico = valores.slice(0, previsaoStartIndex);
+        const valoresPrevisao = valores.slice(previsaoStartIndex - 1);
+
+        const quantidadesHistorico = quantidades.slice(0, previsaoStartIndex);
+        const quantidadesPrevisao = quantidades.slice(previsaoStartIndex - 1);
+
+        const labelsHistorico = labels.slice(0, previsaoStartIndex);
+        const labelsPrevisao = labels.slice(previsaoStartIndex - 1);
+
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Valor Total (R$) - Histórico",
+                data: valores.map((val, index) =>
+                  index < previsaoStartIndex ? val : null
+                ),
+                borderColor: "#3b82f6",
+                backgroundColor: "rgba(59, 130, 246, 0.1)",
+                borderWidth: 3,
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: "#3b82f6",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                yAxisID: "y",
+              },
+              {
+                label: "Valor Total (R$) - Previsão",
+                data: valores.map((val, index) =>
+                  index >= previsaoStartIndex - 1 ? val : null
+                ),
+                borderColor: "#f59e0b",
+                backgroundColor: "rgba(245, 158, 11, 0.1)",
+                borderWidth: 3,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: "#f59e0b",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                yAxisID: "y",
+              },
+              {
+                label: "Quantidade de Vendas - Histórico",
+                data: quantidades.map((val, index) =>
+                  index < previsaoStartIndex ? val : null
+                ),
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.1)",
+                borderWidth: 3,
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: "#10b981",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                yAxisID: "y1",
+              },
+              {
+                label: "Quantidade de Vendas - Previsão",
+                data: quantidades.map((val, index) =>
+                  index >= previsaoStartIndex - 1 ? val : null
+                ),
+                borderColor: "#84cc16",
+                backgroundColor: "rgba(132, 204, 22, 0.1)",
+                borderWidth: 3,
+                borderDash: [5, 5],
+                fill: false,
+                tension: 0.4,
+                pointBackgroundColor: "#84cc16",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+              mode: "index",
+              intersect: false,
+            },
+            plugins: {
+              legend: {
+                position: "top",
+                labels: {
+                  usePointStyle: true,
+                  padding: 20,
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                  },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                titleColor: "#1f2937",
+                bodyColor: "#1f2937",
+                borderColor: "#e5e7eb",
+                borderWidth: 1,
+                cornerRadius: 8,
+                displayColors: true,
+                titleFont: {
+                  family: "Inter",
+                  size: 14,
+                  weight: "600",
+                },
+                bodyFont: {
+                  family: "Inter",
+                  size: 12,
+                },
+                callbacks: {
+                  title: function (context) {
+                    const dataIndex = context[0].dataIndex;
+                    const isPrevisao = dataIndex >= previsaoStartIndex;
+                    return context[0].label + (isPrevisao ? " (Previsão)" : "");
+                  },
+                  label: function (context) {
+                    const dataset = context.dataset;
+                    let value = context.parsed.y;
+
+                    if (dataset.yAxisID === "y") {
+                      return `${dataset.label}: ${formatCurrency(value)}`;
+                    } else {
+                      return `${dataset.label}: ${formatNumber(value)} vendas`;
+                    }
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  color: "#f3f4f6",
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: "#6b7280",
+                  font: {
+                    family: "Inter",
+                    size: 11,
+                  },
+                },
+              },
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                title: {
+                  display: true,
+                  text: "Valor Total (R$)",
+                  color: "#3b82f6",
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                    weight: "600",
+                  },
+                },
+                grid: {
+                  color: "#f3f4f6",
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: "#6b7280",
+                  font: {
+                    family: "Inter",
+                    size: 11,
+                  },
+                  callback: function (value) {
+                    return formatCurrency(value);
+                  },
+                },
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                title: {
+                  display: true,
+                  text: "Quantidade de Vendas",
+                  color: "#10b981",
+                  font: {
+                    family: "Inter",
+                    size: 12,
+                    weight: "600",
+                  },
+                },
+                grid: {
+                  drawOnChartArea: false,
+                },
+                ticks: {
+                  color: "#6b7280",
+                  font: {
+                    family: "Inter",
+                    size: 11,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      async function initDashboard() {
+        try {
+          await carregaPrevisaoVenda();
+
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("dashboard").style.display = "block";
+
+          generateStatsCards();
+          createSalesChart();
+        } catch (err) {
+          console.error("Erro ao inicializar o dashboard:", err);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", initDashboard);
+    </script>
   </body>
 </html>

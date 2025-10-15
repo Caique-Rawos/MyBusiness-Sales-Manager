@@ -16,4 +16,9 @@ export class VendaController {
   async findAll(): Promise<VendaEntity[]> {
     return this.vendaService.findAll();
   }
+
+  @Get('previsao-venda')
+  async findVendasFuturas(): Promise<VendaEntity[]> {
+    return this.vendaService.findVendasFuturas();
+  }
 }
