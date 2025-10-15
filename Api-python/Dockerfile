@@ -13,7 +13,7 @@ WORKDIR /app
 COPY . .
 
 RUN pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir numpy cython \
+    && pip install "numpy<2.0" cython \
     && pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
