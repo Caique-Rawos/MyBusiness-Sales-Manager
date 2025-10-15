@@ -60,7 +60,7 @@ export class VendaService {
 
     if (payload.vendas.length > 2) {
       const response = await axios.post(
-        'http://localhost:5001/forecast',
+        'https://my-business-sales-manager-api-py.dlti3g.easypanel.host/forecast',
         payload,
       );
 
