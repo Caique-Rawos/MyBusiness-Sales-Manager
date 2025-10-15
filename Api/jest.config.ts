@@ -22,4 +22,5 @@ export default {
     '/src/.*\\.module\\.ts$',
     '/src/main\\.ts$',
   ],
+  verbose: false,
 };
