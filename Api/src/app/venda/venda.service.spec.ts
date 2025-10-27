@@ -1,21 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import axios from 'axios';
 import { ClienteEntity } from '../cliente/entity/cliente.entity';
 import { ContasReceberService } from '../contas_receber/contas_receber.service';
 import { VendaUpdateDto } from './dto/atualizaTotalVenda.dto';
 import { VendaEntity } from './entity/venda.entity';
 import { VendaService } from './venda.service';
 
+const queryBuilderMock = {
+  select: jest.fn().mockReturnThis(),
+  addSelect: jest.fn().mockReturnThis(),
+  where: jest.fn().mockReturnThis(),
+  groupBy: jest.fn().mockReturnThis(),
+  orderBy: jest.fn().mockReturnThis(),
+  getRawMany: jest.fn().mockResolvedValue([]),
+};
+
 const vendaRepositoryMock = {
   create: jest.fn().mockReturnValue({}),
   save: jest.fn().mockReturnValue({}),
   find: jest.fn().mockReturnValue([]),
   findOne: jest.fn().mockReturnValue({}),
+  createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
 };
 
 const mockServiceContasReceber = {
   atualizaTotal: jest.fn(),
 };
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('VendaService', () => {
   let service: VendaService;
@@ -87,6 +101,55 @@ describe('VendaService', () => {
           id: 'DESC',
         },
       });
+    });
+  });
+
+  describe('findVendasFuturas', () => {
+    it('should return all vendas with previsao venda', async () => {
+      const vendas = [
+        {
+          mes: '08-2025',
+          quantidadeVendas: 10,
+          valorTotal: 1000,
+          isPrevisao: false,
+        },
+        {
+          mes: '09-2025',
+          quantidadeVendas: 8,
+          valorTotal: 850,
+          isPrevisao: false,
+        },
+        {
+          mes: '10-2025',
+          quantidadeVendas: 6,
+          valorTotal: 650,
+          isPrevisao: false,
+        },
+      ];
+
+      jest.spyOn(queryBuilderMock, 'getRawMany').mockResolvedValue(vendas);
+
+      const mockPrevisao = [
+        {
+          mes: '11-2025',
+          quantidadeVendas: 4,
+          valorTotal: 550,
+          isPrevisao: true,
+        },
+        {
+          mes: '12-2025',
+          quantidadeVendas: 2,
+          valorTotal: 250,
+          isPrevisao: true,
+        },
+      ];
+
+      mockedAxios.post.mockResolvedValueOnce({ data: mockPrevisao });
+
+      const result = await service.findVendasFuturas();
+
+      expect(result).toEqual([...vendas, ...mockPrevisao]);
+      expect(axios.post).toHaveBeenCalled();
     });
   });
 

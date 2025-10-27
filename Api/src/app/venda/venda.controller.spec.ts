@@ -6,6 +6,7 @@ import { VendaService } from './venda.service';
 const mockService = {
   create: jest.fn(),
   findAll: jest.fn(),
+  findVendasFuturas: jest.fn(),
 };
 
 describe('VendaController', () => {
@@ -53,6 +54,21 @@ describe('VendaController', () => {
         .mockResolvedValue(vendas);
 
       const result = await controller.findAll();
+
+      expect(result).toEqual(vendas);
+      expect(spyFindAll).toHaveBeenCalled();
+    });
+  });
+
+  describe('findVendasFuturas', () => {
+    it('should return all vendas and precisao', async () => {
+      const vendas = [];
+
+      const spyFindAll = jest
+        .spyOn(mockService, 'findVendasFuturas')
+        .mockResolvedValue(vendas);
+
+      const result = await controller.findVendasFuturas();
 
       expect(result).toEqual(vendas);
       expect(spyFindAll).toHaveBeenCalled();
