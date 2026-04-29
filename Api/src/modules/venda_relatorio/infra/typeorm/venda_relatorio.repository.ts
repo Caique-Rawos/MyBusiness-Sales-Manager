@@ -2,13 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
 import { IFiltroRelatorio } from '../../domain/filtro_relatorio';
-import { IVendaClienteRelatorio } from '../../domain/venda_relatorio';
+import {
+  IVendaClienteRelatorio,
+  IVendaDataRelatorio,
+} from '../../domain/venda_relatorio';
 import { VendaRelatorioRepository } from '../../domain/venda_relatorio.repository';
 import { VendaOrmEntity } from 'src/modules/venda/infra/typeorm/venda.entity';
 import { Venda } from 'src/modules/venda/domain/venda';
+import { ContagemClienteOrmEntity } from 'src/modules/contagem_cliente/infra/typeorm/contagem_cliente.entity';
 
 @Injectable()
-export class VendaRelatorioTypeOrmRepository implements VendaRelatorioRepository {
+export class VendaRelatorioTypeOrmRepository
+  implements VendaRelatorioRepository
+{
   constructor(
     @InjectRepository(VendaOrmEntity)
     private readonly repository: Repository<VendaOrmEntity>,
@@ -38,6 +44,28 @@ export class VendaRelatorioTypeOrmRepository implements VendaRelatorioRepository
       })
       .groupBy('cliente.id')
       .orderBy('"valorVendas"', 'DESC')
+      .getRawMany();
+  }
+
+  async findAllGroupByData(
+    filtro: IFiltroRelatorio,
+  ): Promise<IVendaDataRelatorio[]> {
+    return this.repository
+      .createQueryBuilder('venda')
+      .leftJoin(
+        ContagemClienteOrmEntity,
+        'contagem',
+        'CAST(contagem.data AS DATE) = CAST(venda.dataVenda AS DATE)',
+      )
+      .select('CAST(venda.dataVenda AS DATE)', 'data')
+      .addSelect('COUNT(venda.id)', 'totalVendas')
+      .addSelect('MAX(contagem.contagem)', 'contagemCliente')
+      .where('CAST(venda.dataVenda AS DATE) BETWEEN :dataInicio AND :dataFim', {
+        dataInicio: filtro.dataInicio,
+        dataFim: filtro.dataFim,
+      })
+      .groupBy('CAST(venda.dataVenda AS DATE)')
+      .orderBy('CAST(venda.dataVenda AS DATE)', 'ASC')
       .getRawMany();
   }
 

@@ -30,7 +30,7 @@
           $.ajax({
             type: "GET",
             url:
-              "./api/requisicao/vendas/venda_relatorio/buscaVendaRelatorioCliente.php?dataInicio=" +
+              "./api/requisicao/vendas/venda_relatorio/buscaVendaRelatorioData.php?dataInicio=" +
               getValue("dataInicio") +
               "&dataFinal=" +
               getValue("dataFinal"),
@@ -39,7 +39,7 @@
 
               jsonData = typeof data === "string" ? JSON.parse(data) : data;
 
-              const vendas = jsonData.vendas;
+              const vendas = jsonData.datas;
 
               if (vendas.length === 0) {
                 zerado();
@@ -47,38 +47,36 @@
               }
 
               vendas.forEach((venda) => {
-                const valorVendaFormatado = `R$ ${parseFloat(venda.valorVendas)
-                  .toFixed(2)
-                  .replace(".", ",")}`;
+                const dataVenda = new Date(venda.data);
+                const dia = String(dataVenda.getUTCDate()).padStart(2, "0");
+                const mes = String(dataVenda.getUTCMonth() + 1).padStart(
+                  2,
+                  "0",
+                );
+                const ano = dataVenda.getUTCFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
 
                 $("#listaVendaRelatorio").html(
                   $("#listaVendaRelatorio").html() +
                     "" +
                     "<tr>" +
                     '<th scope="row">' +
-                    venda.idCliente +
+                    dataFormatada +
                     "</th>" +
                     "<td>" +
-                    venda.nomeCliente +
+                    venda.totalVendas +
                     "</td>" +
                     "<td>" +
-                    venda.quantidadeVendas +
-                    "</td>" +
-                    "<td>" +
-                    valorVendaFormatado +
+                    venda.contagemCliente +
                     "</td>" +
                     "</tr>" +
                     "",
                 );
               });
 
-              $("#total").html(
-                `R$ ${parseFloat(jsonData.totalVendas)
-                  .toFixed(2)
-                  .replace(".", ",")}`,
-              );
+              $("#totalVenda").html(`${parseInt(jsonData.totalVendas)}`);
 
-              $("#quantidade").html(`${parseInt(jsonData.quantidadeTotal)}`);
+              $("#totalCliente").html(`${parseInt(jsonData.totalClientes)}`);
             },
             error: function (jqXHR, textStatus, errorThrown) {
               mensagemErro("Erro ao Carregar Relatorio");
@@ -110,10 +108,9 @@
       <table class="table border">
         <thead>
           <tr>
-            <th scope="col">Codigo</th>
-            <th scope="col">Cliente</th>
+            <th scope="col">data</th>
             <th scope="col">Quantidade Vendas</th>
-            <th scope="col">Valor Total</th>
+            <th scope="col">Contagem Clientes</th>
           </tr>
         </thead>
         <tbody id="listaVendaRelatorio">
@@ -126,9 +123,9 @@
       <table class="table border">
         <thead>
           <tr>
-            <th scope="col" style="width: 35%">Total</th>
-            <td scope="col" style="width: 41%" id="quantidade"></td>
-            <td scope="col" style="width: 24%" id="total"></td>
+            <th scope="col" style="width: 25%">Total</th>
+            <td scope="col" style="width: 38%" id="totalVenda"></td>
+            <td scope="col" style="width: 37%" id="totalCliente"></td>
           </tr>
         </thead>
       </table>

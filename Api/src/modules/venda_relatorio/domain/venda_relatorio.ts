@@ -12,3 +12,9 @@ export interface IVendaClienteRelatorio {
   valorVendas: number;
   quantidadeVendas: number;
 }
+
+export interface IVendaDataRelatorio {
+  data: Date;
+  totalVendas: number;
+  contagemCliente: number;
+}

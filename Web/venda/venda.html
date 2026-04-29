@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="PT-BR">
   <head>
     <meta charset="UTF-8" />
@@ -29,7 +29,7 @@
                   cliente.id +
                   '">' +
                   cliente.nome +
-                  "</option>"
+                  "</option>",
               );
             });
 
@@ -55,7 +55,7 @@
                 const dia = String(dataVenda.getUTCDate()).padStart(2, "0");
                 const mes = String(dataVenda.getUTCMonth() + 1).padStart(
                   2,
-                  "0"
+                  "0",
                 );
                 const ano = dataVenda.getUTCFullYear();
                 const dataFormatada = `${dia}/${mes}/${ano}`;
@@ -85,7 +85,7 @@
                     ")'><i class='fa-solid fa-receipt' style='color: white'></i></button>" +
                     "</td>" +
                     "</tr>" +
-                    ""
+                    "",
                 );
               });
             },
@@ -118,7 +118,11 @@
           const dataFinal = $("#dataFinal").val();
           const tipoRelatorio = $("#tipoRelatorio").val();
           const tela =
-            tipoRelatorio == "1" ? "relatorio_venda" : "relatorio_cliente";
+            tipoRelatorio == "1"
+              ? "relatorio_venda"
+              : tipoRelatorio == "2"
+                ? "relatorio_cliente"
+                : "relatorio_data";
           const url = `?r=${tela}&dataInicio=${dataInicio}&dataFinal=${dataFinal}`;
 
           if (!dataInicio || !dataFinal || !tipoRelatorio) {
@@ -318,6 +322,7 @@
           <select class="form-control" id="tipoRelatorio">
             <option value="1">Relatório de Venda</option>
             <option value="2">Relatório por Cliente</option>
+            <option value="3">Relatório por Data</option>
           </select>
         </div>
       </div>

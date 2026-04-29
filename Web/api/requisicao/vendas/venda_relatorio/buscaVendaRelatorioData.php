@@ -1,6 +1,6 @@
 <?php
 require_once  '../../../../api/path/api-path.php';
-$url = API_PATH . 'venda_relatorio/cliente/';
+$url = API_PATH . 'venda_relatorio/data/';
 
 $dataInicio = isset($_GET['dataInicio']) ? $_GET['dataInicio'] : msgHttpCode(400, 'Data de Inicio precisa estar definida');
 $dataFinal = isset($_GET['dataFinal']) ? $_GET['dataFinal'] : msgHttpCode(400, 'Data Final precisa estar definida');
@@ -31,6 +31,6 @@ $data = array(
         echo json_encode($responseData);
     }
   } else {
-    msgHttpCode($httpcode, "Erro ao Buscar Venda Relatorio Cliente: " . $response);
+    msgHttpCode($httpcode, "Erro ao Buscar Venda Relatorio Data: " . $response);
   }
 ?>

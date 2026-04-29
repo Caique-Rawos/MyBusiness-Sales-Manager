@@ -16,6 +16,7 @@ import { StatusPagamentoModule } from './modules/status_pagamento/status_pagamen
 import { VendaModule } from './modules/venda/venda.module';
 import { VendaItemModule } from './modules/venda_item/venda_item.module';
 import { VendaRelatorioModule } from './modules/venda_relatorio/venda_relatorio.module';
+import { ContagemClienteModule } from './modules/contagem_cliente/contagem_cliente.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { VendaRelatorioModule } from './modules/venda_relatorio/venda_relatorio.
     ProdutoModule,
     CategoriaModule,
     ClienteModule,
+    ContagemClienteModule,
     VendaModule,
     VendaItemModule,
     PagamentoModule,

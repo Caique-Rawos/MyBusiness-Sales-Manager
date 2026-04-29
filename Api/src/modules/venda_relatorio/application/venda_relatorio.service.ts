@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { LojaService } from '../../loja/application/loja.service';
 import { IFiltroRelatorio } from '../domain/filtro_relatorio';
-import { IVendaClienteRelatorio, IVendaRelatorio } from '../domain/venda_relatorio';
+import {
+  IVendaClienteRelatorio,
+  IVendaDataRelatorio,
+  IVendaRelatorio,
+} from '../domain/venda_relatorio';
 import {
   VENDA_RELATORIO_REPOSITORY,
   VendaRelatorioRepository,
@@ -39,16 +43,13 @@ export class VendaRelatorioService {
     };
   }
 
-  async findAllGroupByCliente(
-    filtro: IFiltroRelatorio,
-  ): Promise<{
+  async findAllGroupByCliente(filtro: IFiltroRelatorio): Promise<{
     vendas: IVendaClienteRelatorio[];
     totalVendas: number;
     quantidadeTotal: number;
   }> {
-    const vendasPorCliente = await this.repository.findAllGroupByCliente(
-      filtro,
-    );
+    const vendasPorCliente =
+      await this.repository.findAllGroupByCliente(filtro);
 
     const clienteRelatorio = vendasPorCliente.map((venda) => ({
       idCliente: venda.idCliente,
@@ -68,6 +69,33 @@ export class VendaRelatorioService {
     );
 
     return { vendas: clienteRelatorio, totalVendas, quantidadeTotal };
+  }
+
+  async findAllGroupByData(filtro: IFiltroRelatorio): Promise<{
+    datas: IVendaDataRelatorio[];
+    totalVendas: number;
+    totalClientes: number;
+  }> {
+    const vendasPorData = await this.repository.findAllGroupByData(filtro);
+
+    const datas = vendasPorData.map((venda) => ({
+      data: venda.data,
+      totalVendas: parseFloat(String(venda.totalVendas)),
+      contagemCliente: Math.ceil(
+        parseInt(String(venda.contagemCliente ?? 0), 10) / 2,
+      ),
+    }));
+
+    const totalVendas = datas.reduce(
+      (sum, venda) => sum + venda.totalVendas,
+      0,
+    );
+    const totalClientes = datas.reduce(
+      (sum, venda) => sum + venda.contagemCliente,
+      0,
+    );
+
+    return { datas, totalVendas, totalClientes };
   }
 
   async generateCupomFiscal(filtro: { idVenda: number }) {
