@@ -1,7 +1,6 @@
 <?php
 
 require_once  '../../../api/path/api-path.php';
-  $url = API_PATH . 'cliente/';
 
 function msgHttpCode($httpcode, $msg){
   http_response_code($httpcode);
@@ -9,11 +8,18 @@ function msgHttpCode($httpcode, $msg){
   exit;
 }
 
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $codigo = isset($_POST["codigo"]) ? $_POST['codigo'] : '';
   $nome = isset($_POST["nome"]) ? $_POST['nome'] : msgHttpCode(400, 'Nome não pode estar vazio');
   $cpfCnpj = isset($_POST["cpfCnpj"]) ? $_POST["cpfCnpj"] : msgHttpCode(400, 'CPF/CNPJ não pode estar vazio');
   $observacao = isset($_POST["observacao"]) ? $_POST["observacao"] : '';
+
+  if ($codigo !== '') {
+    $url = API_PATH . 'cliente/' . $codigo;
+  } else {
+    $url = API_PATH . 'cliente/';
+  }
 
   $data = array(
     'nome' => $nome,
@@ -25,7 +31,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   $ch = curl_init($url);
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  curl_setopt($ch, CURLOPT_POST, true);
+  if ($codigo !== '') {
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+  } else {
+    curl_setopt($ch, CURLOPT_POST, true);
+  }
   curl_setopt($ch, CURLOPT_POSTFIELDS, $json_data);
   curl_setopt($ch, CURLOPT_HTTPHEADER, array(
     'Content-Type: application/json',
@@ -35,8 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
   curl_close($ch);
 
-  if ($httpcode == 201) {
-    http_response_code(201);
+  if ($httpcode == 201 || $httpcode == 200) {
+    http_response_code($httpcode);
     $responseData = json_decode($response, true);
     if ($responseData !== null) {
         echo json_encode($responseData);
