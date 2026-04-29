@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
@@ -68,14 +68,14 @@
                     valorVendaFormatado +
                     "</td>" +
                     "</tr>" +
-                    ""
+                    "",
                 );
               });
 
               $("#total").html(
                 `R$ ${parseFloat(jsonData.totalVendas)
                   .toFixed(2)
-                  .replace(".", ",")}`
+                  .replace(".", ",")}`,
               );
 
               $("#quantidade").html(`${parseInt(jsonData.quantidadeTotal)}`);
@@ -126,9 +126,9 @@
       <table class="table border">
         <thead>
           <tr>
-            <th scope="col" style="width: 41.75%">Total</th>
-            <td scope="col" style="width: 36.5%" id="quantidade"></td>
-            <td scope="col" style="width: 21.75%" id="total"></td>
+            <th scope="col" style="width: 35%">Total</th>
+            <td scope="col" style="width: 41%" id="quantidade"></td>
+            <td scope="col" style="width: 24%" id="total"></td>
           </tr>
         </thead>
       </table>

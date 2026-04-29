@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="pt-BR">
   <head>
@@ -29,7 +29,7 @@
         if (input.value.length > 7) {
           input.value = input.value.replace(
             /^(\d{4})\.(\d{2})(\d+)/,
-            "$1.$2.$3"
+            "$1.$2.$3",
           );
         }
       }
@@ -40,30 +40,16 @@
             type: "GET",
             url: "./api/requisicao/loja/buscaLoja.php",
             success: function (data) {
-              const jsonData = JSON.parse(data);
+              const jsonData = JSON.parse(data)[0];
 
-              $("#listaLojaCadastrada").html(
-                $("#listaLojaCadastrada").html() +
-                  "" +
-                  "<tr>" +
-                  '<th scope="row">' +
-                  jsonData.id +
-                  "</th>" +
-                  "<td>" +
-                  jsonData.nomeFantasia +
-                  "</td>" +
-                  "<td>" +
-                  jsonData.cpfCnpj +
-                  "</td>" +
-                  "<td>" +
-                  jsonData.ie +
-                  "</td>" +
-                  "<td>" +
-                  jsonData.endereco +
-                  "</td>" +
-                  "</tr>" +
-                  ""
-              );
+              console.log("jsonData", jsonData);
+
+              $("#codigo").val(jsonData.id);
+              $("#nomeFantasia").val(jsonData.nomeFantasia);
+              $("#cpfCnpj").val(jsonData.cpfCnpj);
+              $("#ie").val(jsonData.ie);
+              $("#endereco").val(jsonData.endereco);
+              $("#botaoSubmit").html("Atualizar");
             },
 
             error: function (jqXHR, textStatus, errorThrown) {
@@ -182,26 +168,10 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary mt-3">Cadastrar</button>
+        <button type="submit" id="botaoSubmit" class="btn btn-primary mt-3">
+          Cadastrar
+        </button>
       </form>
-    </div>
-
-    <div class="container mt-5">
-      <table class="table border">
-        <thead>
-          <tr>
-            <th scope="col">Codigo</th>
-            <th scope="col">Nome Fantasia</th>
-            <th scope="col">CPF/CNPJ</th>
-            <th scope="col">IE</th>
-            <th scope="col">Endereço</th>
-          </tr>
-        </thead>
-
-        <tbody id="listaLojaCadastrada">
-          <!-- Montado no .ready da Pagina -->
-        </tbody>
-      </table>
     </div>
 
     <script>

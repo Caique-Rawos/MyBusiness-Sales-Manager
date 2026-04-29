@@ -31,6 +31,6 @@ $data = array(
         echo json_encode($responseData);
     }
   } else {
-    msgHttpCode($httpcode, "Erro ao Buscar Venda Relatorio: " . $response);
+    msgHttpCode($httpcode, "Erro ao Buscar Venda Relatorio Cliente: " . $response);
   }
 ?>

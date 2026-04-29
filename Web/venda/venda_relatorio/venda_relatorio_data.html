@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      function getValue(paramName) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(paramName);
+      }
+
+      function mensagemErro(msg) {
+        if (msg == "") {
+          msg = "Erro Desconhecido";
+        }
+        Swal.fire({
+          title: "Erro!",
+          text: msg,
+          icon: "error",
+          confirmButtonText: "Ok",
+        });
+      }
+
+      function zerado() {
+        $(".existeVendas").html("");
+        $("#naoExisteVendas").html("Nenhuma Venda Encontrada nesse periodo");
+      }
+
+      function carregaListaVendasRelatorio() {
+        $(document).ready(function () {
+          $.ajax({
+            type: "GET",
+            url:
+              "./api/requisicao/vendas/venda_relatorio/buscaVendaRelatorioData.php?dataInicio=" +
+              getValue("dataInicio") +
+              "&dataFinal=" +
+              getValue("dataFinal"),
+            success: function (data) {
+              let jsonData;
+
+              jsonData = typeof data === "string" ? JSON.parse(data) : data;
+
+              const vendas = jsonData.datas;
+
+              if (vendas.length === 0) {
+                zerado();
+                return;
+              }
+
+              vendas.forEach((venda) => {
+                const dataVenda = new Date(venda.data);
+                const dia = String(dataVenda.getUTCDate()).padStart(2, "0");
+                const mes = String(dataVenda.getUTCMonth() + 1).padStart(
+                  2,
+                  "0",
+                );
+                const ano = dataVenda.getUTCFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                $("#listaVendaRelatorio").html(
+                  $("#listaVendaRelatorio").html() +
+                    "" +
+                    "<tr>" +
+                    '<th scope="row">' +
+                    dataFormatada +
+                    "</th>" +
+                    "<td>" +
+                    venda.totalVendas +
+                    "</td>" +
+                    "<td>" +
+                    venda.contagemCliente +
+                    "</td>" +
+                    "</tr>" +
+                    "",
+                );
+              });
+
+              $("#totalVenda").html(`${parseInt(jsonData.totalVendas)}`);
+
+              $("#totalCliente").html(`${parseInt(jsonData.totalClientes)}`);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              mensagemErro("Erro ao Carregar Relatorio");
+            },
+            dataType: "json",
+          });
+        });
+      }
+
+      $(document).ready(function () {
+        carregaListaVendasRelatorio();
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container my-4 existeVendas">
+      <div class="d-flex justify-content-end mb-3">
+        <button
+          class="btn btn-success"
+          title="Imprimir"
+          onclick="window.print()"
+        >
+          <i class="fa-solid fa-print"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="container mt-5 existeVendas">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col">data</th>
+            <th scope="col">Quantidade Vendas</th>
+            <th scope="col">Contagem Clientes</th>
+          </tr>
+        </thead>
+        <tbody id="listaVendaRelatorio">
+          <!-- Montado no .ready da Pagina -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="container mt-5 existeVendas">
+      <table class="table border">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 25%">Total</th>
+            <td scope="col" style="width: 38%" id="totalVenda"></td>
+            <td scope="col" style="width: 37%" id="totalCliente"></td>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div id="naoExisteVendas" class="text-center" style="color: red"></div>
+  </body>
+</html>
