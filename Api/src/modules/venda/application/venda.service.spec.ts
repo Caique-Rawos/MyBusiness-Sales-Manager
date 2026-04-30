@@ -1,5 +1,9 @@
 import { NotFoundException } from '@nestjs/common';
+import axios from 'axios';
 import { VendaService } from './venda.service';
+
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 let repository: any;
 let contasReceberService: any;
@@ -110,6 +114,72 @@ describe('VendaService', () => {
     repository.findVendasFuturasBase.mockResolvedValue(baseData);
     await expect(service.findVendasFuturas()).resolves.toEqual(expected);
     expect(repository.findVendasFuturasBase).toHaveBeenCalled();
+  });
+
+  it('should include forecast data when more than two months exist', async () => {
+    const baseData = [
+      { mes: '2024-01', valorTotal: 100, quantidadeVendas: 1 },
+      { mes: '2024-02', valorTotal: 120, quantidadeVendas: 2 },
+      { mes: '2024-03', valorTotal: 140, quantidadeVendas: 3 },
+    ];
+    const forecast = [
+      {
+        mes: '2024-04',
+        valorTotal: 160,
+        quantidadeVendas: 4,
+        isPrevisao: true,
+      },
+    ];
+    repository.findVendasFuturasBase.mockResolvedValue(baseData);
+    mockedAxios.post.mockResolvedValue({ data: forecast });
+
+    await expect(service.findVendasFuturas()).resolves.toEqual([
+      {
+        mes: '2024-01',
+        valorTotal: 100,
+        quantidadeVendas: 1,
+        isPrevisao: false,
+      },
+      {
+        mes: '2024-02',
+        valorTotal: 120,
+        quantidadeVendas: 2,
+        isPrevisao: false,
+      },
+      {
+        mes: '2024-03',
+        valorTotal: 140,
+        quantidadeVendas: 3,
+        isPrevisao: false,
+      },
+      ...forecast,
+    ]);
+    expect(repository.findVendasFuturasBase).toHaveBeenCalled();
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      'https://my-business-sales-manager-api-py.dlti3g.easypanel.host/forecast',
+      {
+        vendas: [
+          {
+            mes: '2024-01',
+            valorTotal: 100,
+            quantidadeVendas: 1,
+            isPrevisao: false,
+          },
+          {
+            mes: '2024-02',
+            valorTotal: 120,
+            quantidadeVendas: 2,
+            isPrevisao: false,
+          },
+          {
+            mes: '2024-03',
+            valorTotal: 140,
+            quantidadeVendas: 3,
+            isPrevisao: false,
+          },
+        ],
+      },
+    );
   });
 
   it('should update total and call related service', async () => {

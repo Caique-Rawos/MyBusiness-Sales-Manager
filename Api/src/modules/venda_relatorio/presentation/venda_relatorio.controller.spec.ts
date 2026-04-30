@@ -59,4 +59,17 @@ describe('VendaRelatorioController', () => {
       {} as any,
     );
   });
+
+  it('should call generateCupomFiscal', async () => {
+    const result = {} as any;
+    vendaRelatorioService.generateCupomFiscal = jest
+      .fn()
+      .mockResolvedValue(result);
+    await expect(controller.generateCupomFiscal({ idVenda: 1 })).resolves.toBe(
+      result,
+    );
+    expect(vendaRelatorioService.generateCupomFiscal).toHaveBeenCalledWith({
+      idVenda: 1,
+    });
+  });
 });

@@ -26,4 +26,10 @@ describe('ClienteTypeOrmRepository', () => {
     await expect(repository.update({ id: 1 } as any)).resolves.toBeUndefined();
     expect(typeOrmRepository.update).toHaveBeenCalledWith(1, { id: 1 } as any);
   });
+
+  it('should findToday entity', async () => {
+    const data = { id: 1, contagem: 2, data: new Date() };
+    typeOrmRepository.findOne.mockResolvedValue(data);
+    await expect(repository.findToday()).resolves.toEqual(data);
+  });
 });

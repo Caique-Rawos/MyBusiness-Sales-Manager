@@ -13,6 +13,7 @@ describe('VendaTypeOrmRepository', () => {
       update: jest.fn(),
       delete: jest.fn(),
       getCupomItens: jest.fn(),
+      createQueryBuilder: jest.fn(),
     };
     repository = new VendaTypeOrmRepository(typeOrmRepository as any);
   });
@@ -53,5 +54,27 @@ describe('VendaTypeOrmRepository', () => {
     typeOrmRepository.delete.mockResolvedValue(undefined);
     await expect(repository.delete(1)).resolves.toBeUndefined();
     expect(typeOrmRepository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should get future sales base data', async () => {
+    const queryBuilder: any = {
+      select: jest.fn().mockReturnThis(),
+      addSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      groupBy: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getRawMany: jest
+        .fn()
+        .mockResolvedValue([
+          { mes: '01-2024', quantidadeVendas: '1', valorTotal: '100' },
+        ]),
+    };
+    typeOrmRepository.createQueryBuilder.mockReturnValue(queryBuilder);
+
+    await expect(repository.findVendasFuturasBase()).resolves.toEqual([
+      { mes: '01-2024', quantidadeVendas: '1', valorTotal: '100' },
+    ]);
+    expect(typeOrmRepository.createQueryBuilder).toHaveBeenCalledWith('venda');
+    expect(queryBuilder.getRawMany).toHaveBeenCalled();
   });
 });
