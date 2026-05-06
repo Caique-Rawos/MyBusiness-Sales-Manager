@@ -66,6 +66,10 @@ describe('VendaItemService', () => {
   it('should create', async () => {
     const dto = {} as any;
     const expected = {} as any;
+    repository.findByVendaId.mockResolvedValue([
+      { subTotal: 10 },
+      { subTotal: 15 },
+    ] as any);
     repository.create.mockResolvedValue(expected);
     await expect(service.create(dto)).resolves.toBe(expected);
     expect(repository.create).toHaveBeenCalledWith(dto);

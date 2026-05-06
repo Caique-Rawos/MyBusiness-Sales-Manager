@@ -1,10 +1,13 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ProdutoService } from '../../produto/application/produto.service';
 import { VendaService } from '../../venda/application/venda.service';
-import { VENDA_ITEM_REPOSITORY, VendaItemRepository } from '../domain/venda_item.repository';
+import { VendaItem } from '../domain/venda_item';
+import {
+  VENDA_ITEM_REPOSITORY,
+  VendaItemRepository,
+} from '../domain/venda_item.repository';
 import { CreateVendaItemDto } from './dto/create-venda_item.dto';
 import { UpdateVendaItemDto } from './dto/update-venda_item.dto';
-import { VendaItem } from '../domain/venda_item';
 
 @Injectable()
 export class VendaItemService {
@@ -15,8 +18,11 @@ export class VendaItemService {
     private readonly produtoService: ProdutoService,
   ) {}
 
-  create(data: CreateVendaItemDto): Promise<VendaItem> {
-    return this.repository.create(data);
+  async create(data: CreateVendaItemDto): Promise<VendaItem> {
+    const result = await this.repository.create(data);
+    await this.novoTotalVenda(data.idVenda);
+    await this.atualizaEstoqueProduto(data.idProduto, data.quantidade);
+    return result;
   }
 
   findAll(): Promise<VendaItem[]> {
