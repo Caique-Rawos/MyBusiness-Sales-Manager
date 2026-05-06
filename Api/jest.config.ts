@@ -17,8 +17,8 @@ export default {
   coverageDirectory: '../coverage',
   coveragePathIgnorePatterns: [
     '/node_modules/',
-    '/src/app/.*\\.entity\\.ts$',
-    '/src/app/.*\\.dto\\.ts$',
+    '\\.entity\\.ts$',
+    '\\.dto\\.ts$',
     '/src/.*\\.module\\.ts$',
     '/src/main\\.ts$',
   ],

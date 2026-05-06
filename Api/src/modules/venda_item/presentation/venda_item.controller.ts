@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { VendaItemService } from '../application/venda_item.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { CreateVendaItemDto } from '../application/dto/create-venda_item.dto';
 import { UpdateVendaItemDto } from '../application/dto/update-venda_item.dto';
+import { VendaItemService } from '../application/venda_item.service';
 import { VendaItem } from '../domain/venda_item';
 
 @Controller('venda_item')
@@ -10,13 +19,7 @@ export class VendaItemController {
 
   @Post()
   async create(@Body() data: CreateVendaItemDto): Promise<VendaItem> {
-    const result = await this.vendaItemService.create(data);
-    await this.vendaItemService.novoTotalVenda(data.idVenda);
-    await this.vendaItemService.atualizaEstoqueProduto(
-      data.idProduto,
-      data.quantidade,
-    );
-    return result;
+    return await this.vendaItemService.create(data);
   }
 
   @Get()
@@ -35,7 +38,10 @@ export class VendaItemController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: UpdateVendaItemDto): Promise<VendaItem> {
+  update(
+    @Param('id') id: string,
+    @Body() data: UpdateVendaItemDto,
+  ): Promise<VendaItem> {
     return this.vendaItemService.update(Number(id), data);
   }
 
