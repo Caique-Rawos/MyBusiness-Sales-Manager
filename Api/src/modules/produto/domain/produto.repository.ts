@@ -10,4 +10,7 @@ export interface ProdutoRepository {
   findById(id: number): Promise<Produto | null>;
   update(id: number, data: UpdateProdutoDto): Promise<Produto>;
   delete(id: number): Promise<void>;
+  existsByRegraFiscalId(idRegraFiscal: number): Promise<boolean>;
+  existsByCategoriaId(idCategoria: number): Promise<boolean>;
+  updateEstoque(id: number, novoEstoque: number): Promise<void>;
 }

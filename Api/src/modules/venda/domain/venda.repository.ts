@@ -12,4 +12,6 @@ export interface VendaRepository {
   update(id: number, data: UpdateVendaDto): Promise<Venda>;
   delete(id: number): Promise<void>;
   findVendasFuturasBase(): Promise<IVendaPrevisao[]>;
+  existsByClienteId(idCliente: number): Promise<boolean>;
+  updateTotal(id: number, total: number): Promise<void>;
 }

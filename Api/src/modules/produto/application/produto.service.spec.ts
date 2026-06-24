@@ -1,7 +1,10 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
+import { JOB_NAMES } from 'src/shared/queue-names';
 import { ProdutoService } from './produto.service';
 
 let repository: any;
+let vendaItemService: any;
+let estoqueQueue: any;
 let service: ProdutoService;
 
 describe('ProdutoService', () => {
@@ -12,25 +15,35 @@ describe('ProdutoService', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
+      existsByRegraFiscalId: jest.fn(),
+      existsByCategoriaId: jest.fn(),
+      updateEstoque: jest.fn(),
     };
-    service = new ProdutoService(repository as any);
+    vendaItemService = {
+      existsByProdutoId: jest.fn().mockResolvedValue(false),
+    };
+    estoqueQueue = { add: jest.fn().mockResolvedValue(undefined) };
+    service = new ProdutoService(repository as any, vendaItemService, estoqueQueue);
   });
 
-  it('should create', async () => {
-    const dto = {} as any;
-    const expected = {} as any;
-    repository.create.mockResolvedValue(expected);
-    await expect(service.create(dto)).resolves.toBe(expected);
-    expect(repository.create).toHaveBeenCalledWith(dto);
+  it('should create produto without emitting entry when estoque is 0', async () => {
+    const dto = { descricao: 'Produto', estoque: 0 } as any;
+    const created = { id: 1, estoque: 0 } as any;
+    repository.create.mockResolvedValue(created);
+    await expect(service.create(dto)).resolves.toBe(created);
+    expect(estoqueQueue.add).not.toHaveBeenCalled();
+  });
+
+  it('should create produto and emit entrada job when estoque > 0', async () => {
+    const dto = { descricao: 'Produto', estoque: 10 } as any;
+    const created = { id: 5, estoque: 10 } as any;
+    repository.create.mockResolvedValue(created);
+    await expect(service.create(dto)).resolves.toBe(created);
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ENTRADA, {
+      idProduto: 5,
+      quantidade: 10,
+      motivo: 'Cadastro de produto',
+    });
   });
 
   it('should find all', async () => {
@@ -63,16 +76,21 @@ describe('ProdutoService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
   });
 
-  it('should delete when entity exists', async () => {
+  it('should delete when produto is not referenced', async () => {
     repository.findById.mockResolvedValue({ id: 1 } as any);
+    vendaItemService.existsByProdutoId.mockResolvedValue(false);
     await expect(service.delete(1)).resolves.toBeUndefined();
-    expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should throw ConflictException when produto is referenced in venda_item', async () => {
+    repository.findById.mockResolvedValue({ id: 1 } as any);
+    vendaItemService.existsByProdutoId.mockResolvedValue(true);
+    await expect(service.delete(1)).rejects.toThrow(ConflictException);
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {
@@ -80,16 +98,16 @@ describe('ProdutoService', () => {
     await expect(service.delete(1)).rejects.toThrow(NotFoundException);
   });
 
-  it('should update product stock', async () => {
+  it('should ajustar estoque applying delta to current stock', async () => {
     repository.findById.mockResolvedValue({ id: 1, estoque: '10' } as any);
-    await expect(service.atualizaEstoque(1, 2)).resolves.toBeUndefined();
-    expect(repository.update).toHaveBeenCalledWith(1, { estoque: 8 });
+    repository.updateEstoque.mockResolvedValue(undefined);
+    await expect(service.ajustarEstoque(1, -3)).resolves.toBeUndefined();
+    expect(repository.updateEstoque).toHaveBeenCalledWith(1, 7);
   });
 
-  it('should throw NotFoundException when product is not found', async () => {
+  it('should silently skip ajustarEstoque when produto not found', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.atualizaEstoque(1, 2)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.ajustarEstoque(1, -3)).resolves.toBeUndefined();
+    expect(repository.updateEstoque).not.toHaveBeenCalled();
   });
 });

@@ -1,7 +1,7 @@
 <?php
 
 require_once  '../../../api/path/api-path.php';
-$url = API_PATH . 'status_pagamento/';
+$url = API_PATH . 'status-pagamento/';
 
 $curl = curl_init($url);
 

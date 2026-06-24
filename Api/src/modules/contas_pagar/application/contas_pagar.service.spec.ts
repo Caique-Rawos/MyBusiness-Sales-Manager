@@ -12,15 +12,8 @@ describe('ContasPagarService', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
+      existsByPagamentoId: jest.fn(),
+      existsByStatusPagamentoId: jest.fn(),
     };
     service = new ContasPagarService(repository as any);
   });
@@ -63,9 +56,7 @@ describe('ContasPagarService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
   });
 
   it('should delete when entity exists', async () => {
@@ -78,5 +69,17 @@ describe('ContasPagarService', () => {
   it('should throw NotFoundException when delete entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
     await expect(service.delete(1)).rejects.toThrow(NotFoundException);
+  });
+
+  it('should check if pagamento is referenced', async () => {
+    repository.existsByPagamentoId.mockResolvedValue(true);
+    await expect(service.existsByPagamentoId(1)).resolves.toBe(true);
+    expect(repository.existsByPagamentoId).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if status pagamento is referenced', async () => {
+    repository.existsByStatusPagamentoId.mockResolvedValue(false);
+    await expect(service.existsByStatusPagamentoId(1)).resolves.toBe(false);
+    expect(repository.existsByStatusPagamentoId).toHaveBeenCalledWith(1);
   });
 });

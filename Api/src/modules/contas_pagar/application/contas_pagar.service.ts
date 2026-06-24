@@ -45,4 +45,12 @@ export class ContasPagarService {
     }
     await this.repository.delete(id);
   }
+
+  existsByPagamentoId(idPagamento: number): Promise<boolean> {
+    return this.repository.existsByPagamentoId(idPagamento);
+  }
+
+  existsByStatusPagamentoId(idStatusPagamento: number): Promise<boolean> {
+    return this.repository.existsByStatusPagamentoId(idStatusPagamento);
+  }
 }

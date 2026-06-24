@@ -1,4 +1,5 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ProdutoService } from 'src/modules/produto/application/produto.service';
 import {
   REGRA_FISCAL_REPOSITORY,
   RegraFiscalRepository,
@@ -12,6 +13,7 @@ export class RegraFiscalService {
   constructor(
     @Inject(REGRA_FISCAL_REPOSITORY)
     private readonly repository: RegraFiscalRepository,
+    private readonly produtoService: ProdutoService,
   ) {}
 
   create(data: CreateRegraFiscalDto): Promise<RegraFiscal> {
@@ -43,6 +45,12 @@ export class RegraFiscalService {
     if (!exists) {
       throw new NotFoundException('RegraFiscal not found');
     }
+
+    const referenced = await this.produtoService.existsByRegraFiscalId(id);
+    if (referenced) {
+      throw new ConflictException('Regra fiscal possui produtos vinculados e não pode ser removida');
+    }
+
     await this.repository.delete(id);
   }
 }

@@ -1,7 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { RegraFiscalService } from './regra_fiscal.service';
 
 let repository: any;
+let produtoService: any;
 let service: RegraFiscalService;
 
 describe('RegraFiscalService', () => {
@@ -12,17 +13,11 @@ describe('RegraFiscalService', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
     };
-    service = new RegraFiscalService(repository as any);
+    produtoService = {
+      existsByRegraFiscalId: jest.fn().mockResolvedValue(false),
+    };
+    service = new RegraFiscalService(repository as any, produtoService);
   });
 
   it('should create', async () => {
@@ -63,16 +58,21 @@ describe('RegraFiscalService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
   });
 
-  it('should delete when entity exists', async () => {
+  it('should delete when regra fiscal has no produtos', async () => {
     repository.findById.mockResolvedValue({ id: 1 } as any);
+    produtoService.existsByRegraFiscalId.mockResolvedValue(false);
     await expect(service.delete(1)).resolves.toBeUndefined();
-    expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should throw ConflictException when regra fiscal has produtos vinculados', async () => {
+    repository.findById.mockResolvedValue({ id: 1 } as any);
+    produtoService.existsByRegraFiscalId.mockResolvedValue(true);
+    await expect(service.delete(1)).rejects.toThrow(ConflictException);
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {

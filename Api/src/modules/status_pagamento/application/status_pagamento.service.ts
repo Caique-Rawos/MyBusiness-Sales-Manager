@@ -1,4 +1,6 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ContasPagarService } from 'src/modules/contas_pagar/application/contas_pagar.service';
+import { ContasReceberService } from 'src/modules/contas_receber/application/contas_receber.service';
 import {
   STATUS_PAGAMENTO_REPOSITORY,
   StatusPagamentoRepository,
@@ -12,6 +14,8 @@ export class StatusPagamentoService {
   constructor(
     @Inject(STATUS_PAGAMENTO_REPOSITORY)
     private readonly repository: StatusPagamentoRepository,
+    private readonly contasReceberService: ContasReceberService,
+    private readonly contasPagarService: ContasPagarService,
   ) {}
 
   create(data: CreateStatusPagamentoDto): Promise<StatusPagamento> {
@@ -43,6 +47,18 @@ export class StatusPagamentoService {
     if (!exists) {
       throw new NotFoundException('StatusPagamento not found');
     }
+
+    const [emReceber, emPagar] = await Promise.all([
+      this.contasReceberService.existsByStatusPagamentoId(id),
+      this.contasPagarService.existsByStatusPagamentoId(id),
+    ]);
+
+    if (emReceber || emPagar) {
+      throw new ConflictException(
+        'Status de pagamento possui contas vinculadas e não pode ser removido',
+      );
+    }
+
     await this.repository.delete(id);
   }
 }

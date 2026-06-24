@@ -46,6 +46,15 @@ export class VendaTypeOrmRepository implements VendaRepository {
     await this.repository.delete(id);
   }
 
+  async existsByClienteId(idCliente: number): Promise<boolean> {
+    const count = await this.repository.count({ where: { idCliente } });
+    return count > 0;
+  }
+
+  async updateTotal(id: number, total: number): Promise<void> {
+    await this.repository.update(id, { totalVenda: total });
+  }
+
   async findVendasFuturasBase(): Promise<IVendaPrevisao[]> {
     const query = this.repository
       .createQueryBuilder('venda')

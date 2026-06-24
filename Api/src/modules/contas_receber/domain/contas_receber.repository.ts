@@ -9,6 +9,8 @@ export interface ContasReceberRepository {
   findAll(): Promise<ContasReceber[]>;
   findById(id: number): Promise<ContasReceber | null>;
   findByVendaId(idVenda: number): Promise<ContasReceber | null>;
+  existsByPagamentoId(idPagamento: number): Promise<boolean>;
+  existsByStatusPagamentoId(idStatusPagamento: number): Promise<boolean>;
   update(id: number, data: UpdateContasReceberDto): Promise<ContasReceber>;
   delete(id: number): Promise<void>;
 }

@@ -75,7 +75,7 @@ export class ContasReceberOrmEntity {
   })
   idVenda?: number;
 
-  @OneToOne(() => VendaOrmEntity)
+  @OneToOne(() => VendaOrmEntity, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id_venda' })
   venda: VendaOrmEntity;
 }

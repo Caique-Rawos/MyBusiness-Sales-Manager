@@ -1,8 +1,6 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CategoriaRepository,
-  CATEGORIA_REPOSITORY,
-} from '../domain/categoria.repository';
+import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ProdutoService } from 'src/modules/produto/application/produto.service';
+import { CategoriaRepository, CATEGORIA_REPOSITORY } from '../domain/categoria.repository';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { Categoria } from '../domain/categoria';
@@ -12,6 +10,7 @@ export class CategoriaService {
   constructor(
     @Inject(CATEGORIA_REPOSITORY)
     private readonly repository: CategoriaRepository,
+    private readonly produtoService: ProdutoService,
   ) {}
 
   create(data: CreateCategoriaDto): Promise<Categoria> {
@@ -43,6 +42,12 @@ export class CategoriaService {
     if (!exists) {
       throw new NotFoundException('Categoria not found');
     }
+
+    const referenced = await this.produtoService.existsByCategoriaId(id);
+    if (referenced) {
+      throw new ConflictException('Categoria possui produtos vinculados e não pode ser removida');
+    }
+
     await this.repository.delete(id);
   }
 }

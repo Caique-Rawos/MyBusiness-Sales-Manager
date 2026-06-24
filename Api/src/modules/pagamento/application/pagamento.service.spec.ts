@@ -1,7 +1,9 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { PagamentoService } from './pagamento.service';
 
 let repository: any;
+let contasReceberService: any;
+let contasPagarService: any;
 let service: PagamentoService;
 
 describe('PagamentoService', () => {
@@ -12,17 +14,14 @@ describe('PagamentoService', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
     };
-    service = new PagamentoService(repository as any);
+    contasReceberService = {
+      existsByPagamentoId: jest.fn().mockResolvedValue(false),
+    };
+    contasPagarService = {
+      existsByPagamentoId: jest.fn().mockResolvedValue(false),
+    };
+    service = new PagamentoService(repository, contasReceberService, contasPagarService);
   });
 
   it('should create', async () => {
@@ -63,16 +62,28 @@ describe('PagamentoService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
   });
 
-  it('should delete when entity exists', async () => {
+  it('should delete when entity exists and has no linked contas', async () => {
     repository.findById.mockResolvedValue({ id: 1 } as any);
     await expect(service.delete(1)).resolves.toBeUndefined();
     expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should throw ConflictException when pagamento is used in contas_receber', async () => {
+    repository.findById.mockResolvedValue({ id: 1 } as any);
+    contasReceberService.existsByPagamentoId.mockResolvedValue(true);
+    await expect(service.delete(1)).rejects.toThrow(ConflictException);
+    expect(repository.delete).not.toHaveBeenCalled();
+  });
+
+  it('should throw ConflictException when pagamento is used in contas_pagar', async () => {
+    repository.findById.mockResolvedValue({ id: 1 } as any);
+    contasPagarService.existsByPagamentoId.mockResolvedValue(true);
+    await expect(service.delete(1)).rejects.toThrow(ConflictException);
+    expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {

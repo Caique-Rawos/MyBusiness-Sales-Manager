@@ -1,9 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
+import { JOB_NAMES } from 'src/shared/queue-names';
 import { VendaItemService } from './venda_item.service';
 
 let repository: any;
-let vendaService: any;
-let produtoService: any;
+let vendaQueue: any;
+let estoqueQueue: any;
 let service: VendaItemService;
 
 describe('VendaItemService', () => {
@@ -15,64 +16,26 @@ describe('VendaItemService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
+      existsByProdutoId: jest.fn(),
     };
-    vendaService = {
-      create: jest.fn(),
-      findAll: jest.fn(),
-      findById: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
-    };
-    produtoService = {
-      create: jest.fn(),
-      findAll: jest.fn(),
-      findById: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-      findByVendaId: jest.fn(),
-      findToday: jest.fn(),
-      findByAlias: jest.fn(),
-      findVendasFuturasBase: jest.fn(),
-      findAllGroupByCliente: jest.fn(),
-      findAllGroupByData: jest.fn(),
-      getCupomItens: jest.fn(),
-      atualizaTotal: jest.fn(),
-      atualizaEstoque: jest.fn(),
-    };
-    service = new VendaItemService(
-      repository,
-      vendaService,
-      produtoService as any,
-    );
+    vendaQueue = { add: jest.fn().mockResolvedValue(undefined) };
+    estoqueQueue = { add: jest.fn().mockResolvedValue(undefined) };
+    service = new VendaItemService(repository, vendaQueue, estoqueQueue);
   });
 
-  it('should create', async () => {
-    const dto = {} as any;
-    const expected = {} as any;
-    repository.findByVendaId.mockResolvedValue([
-      { subTotal: 10 },
-      { subTotal: 15 },
-    ] as any);
+  it('should create and emit queue jobs', async () => {
+    const dto = { idVenda: 1, idProduto: 2, quantidade: 3 } as any;
+    const expected = { id: 10, idVenda: 1 } as any;
     repository.create.mockResolvedValue(expected);
     await expect(service.create(dto)).resolves.toBe(expected);
     expect(repository.create).toHaveBeenCalledWith(dto);
+    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: 1 });
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.SAIDA, {
+      idProduto: 2,
+      quantidade: 3,
+      idVenda: 1,
+      idVendaItem: 10,
+    });
   });
 
   it('should find all', async () => {
@@ -105,16 +68,15 @@ describe('VendaItemService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
   });
 
-  it('should delete when entity exists', async () => {
-    repository.findById.mockResolvedValue({ id: 1 } as any);
+  it('should delete and emit estorno + calcular-total jobs', async () => {
+    repository.findById.mockResolvedValue({ id: 1, idVenda: 5 } as any);
     await expect(service.delete(1)).resolves.toBeUndefined();
-    expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: 1 });
+    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: 5 });
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {
@@ -129,22 +91,9 @@ describe('VendaItemService', () => {
     expect(repository.findByVendaId).toHaveBeenCalledWith(1);
   });
 
-  it('should calculate and update total venda with item subtotals', async () => {
-    repository.findByVendaId.mockResolvedValue([
-      { subTotal: 10 },
-      { subTotal: 15 },
-    ] as any);
-    vendaService.atualizaTotal.mockResolvedValue(undefined);
-    await expect(service.novoTotalVenda(1)).resolves.toBeUndefined();
-    expect(vendaService.atualizaTotal).toHaveBeenCalledWith({
-      id_venda: 1,
-      total: 25,
-    });
-  });
-
-  it('should call produtoService.atualizaEstoque', async () => {
-    produtoService.atualizaEstoque.mockResolvedValue(undefined);
-    await expect(service.atualizaEstoqueProduto(1, 5)).resolves.toBeUndefined();
-    expect(produtoService.atualizaEstoque).toHaveBeenCalledWith(1, 5);
+  it('should check if produto is referenced', async () => {
+    repository.existsByProdutoId.mockResolvedValue(true);
+    await expect(service.existsByProdutoId(1)).resolves.toBe(true);
+    expect(repository.existsByProdutoId).toHaveBeenCalledWith(1);
   });
 });

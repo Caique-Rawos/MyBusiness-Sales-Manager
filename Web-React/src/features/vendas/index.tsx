@@ -1,0 +1,6 @@
+export { VendasPage } from './venda/VendasPage'
+export { VendaItemPage } from './venda-item/VendaItemPage'
+export { CupomFiscalPage } from './cupom/CupomFiscalPage'
+export { RelatorioVendasPage } from './relatorios/RelatorioVendasPage'
+export { RelatorioClientePage } from './relatorios/RelatorioClientePage'
+export { RelatorioDataPage } from './relatorios/RelatorioDataPage'
