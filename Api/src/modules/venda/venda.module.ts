@@ -1,9 +1,6 @@
-import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { VendaItemModule } from 'src/modules/venda_item/venda_item.module';
-import { QUEUE_NAMES } from 'src/shared/queue-names';
-import { VendaProcessor } from './application/venda.processor';
+import { ContasReceberModule } from '../contas_receber/contas_receber.module';
 import { VendaService } from './application/venda.service';
 import { VENDA_REPOSITORY } from './domain/venda.repository';
 import { VendaOrmEntity } from './infra/typeorm/venda.entity';
@@ -11,17 +8,10 @@ import { VendaTypeOrmRepository } from './infra/typeorm/venda.repository';
 import { VendaController } from './presentation/venda.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([VendaOrmEntity]),
-    BullModule.registerQueue({ name: QUEUE_NAMES.VENDA }),
-    BullModule.registerQueue({ name: QUEUE_NAMES.ESTOQUE }),
-    BullModule.registerQueue({ name: QUEUE_NAMES.CONTAS_RECEBER }),
-    VendaItemModule,
-  ],
+  imports: [TypeOrmModule.forFeature([VendaOrmEntity]), ContasReceberModule],
   controllers: [VendaController],
   providers: [
     VendaService,
-    VendaProcessor,
     {
       provide: VENDA_REPOSITORY,
       useClass: VendaTypeOrmRepository,

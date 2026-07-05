@@ -1,17 +1,12 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { VendaUpdateDto } from '../../venda/application/dto/atualizaTotalVenda.dto';
-import { ContasReceber } from '../domain/contas_receber';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   CONTAS_RECEBER_REPOSITORY,
   ContasReceberRepository,
 } from '../domain/contas_receber.repository';
 import { CreateContasReceberDto } from './dto/create-contas_receber.dto';
 import { UpdateContasReceberDto } from './dto/update-contas_receber.dto';
+import { ContasReceber } from '../domain/contas_receber';
+import { VendaUpdateDto } from '../../venda/application/dto/atualizaTotalVenda.dto';
 
 @Injectable()
 export class ContasReceberService {
@@ -36,20 +31,11 @@ export class ContasReceberService {
     return contas;
   }
 
-  async update(
-    id: number,
-    data: UpdateContasReceberDto,
-  ): Promise<ContasReceber> {
+  async update(id: number, data: UpdateContasReceberDto): Promise<ContasReceber> {
     const exists = await this.repository.findById(id);
     if (!exists) {
       throw new NotFoundException('ContasReceber not found');
     }
-
-    if (exists.idVenda) {
-      delete data.valorTotal;
-      delete data.idVenda;
-    }
-
     return this.repository.update(id, data);
   }
 
@@ -58,33 +44,14 @@ export class ContasReceberService {
     if (!exists) {
       throw new NotFoundException('ContasReceber not found');
     }
-
-    if (exists.idVenda) {
-      throw new ConflictException(
-        'Conta vinculada a uma venda não pode ser excluída',
-      );
-    }
-
     await this.repository.delete(id);
   }
 
-  existsByPagamentoId(idPagamento: number): Promise<boolean> {
-    return this.repository.existsByPagamentoId(idPagamento);
-  }
-
-  existsByStatusPagamentoId(idStatusPagamento: number): Promise<boolean> {
-    return this.repository.existsByStatusPagamentoId(idStatusPagamento);
-  }
-
   async atualizaTotal(vendaUpdateDto: VendaUpdateDto): Promise<void> {
-    const receber = await this.repository.findByVendaId(
-      vendaUpdateDto.id_venda,
-    );
+    const receber = await this.repository.findByVendaId(vendaUpdateDto.id_venda);
     if (!receber) {
       throw new NotFoundException('ContasReceber not found');
     }
-    await this.repository.update(receber.id, {
-      valorTotal: vendaUpdateDto.total,
-    });
+    await this.repository.update(receber.id, { valorTotal: vendaUpdateDto.total });
   }
 }

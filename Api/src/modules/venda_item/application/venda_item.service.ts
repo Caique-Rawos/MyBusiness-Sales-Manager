@@ -1,7 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bullmq';
-import { Queue } from 'bullmq';
-import { JOB_NAMES, QUEUE_NAMES } from 'src/shared/queue-names';
+import { ProdutoService } from '../../produto/application/produto.service';
+import { VendaService } from '../../venda/application/venda.service';
 import { VendaItem } from '../domain/venda_item';
 import {
   VENDA_ITEM_REPOSITORY,
@@ -15,19 +14,14 @@ export class VendaItemService {
   constructor(
     @Inject(VENDA_ITEM_REPOSITORY)
     private readonly repository: VendaItemRepository,
-    @InjectQueue(QUEUE_NAMES.VENDA) private readonly vendaQueue: Queue,
-    @InjectQueue(QUEUE_NAMES.ESTOQUE) private readonly estoqueQueue: Queue,
+    private readonly vendaService: VendaService,
+    private readonly produtoService: ProdutoService,
   ) {}
 
   async create(data: CreateVendaItemDto): Promise<VendaItem> {
     const result = await this.repository.create(data);
-    await this.vendaQueue.add(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: data.idVenda });
-    await this.estoqueQueue.add(JOB_NAMES.ESTOQUE.SAIDA, {
-      idProduto: data.idProduto,
-      quantidade: data.quantidade,
-      idVenda: data.idVenda,
-      idVendaItem: result.id,
-    });
+    await this.novoTotalVenda(data.idVenda);
+    await this.atualizaEstoqueProduto(data.idProduto, data.quantidade);
     return result;
   }
 
@@ -57,15 +51,29 @@ export class VendaItemService {
       throw new NotFoundException('VendaItem not found');
     }
     await this.repository.delete(id);
-    await this.estoqueQueue.add(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: id });
-    await this.vendaQueue.add(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: exists.idVenda });
   }
 
   findByIdVenda(idVenda: number): Promise<VendaItem[]> {
     return this.repository.findByVendaId(idVenda);
   }
 
-  async existsByProdutoId(idProduto: number): Promise<boolean> {
-    return this.repository.existsByProdutoId(idProduto);
+  async novoTotalVenda(idVenda: number): Promise<void> {
+    const vendaItens = await this.findByIdVenda(idVenda);
+    const totalSubtotais = vendaItens.reduce(
+      (sum, item) => sum + Number(item.subTotal),
+      0,
+    );
+
+    await this.vendaService.atualizaTotal({
+      id_venda: idVenda,
+      total: totalSubtotais,
+    });
+  }
+
+  async atualizaEstoqueProduto(
+    idProduto: number,
+    quantidade: number,
+  ): Promise<void> {
+    await this.produtoService.atualizaEstoque(idProduto, quantidade);
   }
 }

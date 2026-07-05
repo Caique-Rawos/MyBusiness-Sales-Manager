@@ -1,4 +1,4 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { ContasReceberService } from './contas_receber.service';
 
 let repository: any;
@@ -13,8 +13,6 @@ describe('ContasReceberService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       findByVendaId: jest.fn(),
-      existsByPagamentoId: jest.fn(),
-      existsByStatusPagamentoId: jest.fn(),
       findToday: jest.fn(),
       findByAlias: jest.fn(),
       findVendasFuturasBase: jest.fn(),
@@ -54,7 +52,7 @@ describe('ContasReceberService', () => {
     await expect(service.findById(1)).rejects.toThrow(NotFoundException);
   });
 
-  it('should update when entity exists and has no venda link', async () => {
+  it('should update when entity exists', async () => {
     const expected = {} as any;
     repository.findById.mockResolvedValue({ id: 1 } as any);
     repository.update.mockResolvedValue(expected);
@@ -63,57 +61,23 @@ describe('ContasReceberService', () => {
     expect(repository.update).toHaveBeenCalledWith(1, {});
   });
 
-  it('should update allowed fields when entity is linked to a venda', async () => {
-    const expected = {} as any;
-    repository.findById.mockResolvedValue({ id: 1, idVenda: 5 } as any);
-    repository.update.mockResolvedValue(expected);
-    const dto = { descricao: 'nova desc', valorPago: 100 } as any;
-    await expect(service.update(1, dto)).resolves.toBe(expected);
-    expect(repository.update).toHaveBeenCalledWith(1, dto);
-  });
-
-  it('should silently ignore valorTotal and idVenda when conta is venda-linked', async () => {
-    const expected = {} as any;
-    repository.findById.mockResolvedValue({ id: 1, idVenda: 5 } as any);
-    repository.update.mockResolvedValue(expected);
-    const dto = { valorTotal: 999, idVenda: 10, valorPago: 50 } as any;
-    await expect(service.update(1, dto)).resolves.toBe(expected);
-    expect(repository.update).toHaveBeenCalledWith(1, { valorPago: 50 });
-  });
-
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.update(1, {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
-  it('should delete when entity exists and has no venda link', async () => {
+  it('should delete when entity exists', async () => {
     repository.findById.mockResolvedValue({ id: 1 } as any);
     await expect(service.delete(1)).resolves.toBeUndefined();
     expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
   });
 
-  it('should throw ConflictException when deleting a venda-linked conta', async () => {
-    repository.findById.mockResolvedValue({ id: 1, idVenda: 5 } as any);
-    await expect(service.delete(1)).rejects.toThrow(ConflictException);
-    expect(repository.delete).not.toHaveBeenCalled();
-  });
-
   it('should throw NotFoundException when delete entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
     await expect(service.delete(1)).rejects.toThrow(NotFoundException);
-  });
-
-  it('should check if pagamento is referenced', async () => {
-    repository.existsByPagamentoId.mockResolvedValue(true);
-    await expect(service.existsByPagamentoId(1)).resolves.toBe(true);
-    expect(repository.existsByPagamentoId).toHaveBeenCalledWith(1);
-  });
-
-  it('should check if status pagamento is referenced', async () => {
-    repository.existsByStatusPagamentoId.mockResolvedValue(false);
-    await expect(service.existsByStatusPagamentoId(1)).resolves.toBe(false);
-    expect(repository.existsByStatusPagamentoId).toHaveBeenCalledWith(1);
   });
 
   it('should update total when contas receber exists', async () => {

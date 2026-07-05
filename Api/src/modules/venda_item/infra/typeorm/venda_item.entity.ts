@@ -57,7 +57,7 @@ export class VendaItemOrmEntity {
   })
   idVenda!: number;
 
-  @ManyToOne(() => VendaOrmEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => VendaOrmEntity)
   @JoinColumn({ name: 'id_venda' })
   venda: VendaOrmEntity;
 

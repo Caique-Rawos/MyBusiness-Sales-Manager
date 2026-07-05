@@ -44,18 +44,4 @@ export class ProdutoTypeOrmRepository implements ProdutoRepository {
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
   }
-
-  async existsByRegraFiscalId(idRegraFiscal: number): Promise<boolean> {
-    const count = await this.repository.count({ where: { idRegraFiscal } });
-    return count > 0;
-  }
-
-  async existsByCategoriaId(idCategoria: number): Promise<boolean> {
-    const count = await this.repository.count({ where: { idCategoria } });
-    return count > 0;
-  }
-
-  async updateEstoque(id: number, novoEstoque: number): Promise<void> {
-    await this.repository.update(id, { estoque: novoEstoque });
-  }
 }

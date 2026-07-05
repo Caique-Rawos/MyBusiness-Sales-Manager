@@ -51,9 +51,4 @@ export class VendaItemTypeOrmRepository implements VendaItemRepository {
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
   }
-
-  async existsByProdutoId(idProduto: number): Promise<boolean> {
-    const count = await this.repository.count({ where: { idProduto } });
-    return count > 0;
-  }
 }

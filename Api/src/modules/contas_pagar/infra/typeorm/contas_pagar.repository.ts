@@ -41,16 +41,6 @@ export class ContasPagarTypeOrmRepository implements ContasPagarRepository {
     });
   }
 
-  async existsByPagamentoId(idPagamento: number): Promise<boolean> {
-    const count = await this.repository.count({ where: { idPagamento } });
-    return count > 0;
-  }
-
-  async existsByStatusPagamentoId(idStatusPagamento: number): Promise<boolean> {
-    const count = await this.repository.count({ where: { idStatusPagamento } });
-    return count > 0;
-  }
-
   async delete(id: number): Promise<void> {
     await this.repository.delete(id);
   }

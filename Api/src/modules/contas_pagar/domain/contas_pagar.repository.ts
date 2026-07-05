@@ -8,8 +8,6 @@ export interface ContasPagarRepository {
   create(data: CreateContasPagarDto): Promise<ContasPagar>;
   findAll(): Promise<ContasPagar[]>;
   findById(id: number): Promise<ContasPagar | null>;
-  existsByPagamentoId(idPagamento: number): Promise<boolean>;
-  existsByStatusPagamentoId(idStatusPagamento: number): Promise<boolean>;
   update(id: number, data: UpdateContasPagarDto): Promise<ContasPagar>;
   delete(id: number): Promise<void>;
 }

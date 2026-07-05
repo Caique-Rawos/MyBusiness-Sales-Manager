@@ -34,31 +34,30 @@ describe('VendaRelatorioController', () => {
   it('should call findAll', async () => {
     const result = {} as any;
     vendaRelatorioService.findAll.mockResolvedValue(result);
-    await expect(controller.findAll('2024-01-01', '2024-12-31')).resolves.toBe(result);
-    expect(vendaRelatorioService.findAll).toHaveBeenCalledWith({
-      dataInicio: new Date('2024-01-01'),
-      dataFim: new Date('2024-12-31'),
-    });
+    await expect(controller.findAll({} as any)).resolves.toBe(result);
+    expect(vendaRelatorioService.findAll).toHaveBeenCalledWith({} as any);
   });
 
   it('should call findAllGroupByCliente', async () => {
     const result = {} as any;
     vendaRelatorioService.findAllGroupByCliente.mockResolvedValue(result);
-    await expect(controller.findAllGroupByCliente('2024-01-01', '2024-12-31')).resolves.toBe(result);
-    expect(vendaRelatorioService.findAllGroupByCliente).toHaveBeenCalledWith({
-      dataInicio: new Date('2024-01-01'),
-      dataFim: new Date('2024-12-31'),
-    });
+    await expect(controller.findAllGroupByCliente({} as any)).resolves.toBe(
+      result,
+    );
+    expect(vendaRelatorioService.findAllGroupByCliente).toHaveBeenCalledWith(
+      {} as any,
+    );
   });
 
   it('should call findAllGroupByData', async () => {
     const result = {} as any;
     vendaRelatorioService.findAllGroupByData.mockResolvedValue(result);
-    await expect(controller.findAllGroupByData('2024-01-01', '2024-12-31')).resolves.toBe(result);
-    expect(vendaRelatorioService.findAllGroupByData).toHaveBeenCalledWith({
-      dataInicio: new Date('2024-01-01'),
-      dataFim: new Date('2024-12-31'),
-    });
+    await expect(controller.findAllGroupByData({} as any)).resolves.toBe(
+      result,
+    );
+    expect(vendaRelatorioService.findAllGroupByData).toHaveBeenCalledWith(
+      {} as any,
+    );
   });
 
   it('should call generateCupomFiscal', async () => {
@@ -66,7 +65,11 @@ describe('VendaRelatorioController', () => {
     vendaRelatorioService.generateCupomFiscal = jest
       .fn()
       .mockResolvedValue(result);
-    await expect(controller.generateCupomFiscal('1')).resolves.toBe(result);
-    expect(vendaRelatorioService.generateCupomFiscal).toHaveBeenCalledWith({ idVenda: 1 });
+    await expect(controller.generateCupomFiscal({ idVenda: 1 })).resolves.toBe(
+      result,
+    );
+    expect(vendaRelatorioService.generateCupomFiscal).toHaveBeenCalledWith({
+      idVenda: 1,
+    });
   });
 });

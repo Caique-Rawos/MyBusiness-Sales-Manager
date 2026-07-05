@@ -11,5 +11,4 @@ export interface VendaItemRepository {
   findByVendaId(idVenda: number): Promise<VendaItem[]>;
   update(id: number, data: UpdateVendaItemDto): Promise<VendaItem>;
   delete(id: number): Promise<void>;
-  existsByProdutoId(idProduto: number): Promise<boolean>;
 }

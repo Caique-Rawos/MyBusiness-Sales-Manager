@@ -1,8 +1,7 @@
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { ClienteService } from './cliente.service';
 
 let repository: any;
-let vendaService: any;
 let service: ClienteService;
 
 describe('ClienteService', () => {
@@ -13,11 +12,17 @@ describe('ClienteService', () => {
       findById: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      findByVendaId: jest.fn(),
+      findToday: jest.fn(),
+      findByAlias: jest.fn(),
+      findVendasFuturasBase: jest.fn(),
+      findAllGroupByCliente: jest.fn(),
+      findAllGroupByData: jest.fn(),
+      getCupomItens: jest.fn(),
+      atualizaTotal: jest.fn(),
+      atualizaEstoque: jest.fn(),
     };
-    vendaService = {
-      existsByClienteId: jest.fn().mockResolvedValue(false),
-    };
-    service = new ClienteService(repository as any, vendaService);
+    service = new ClienteService(repository as any);
   });
 
   it('should create', async () => {
@@ -58,21 +63,16 @@ describe('ClienteService', () => {
 
   it('should throw NotFoundException when update entity does not exist', async () => {
     repository.findById.mockResolvedValue(null);
-    await expect(service.update(1, {} as any)).rejects.toThrow(NotFoundException);
+    await expect(service.update(1, {} as any)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 
-  it('should delete when cliente has no vendas', async () => {
+  it('should delete when entity exists', async () => {
     repository.findById.mockResolvedValue({ id: 1 } as any);
-    vendaService.existsByClienteId.mockResolvedValue(false);
     await expect(service.delete(1)).resolves.toBeUndefined();
+    expect(repository.findById).toHaveBeenCalledWith(1);
     expect(repository.delete).toHaveBeenCalledWith(1);
-  });
-
-  it('should throw ConflictException when cliente has vendas', async () => {
-    repository.findById.mockResolvedValue({ id: 1 } as any);
-    vendaService.existsByClienteId.mockResolvedValue(true);
-    await expect(service.delete(1)).rejects.toThrow(ConflictException);
-    expect(repository.delete).not.toHaveBeenCalled();
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {

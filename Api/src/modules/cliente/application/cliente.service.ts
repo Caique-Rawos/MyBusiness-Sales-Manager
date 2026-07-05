@@ -1,5 +1,4 @@
-import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { VendaService } from 'src/modules/venda/application/venda.service';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import {
   CLIENTE_REPOSITORY,
   ClienteRepository,
@@ -13,7 +12,6 @@ export class ClienteService {
   constructor(
     @Inject(CLIENTE_REPOSITORY)
     private readonly repository: ClienteRepository,
-    private readonly vendaService: VendaService,
   ) {}
 
   create(data: CreateClienteDto): Promise<Cliente> {
@@ -45,12 +43,6 @@ export class ClienteService {
     if (!exists) {
       throw new NotFoundException('Cliente not found');
     }
-
-    const referenced = await this.vendaService.existsByClienteId(id);
-    if (referenced) {
-      throw new ConflictException('Cliente possui vendas vinculadas e não pode ser removido');
-    }
-
     await this.repository.delete(id);
   }
 }
