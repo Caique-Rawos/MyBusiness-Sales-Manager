@@ -7,3 +7,4 @@
 - [Entrada de estoque no cadastro](project_estoque_entrada_record_only.md) — `registrarEntrada` só grava movimento, não ajusta estoque; campo `motivo` identifica a origem
 - [Multi-tenant + Auth](project_multi_tenant_auth.md) — Schema-per-tenant, roteamento de conexão, JWT/RBAC, gotchas de search_path e filas BullMQ
 - [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
+- [PENDÊNCIA: aplicar @RequirePermission](project_pending_permission_enforcement.md) — RBAC existe mas não trava nenhuma rota ainda; atacar assim que possível após o frontend
