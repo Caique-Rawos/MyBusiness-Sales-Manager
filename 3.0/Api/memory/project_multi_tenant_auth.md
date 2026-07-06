@@ -32,9 +32,11 @@ Arrays explícitos em `src/shared/entities/{catalog,tenant}-entities.ts` — **t
 
 Access token JWT (15min, payload `{sub, tenantId, schema, permissions[]}`) + refresh token opaco (7 dias, hash sha256 em `refresh_token`, cookie httpOnly em `/auth/*`, sempre rotacionado a cada uso). `@Public()` isenta rotas do guard global; sem isso, toda rota exige token válido.
 
-## RBAC: catálogo existe, mas não está aplicado
+## RBAC: aplicado nos 15 controllers de negócio
 
-`PermissionGuard` + `@RequirePermission('modulo:acao')` funcionam, e 60 permissões (`{criar,listar,editar,deletar}` × 15 módulos) são seedadas no boot (`PermissionSeedService`). **Mas nenhum controller existente usa `@RequirePermission` ainda** — hoje qualquer usuário autenticado acessa qualquer rota, independente de papel. Aplicar isso é trabalho pendente (fácil, mecânico, mas ainda não feito).
+`PermissionGuard` + `@RequirePermission(PERMISSOES.MODULO.acao)` (`src/modules/auth/application/permission-catalog.ts`) travam cada rota dos 15 módulos pela permissão certa. 60 permissões (`{criar,listar,editar,deletar}` × 15 módulos) seedadas no boot (`PermissionSeedService`). `PermissaoChave` é um template literal type derivado das mesmas listas — digitar uma chave inválida quebra o build.
+
+**Gotcha de design a lembrar (RBAC ainda não implementado, ver `project_pending_user_management_ui.md`)**: o papel "Administrador" criado no signup é uma fotografia das permissões que existiam naquele momento — permissão nova adicionada depois (feature nova) não chega automaticamente pros tenants já existentes. A solução decidida é um bypass via flag `isOwner` no usuário (não sincronizar `papel_permissao` retroativamente), a implementar na Task de gestão de usuários.
 
 ## Signup self-service
 
