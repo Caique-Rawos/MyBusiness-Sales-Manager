@@ -459,7 +459,7 @@ Configurado em `app.module.ts`. Cria/atualiza o schema automaticamente. Adequado
 
 ### CORS
 
-Configurado em `main.ts` para aceitar requisições de `http://localhost:5173` (frontend Vite/React).
+Configurado em `main.ts` via `CORS_ORIGIN` (lista de origens separadas por vírgula). Sem a env var, cai no fallback `http://localhost:5173` (dev local).
 
 ### Variáveis de ambiente
 
