@@ -6,3 +6,7 @@ export interface Usuario {
   ativo: boolean;
   criadoEm: Date;
 }
+
+export interface UsuarioComPermissoes extends Usuario {
+  permissions: string[];
+}

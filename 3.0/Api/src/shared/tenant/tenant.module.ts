@@ -20,4 +20,4 @@ import { TENANT_CLS_KEY } from './tenant-context.service';
   providers: [TenantConnectionRegistryService, TenantContextService],
   exports: [TenantConnectionRegistryService, TenantContextService],
 })
-export class TenantModule {}
+export class TenantConnectionModule {}
