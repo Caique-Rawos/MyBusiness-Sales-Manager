@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { buildTypeOrmOptions } from './shared/database/typeorm-options';
 import { catalogEntities } from './shared/entities/catalog-entities';
-import { tenantEntities } from './shared/entities/tenant-entities';
 import { TenantConnectionModule } from './shared/tenant/tenant.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
@@ -38,9 +37,9 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
     }),
     TypeOrmModule.forRoot({
       ...buildTypeOrmOptions(),
-      entities: [...catalogEntities, ...tenantEntities],
+      entities: catalogEntities,
       synchronize: false,
-      migrations: [__dirname + '/migrations/*{.js,.ts}'],
+      migrations: [__dirname + '/migrations/catalog/*{.js,.ts}'],
       migrationsRun: true,
     } as TypeOrmModuleOptions),
     TenantConnectionModule,

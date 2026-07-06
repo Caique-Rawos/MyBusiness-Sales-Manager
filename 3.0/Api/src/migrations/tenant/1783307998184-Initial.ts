@@ -1,14 +1,9 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Initial1783305049096 implements MigrationInterface {
-    name = 'Initial1783305049096'
+export class Initial1783307998184 implements MigrationInterface {
+    name = 'Initial1783307998184'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`CREATE TABLE "tenant" ("id" SERIAL NOT NULL, "schemaName" character varying(63) NOT NULL, "ativo" boolean NOT NULL DEFAULT true, "criadoEm" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_99453a3d44a37cb72e9fc4e31e3" UNIQUE ("schemaName"), CONSTRAINT "PK_da8c6efd67bb301e810e56ac139" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "permissao" ("id" SERIAL NOT NULL, "chave" character varying(80) NOT NULL, "descricao" character varying(160) NOT NULL, CONSTRAINT "UQ_45f26998f57112672b02dcb5d97" UNIQUE ("chave"), CONSTRAINT "PK_28ff4b3ae798fa9f16f6665d68d" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "papel" ("id" SERIAL NOT NULL, "nome" character varying(60) NOT NULL, "tenantId" integer NOT NULL, CONSTRAINT "PK_06729b95bd8b347f808aad78335" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "usuario" ("id" SERIAL NOT NULL, "email" character varying(160) NOT NULL, "senhaHash" character varying(255) NOT NULL, "tenantId" integer NOT NULL, "ativo" boolean NOT NULL DEFAULT true, "criadoEm" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_2863682842e688ca198eb25c124" UNIQUE ("email"), CONSTRAINT "PK_a56c58e5cabaa04fb2c98d2d7e2" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "refresh_token" ("id" SERIAL NOT NULL, "usuarioId" integer NOT NULL, "tokenHash" character varying(255) NOT NULL, "expiraEm" TIMESTAMP NOT NULL, "revogadoEm" TIMESTAMP, "criadoEm" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_b575dd3c21fb0831013c909e7fe" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "categoria" ("id" SERIAL NOT NULL, "descricao" character varying(100) NOT NULL, CONSTRAINT "PK_f027836b77b84fb4c3a374dc70d" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "cliente" ("id" SERIAL NOT NULL, "nome" character varying(100) NOT NULL, "cpfCnpj" character varying(18) NOT NULL, "observacao" text, CONSTRAINT "PK_18990e8df6cf7fe71b9dc0f5f39" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "contagem_cliente" ("id" SERIAL NOT NULL, "contagem" integer NOT NULL DEFAULT '0', "data" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_a413834f33e8d1c772d2ae42b30" PRIMARY KEY ("id"))`);
@@ -23,12 +18,6 @@ export class Initial1783305049096 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "movimento_estoque" ("id" SERIAL NOT NULL, "tipo" character varying(20) NOT NULL, "quantidade" numeric(13,2) NOT NULL, "id_produto" integer NOT NULL, "motivo" character varying(100), "id_venda" integer, "id_venda_item" integer, "data_movimento" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_089222933c2d3e7c877cb22a659" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "loja" ("id" integer NOT NULL, "nomeFantasia" character varying(60) NOT NULL, "cpfCnpj" character varying(18) NOT NULL, "ie" character varying(15), "endereco" character varying(100) NOT NULL, CONSTRAINT "PK_81ad5d6a90a7a01aa53b334cea9" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "paginas" ("id" SERIAL NOT NULL, "descricao" character varying(100) NOT NULL, "alias" character varying(100) NOT NULL, "arquivo" character varying(255) NOT NULL, "ativo" boolean NOT NULL DEFAULT true, CONSTRAINT "PK_bee7ea3af0c268319010bbc2e4c" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "papel_permissao" ("papelId" integer NOT NULL, "permissaoId" integer NOT NULL, CONSTRAINT "PK_70105b3b8a657d240512b3d5156" PRIMARY KEY ("papelId", "permissaoId"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_b3101c161af5148ff20bc994d2" ON "papel_permissao" ("papelId") `);
-        await queryRunner.query(`CREATE INDEX "IDX_b0babb3871a96335ee04749fc2" ON "papel_permissao" ("permissaoId") `);
-        await queryRunner.query(`CREATE TABLE "usuario_papel" ("usuarioId" integer NOT NULL, "papelId" integer NOT NULL, CONSTRAINT "PK_f9217bd3e955aaaff54c363d6d8" PRIMARY KEY ("usuarioId", "papelId"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_091ada48a681d2db23d10e1726" ON "usuario_papel" ("usuarioId") `);
-        await queryRunner.query(`CREATE INDEX "IDX_33306c0217acb32b6e55b37aa8" ON "usuario_papel" ("papelId") `);
         await queryRunner.query(`ALTER TABLE "contas_pagar" ADD CONSTRAINT "FK_44199a9b9ad8a0edc72d9ba79d5" FOREIGN KEY ("id_pagamento") REFERENCES "pagamento"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" ADD CONSTRAINT "FK_d1b896850f4d35db617a5e4c8f0" FOREIGN KEY ("id_status_pagamento") REFERENCES "status_pagamento"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "produto" ADD CONSTRAINT "FK_b4b4301786e895495ebff7687a8" FOREIGN KEY ("id_categoria") REFERENCES "categoria"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -40,17 +29,9 @@ export class Initial1783305049096 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "contas_receber" ADD CONSTRAINT "FK_1ef61cce446868665d1444764a9" FOREIGN KEY ("id_status_pagamento") REFERENCES "status_pagamento"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contas_receber" ADD CONSTRAINT "FK_d19878115f9838b45831fc11a69" FOREIGN KEY ("id_venda") REFERENCES "venda"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "movimento_estoque" ADD CONSTRAINT "FK_1df224bacbcdf82fcd9c2cf3e7c" FOREIGN KEY ("id_produto") REFERENCES "produto"("id") ON DELETE CASCADE ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "papel_permissao" ADD CONSTRAINT "FK_b3101c161af5148ff20bc994d2b" FOREIGN KEY ("papelId") REFERENCES "papel"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "papel_permissao" ADD CONSTRAINT "FK_b0babb3871a96335ee04749fc22" FOREIGN KEY ("permissaoId") REFERENCES "permissao"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "usuario_papel" ADD CONSTRAINT "FK_091ada48a681d2db23d10e17268" FOREIGN KEY ("usuarioId") REFERENCES "usuario"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "usuario_papel" ADD CONSTRAINT "FK_33306c0217acb32b6e55b37aa8b" FOREIGN KEY ("papelId") REFERENCES "papel"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "usuario_papel" DROP CONSTRAINT "FK_33306c0217acb32b6e55b37aa8b"`);
-        await queryRunner.query(`ALTER TABLE "usuario_papel" DROP CONSTRAINT "FK_091ada48a681d2db23d10e17268"`);
-        await queryRunner.query(`ALTER TABLE "papel_permissao" DROP CONSTRAINT "FK_b0babb3871a96335ee04749fc22"`);
-        await queryRunner.query(`ALTER TABLE "papel_permissao" DROP CONSTRAINT "FK_b3101c161af5148ff20bc994d2b"`);
         await queryRunner.query(`ALTER TABLE "movimento_estoque" DROP CONSTRAINT "FK_1df224bacbcdf82fcd9c2cf3e7c"`);
         await queryRunner.query(`ALTER TABLE "contas_receber" DROP CONSTRAINT "FK_d19878115f9838b45831fc11a69"`);
         await queryRunner.query(`ALTER TABLE "contas_receber" DROP CONSTRAINT "FK_1ef61cce446868665d1444764a9"`);
@@ -62,12 +43,6 @@ export class Initial1783305049096 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "produto" DROP CONSTRAINT "FK_b4b4301786e895495ebff7687a8"`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" DROP CONSTRAINT "FK_d1b896850f4d35db617a5e4c8f0"`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" DROP CONSTRAINT "FK_44199a9b9ad8a0edc72d9ba79d5"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_33306c0217acb32b6e55b37aa8"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_091ada48a681d2db23d10e1726"`);
-        await queryRunner.query(`DROP TABLE "usuario_papel"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_b0babb3871a96335ee04749fc2"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_b3101c161af5148ff20bc994d2"`);
-        await queryRunner.query(`DROP TABLE "papel_permissao"`);
         await queryRunner.query(`DROP TABLE "paginas"`);
         await queryRunner.query(`DROP TABLE "loja"`);
         await queryRunner.query(`DROP TABLE "movimento_estoque"`);
@@ -82,11 +57,6 @@ export class Initial1783305049096 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "contagem_cliente"`);
         await queryRunner.query(`DROP TABLE "cliente"`);
         await queryRunner.query(`DROP TABLE "categoria"`);
-        await queryRunner.query(`DROP TABLE "refresh_token"`);
-        await queryRunner.query(`DROP TABLE "usuario"`);
-        await queryRunner.query(`DROP TABLE "papel"`);
-        await queryRunner.query(`DROP TABLE "permissao"`);
-        await queryRunner.query(`DROP TABLE "tenant"`);
     }
 
 }

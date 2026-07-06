@@ -49,14 +49,17 @@ export class TenantConnectionRegistryService implements OnModuleInit, OnModuleDe
     return dataSource;
   }
 
-  private createDataSource(schema: string): Promise<DataSource> {
+  private async createDataSource(schema: string): Promise<DataSource> {
     const dataSource = new DataSource({
       ...buildTypeOrmOptions(),
       schema,
       entities: tenantEntities,
       synchronize: false,
+      migrations: [__dirname + '/../../migrations/tenant/*{.js,.ts}'],
       extra: { max: 5 },
     });
-    return dataSource.initialize();
+    await dataSource.initialize();
+    await dataSource.runMigrations();
+    return dataSource;
   }
 }
