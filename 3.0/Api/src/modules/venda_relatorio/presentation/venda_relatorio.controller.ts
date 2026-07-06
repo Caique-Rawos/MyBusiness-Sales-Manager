@@ -1,5 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { RequirePermission } from '../../auth/presentation/decorators/require-permission.decorator';
+import { PERMISSOES } from '../../auth/application/permission-catalog';
 import { VendaRelatorioService } from '../application/venda_relatorio.service';
 import { IFiltroRelatorio } from '../domain/filtro_relatorio';
 import {
@@ -16,6 +18,7 @@ export class VendaRelatorioController {
   @ApiOperation({ summary: 'Relatório geral de vendas por período' })
   @ApiQuery({ name: 'dataInicio', required: true, type: String, example: '2024-01-01' })
   @ApiQuery({ name: 'dataFim', required: true, type: String, example: '2024-12-31' })
+  @RequirePermission(PERMISSOES.VENDA_RELATORIO.listar)
   @Get()
   findAll(
     @Query('dataInicio') dataInicio: string,
@@ -31,6 +34,7 @@ export class VendaRelatorioController {
   @ApiOperation({ summary: 'Relatório de vendas agrupado por cliente' })
   @ApiQuery({ name: 'dataInicio', required: true, type: String, example: '2024-01-01' })
   @ApiQuery({ name: 'dataFim', required: true, type: String, example: '2024-12-31' })
+  @RequirePermission(PERMISSOES.VENDA_RELATORIO.listar)
   @Get('cliente')
   findAllGroupByCliente(
     @Query('dataInicio') dataInicio: string,
@@ -50,6 +54,7 @@ export class VendaRelatorioController {
   @ApiOperation({ summary: 'Relatório de vendas agrupado por data' })
   @ApiQuery({ name: 'dataInicio', required: true, type: String, example: '2024-01-01' })
   @ApiQuery({ name: 'dataFim', required: true, type: String, example: '2024-12-31' })
+  @RequirePermission(PERMISSOES.VENDA_RELATORIO.listar)
   @Get('data')
   findAllGroupByData(
     @Query('dataInicio') dataInicio: string,
@@ -67,6 +72,7 @@ export class VendaRelatorioController {
   }
 
   @ApiOperation({ summary: 'Gerar cupom fiscal de uma venda' })
+  @RequirePermission(PERMISSOES.VENDA_RELATORIO.listar)
   @Get('cupom_fiscal/:idVenda')
   generateCupomFiscal(@Param('idVenda') idVenda: string) {
     return this.vendaRelatorioService.generateCupomFiscal({ idVenda: Number(idVenda) });
