@@ -12,12 +12,21 @@ import {
 } from '../lib/auth-session'
 import { refreshSession } from '../lib/refresh-session'
 
+export interface SignupPayload {
+  email: string
+  senha: string
+  nomeFantasia: string
+  cpfCnpj: string
+  endereco: string
+}
+
 interface AuthContextValue {
   user: AuthUser | null
   tenant: AuthTenant | null
   isAuthenticated: boolean
   isLoading: boolean
   login: (email: string, senha: string) => Promise<void>
+  signup: (data: SignupPayload) => Promise<void>
   logout: () => Promise<void>
   hasPermission: (permission: string) => boolean
 }
@@ -44,6 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryClient.clear()
   }
 
+  async function signup(data: SignupPayload) {
+    const res = await http.post<AuthSession>('/tenants/signup', data)
+    setSession(res.data)
+    setSessionState(res.data)
+    queryClient.clear()
+  }
+
   async function logout() {
     await http.post('/auth/logout').catch(() => undefined)
     clearSession()
@@ -57,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: !!session,
     isLoading,
     login,
+    signup,
     logout,
     hasPermission: (permission) => session?.usuario.permissions.includes(permission) ?? false,
   }

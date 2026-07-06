@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Layout } from '../shared/components/layout/Layout'
 import { ProtectedRoute } from '../shared/components/auth/ProtectedRoute'
-import { LoginPage } from '../features/auth'
+import { LoginPage, SignupPage } from '../features/auth'
 import { DashboardPage } from '../features/dashboard'
 import { ClientesPage } from '../features/clientes'
 import { ProdutosPage, CategoriaPage, EstoquePage, RegraFiscalPage } from '../features/produtos'
@@ -26,6 +26,7 @@ export function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/" element={<DashboardPage />} />
