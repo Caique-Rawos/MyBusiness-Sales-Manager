@@ -16,7 +16,7 @@ Arrays explícitos em `src/shared/entities/{catalog,tenant}-entities.ts` — **t
 
 ## Migrations: duas streams, não uma
 
-`src/migrations/catalog/` (rodada uma vez, contra `public`) e `src/migrations/tenant/` (rodada uma vez por schema, incluindo `public` que também serve de tenant "default"). CLIs: `npm run migration:generate:catalog` / `:tenant`. **Nunca gerar uma migration combinada** — cada stream tem seu próprio `data-source-{catalog,tenant}.ts`.
+`src/migrations/catalog/` (rodada uma vez, contra `public`) e `src/migrations/tenant/` (rodada sob demanda, uma vez por schema de tenant real — `tenant_1`, `tenant_2`...). CLIs: `npm run migration:generate:catalog` / `:tenant`. **Nunca gerar uma migration combinada** — cada stream tem seu próprio `data-source-{catalog,tenant}.ts`. `public` recebe **só** as migrations de catalog — não é tratado como tenant (isso já foi assim numa versão inicial, e foi removido; ver `TenantConnectionRegistryService`, sem `onModuleInit`).
 
 ## Roteamento de conexão (o coração do isolamento)
 
