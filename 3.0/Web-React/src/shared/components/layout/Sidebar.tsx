@@ -116,8 +116,8 @@ export function Sidebar() {
 
         <div className="space-y-1 border-t border-gray-800 pt-3 mt-3">
           {showLoja && <NavItem to="/loja" icon={Store} label="Loja" />}
-          <div className="px-3 py-1 text-xs text-gray-500 truncate" title={user?.email}>
-            {user?.email}
+          <div className="px-3 py-1 text-xs text-gray-500 truncate" title={user?.nome}>
+            {user?.nome}
           </div>
           <button
             onClick={handleLogout}

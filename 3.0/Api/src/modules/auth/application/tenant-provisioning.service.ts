@@ -56,6 +56,7 @@ export class TenantProvisioningService {
 
       const senhaHash = await bcrypt.hash(dto.senha, 10);
       const usuario = await this.usuarioRepository.create({
+        nome: dto.nome,
         email: dto.email,
         senhaHash,
         tenantId: tenant.id,

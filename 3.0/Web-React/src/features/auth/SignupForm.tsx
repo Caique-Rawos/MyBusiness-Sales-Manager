@@ -35,6 +35,12 @@ export function SignupForm({ onSubmit, isPending }: SignupFormProps) {
         {...register('endereco')}
       />
       <Input
+        label="Seu nome"
+        placeholder="Como você se chama"
+        error={errors.nome?.message}
+        {...register('nome')}
+      />
+      <Input
         label="E-mail"
         type="email"
         autoComplete="email"

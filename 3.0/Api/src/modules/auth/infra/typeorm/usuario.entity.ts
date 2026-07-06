@@ -6,6 +6,9 @@ export class UsuarioOrmEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ name: 'nome', type: 'varchar', length: 120 })
+  nome!: string;
+
   @Column({ name: 'email', type: 'varchar', length: 160, unique: true })
   email!: string;
 

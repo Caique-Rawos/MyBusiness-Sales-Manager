@@ -1,6 +1,9 @@
 import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class SignupDto {
+  @IsString()
+  nome!: string;
+
   @IsEmail()
   email!: string;
 

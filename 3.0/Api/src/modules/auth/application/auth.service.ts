@@ -14,7 +14,7 @@ const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export interface AuthResult {
   accessToken: string;
   refreshToken: string;
-  usuario: { id: number; email: string; permissions: string[] };
+  usuario: { id: number; nome: string; email: string; permissions: string[] };
   tenant: { id: number; schema: string };
 }
 
@@ -98,7 +98,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken: rawRefreshToken,
-      usuario: { id: usuario.id, email: usuario.email, permissions: usuario.permissions },
+      usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, permissions: usuario.permissions },
       tenant: { id: tenant.id, schema: tenant.schemaName },
     };
   }

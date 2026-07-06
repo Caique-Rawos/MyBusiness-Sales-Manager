@@ -13,6 +13,7 @@ import {
 import { refreshSession } from '../lib/refresh-session'
 
 export interface SignupPayload {
+  nome: string
   email: string
   senha: string
   nomeFantasia: string

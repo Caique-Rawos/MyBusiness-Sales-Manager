@@ -3,6 +3,7 @@ import { Usuario, UsuarioComPermissoes } from './usuario';
 export const USUARIO_REPOSITORY = 'USUARIO_REPOSITORY';
 
 export interface CreateUsuarioData {
+  nome: string;
   email: string;
   senhaHash: string;
   tenantId: number;
