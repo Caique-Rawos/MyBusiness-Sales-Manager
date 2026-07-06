@@ -3,6 +3,7 @@ export interface AuthUser {
   nome: string
   email: string
   permissions: string[]
+  isOwner: boolean
 }
 
 export interface AuthTenant {

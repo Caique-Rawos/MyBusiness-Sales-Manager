@@ -76,7 +76,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     signup,
     logout,
-    hasPermission: (permission) => session?.usuario.permissions.includes(permission) ?? false,
+    hasPermission: (permission) =>
+      session?.usuario.isOwner || (session?.usuario.permissions.includes(permission) ?? false),
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

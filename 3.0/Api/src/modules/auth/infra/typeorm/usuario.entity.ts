@@ -21,6 +21,9 @@ export class UsuarioOrmEntity {
   @Column({ name: 'ativo', type: 'boolean', default: true })
   ativo!: boolean;
 
+  @Column({ name: 'isOwner', type: 'boolean', default: false })
+  isOwner!: boolean;
+
   @CreateDateColumn({ name: 'criadoEm' })
   criadoEm!: Date;
 

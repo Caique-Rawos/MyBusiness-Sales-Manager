@@ -16,6 +16,10 @@ export class PermissionGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
+    if (request.user?.isOwner) {
+      return true;
+    }
+
     const permissions: string[] = request.user?.permissions ?? [];
     if (!permissions.includes(required)) {
       throw new ForbiddenException('Permissão insuficiente para esta ação');

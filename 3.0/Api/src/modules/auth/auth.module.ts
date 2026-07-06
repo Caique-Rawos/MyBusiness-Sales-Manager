@@ -5,8 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LojaModule } from '../loja/loja.module';
 import { TenantModule } from '../tenant/tenant.module';
 import { AuthService } from './application/auth.service';
+import { PapelService } from './application/papel.service';
 import { PermissionSeedService } from './application/permission-seed.service';
 import { TenantProvisioningService } from './application/tenant-provisioning.service';
+import { UsuarioService } from './application/usuario.service';
 import { PAPEL_REPOSITORY } from './domain/papel.repository';
 import { PERMISSAO_REPOSITORY } from './domain/permissao.repository';
 import { REFRESH_TOKEN_REPOSITORY } from './domain/refresh-token.repository';
@@ -20,7 +22,10 @@ import { RefreshTokenTypeOrmRepository } from './infra/typeorm/refresh-token.rep
 import { UsuarioOrmEntity } from './infra/typeorm/usuario.entity';
 import { UsuarioTypeOrmRepository } from './infra/typeorm/usuario.repository';
 import { AuthController } from './presentation/auth.controller';
+import { PapelController } from './presentation/papel.controller';
+import { PermissaoController } from './presentation/permissao.controller';
 import { SignupController } from './presentation/signup.controller';
+import { UsuarioController } from './presentation/usuario.controller';
 import { JwtAuthGuard } from './presentation/guards/jwt-auth.guard';
 import { PermissionGuard } from './presentation/guards/permission.guard';
 
@@ -41,11 +46,13 @@ import { PermissionGuard } from './presentation/guards/permission.guard';
       }),
     }),
   ],
-  controllers: [AuthController, SignupController],
+  controllers: [AuthController, SignupController, UsuarioController, PapelController, PermissaoController],
   providers: [
     AuthService,
     PermissionSeedService,
     TenantProvisioningService,
+    UsuarioService,
+    PapelService,
     {
       provide: USUARIO_REPOSITORY,
       useClass: UsuarioTypeOrmRepository,

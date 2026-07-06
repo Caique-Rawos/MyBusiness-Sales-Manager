@@ -20,6 +20,7 @@ import {
   StatusPagamentoPage,
 } from '../features/financeiro'
 import { LojaPage } from '../features/loja'
+import { UsuariosPage } from '../features/usuarios'
 
 export function AppRouter() {
   return (
@@ -43,6 +44,7 @@ export function AppRouter() {
             <Route path="/pagamentos" element={<PagamentoPage />} />
             <Route path="/status-pagamento" element={<StatusPagamentoPage />} />
             <Route path="/loja" element={<LojaPage />} />
+            <Route path="/usuarios" element={<UsuariosPage />} />
             <Route path="/relatorio/vendas" element={<RelatorioVendasPage />} />
             <Route path="/relatorio/cliente" element={<RelatorioClientePage />} />
             <Route path="/relatorio/data" element={<RelatorioDataPage />} />

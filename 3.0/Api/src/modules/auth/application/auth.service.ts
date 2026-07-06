@@ -14,7 +14,7 @@ const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export interface AuthResult {
   accessToken: string;
   refreshToken: string;
-  usuario: { id: number; nome: string; email: string; permissions: string[] };
+  usuario: { id: number; nome: string; email: string; permissions: string[]; isOwner: boolean };
   tenant: { id: number; schema: string };
 }
 
@@ -85,6 +85,7 @@ export class AuthService {
       tenantId: tenant.id,
       schema: tenant.schemaName,
       permissions: usuario.permissions,
+      isOwner: usuario.isOwner,
     };
     const accessToken = await this.jwtService.signAsync(payload);
 
@@ -98,7 +99,13 @@ export class AuthService {
     return {
       accessToken,
       refreshToken: rawRefreshToken,
-      usuario: { id: usuario.id, nome: usuario.nome, email: usuario.email, permissions: usuario.permissions },
+      usuario: {
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        permissions: usuario.permissions,
+        isOwner: usuario.isOwner,
+      },
       tenant: { id: tenant.id, schema: tenant.schemaName },
     };
   }

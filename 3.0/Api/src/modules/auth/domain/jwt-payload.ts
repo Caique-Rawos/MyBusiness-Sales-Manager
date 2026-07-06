@@ -3,4 +3,5 @@ export interface JwtPayload {
   tenantId: number;
   schema: string;
   permissions: string[];
+  isOwner: boolean;
 }

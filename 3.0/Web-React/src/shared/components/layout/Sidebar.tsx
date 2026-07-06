@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Package, ShoppingCart,
   TrendingDown, TrendingUp, CreditCard, CheckSquare,
   FileText, Store, ShoppingBag, ChevronDown, ChevronRight,
-  Boxes, Wallet, Tag, WarehouseIcon, LogOut,
+  Boxes, Wallet, Tag, WarehouseIcon, LogOut, UserCog,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 import { useAuth } from '../../context/AuthContext'
@@ -88,6 +88,7 @@ export function Sidebar() {
   const visibleFinanceiroNav = financeiroNav.filter(item => hasPermission(item.permission))
   const showVendas = hasPermission('venda:listar')
   const showLoja = hasPermission('loja:listar')
+  const showUsuarios = hasPermission('usuario:listar') || hasPermission('papel:listar')
 
   async function handleLogout() {
     await logout()
@@ -116,6 +117,7 @@ export function Sidebar() {
 
         <div className="space-y-1 border-t border-gray-800 pt-3 mt-3">
           {showLoja && <NavItem to="/loja" icon={Store} label="Loja" />}
+          {showUsuarios && <NavItem to="/usuarios" icon={UserCog} label="Usuários" />}
           <div className="px-3 py-1 text-xs text-gray-500 truncate" title={user?.nome}>
             {user?.nome}
           </div>

@@ -60,6 +60,7 @@ export class TenantProvisioningService {
         email: dto.email,
         senhaHash,
         tenantId: tenant.id,
+        isOwner: true,
       });
 
       const permissoes = await this.permissaoRepository.findAll();
