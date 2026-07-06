@@ -38,8 +38,7 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Token inválido ou expirado');
     }
 
-    // Garante o DataSource do tenant pronto ANTES da request prosseguir --
-    // TenantContextService.getRepository() e sincrono e depende disso.
+    // getRepository() e sincrono -- precisa do DataSource ja pronto antes da request seguir.
     await this.tenantConnectionRegistry.ensureDataSource(payload.schema);
 
     this.tenantContext.setTenant({

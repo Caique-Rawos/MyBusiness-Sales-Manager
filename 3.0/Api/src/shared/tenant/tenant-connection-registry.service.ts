@@ -56,10 +56,9 @@ export class TenantConnectionRegistryService implements OnModuleInit, OnModuleDe
       entities: tenantEntities,
       synchronize: false,
       migrations: [__dirname + '/../../migrations/tenant/*{.js,.ts}'],
-      // A opcao `schema` do TypeORM so prefixa queries geradas via QueryBuilder/
-      // Repository -- migrations com SQL cru (ex: CREATE TABLE "categoria") nao
-      // sao prefixadas e vao pro search_path da sessao Postgres. Setar aqui
-      // garante que TUDO (migrations inclusive) va pro schema certo.
+      // `schema` acima so prefixa queries via QueryBuilder/Repository -- migrations com
+      // SQL cru ignoram isso e vao pro search_path da sessao. Sem essa linha, toda
+      // migration de tenant cairia sempre em "public", nao no schema deste tenant.
       extra: { max: 5, options: `-c search_path="${schema}"` },
     });
     await dataSource.initialize();

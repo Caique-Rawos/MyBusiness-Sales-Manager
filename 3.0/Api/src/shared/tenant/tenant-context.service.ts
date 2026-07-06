@@ -26,11 +26,7 @@ export class TenantContextService {
     return this.registry.getDataSource(schema).getRepository(entity);
   }
 
-  /**
-   * Estabelece um contexto de tenant novo para o callback informado. Necessario
-   * fora de requisicoes HTTP (ex: processors do BullMQ), onde o middleware do
-   * nestjs-cls nunca rodou e portanto nao existe contexto ativo para popular.
-   */
+  // Fora de requests HTTP (ex: processors do BullMQ) nao ha contexto cls ativo -- cria um novo.
   runWithTenant<T>(store: TenantStore, fn: () => Promise<T>): Promise<T> {
     return this.cls.runWith({ [TENANT_CLS_KEY]: store } as never, fn);
   }
