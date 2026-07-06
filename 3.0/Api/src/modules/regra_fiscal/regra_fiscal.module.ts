@@ -1,14 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProdutoModule } from 'src/modules/produto/produto.module';
 import { RegraFiscalService } from './application/regra_fiscal.service';
 import { REGRA_FISCAL_REPOSITORY } from './domain/regra_fiscal.repository';
-import { RegraFiscalOrmEntity } from './infra/typeorm/regra_fiscal.entity';
 import { RegraFiscalTypeOrmRepository } from './infra/typeorm/regra_fiscal.repository';
 import { RegraFiscalController } from './presentation/regra_fiscal.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RegraFiscalOrmEntity]), ProdutoModule],
+  imports: [ProdutoModule],
   controllers: [RegraFiscalController],
   providers: [
     RegraFiscalService,

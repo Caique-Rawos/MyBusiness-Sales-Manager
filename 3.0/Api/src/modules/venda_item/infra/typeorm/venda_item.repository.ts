@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreateVendaItemDto } from '../../application/dto/create-venda_item.dto';
 import { UpdateVendaItemDto } from '../../application/dto/update-venda_item.dto';
 import { VendaItem } from '../../domain/venda_item';
@@ -9,10 +9,11 @@ import { VendaItemOrmEntity } from './venda_item.entity';
 
 @Injectable()
 export class VendaItemTypeOrmRepository implements VendaItemRepository {
-  constructor(
-    @InjectRepository(VendaItemOrmEntity)
-    private readonly repository: Repository<VendaItemOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<VendaItemOrmEntity> {
+    return this.tenantContext.getRepository(VendaItemOrmEntity);
+  }
 
   async create(data: CreateVendaItemDto): Promise<VendaItem> {
     const object = this.repository.create(data);

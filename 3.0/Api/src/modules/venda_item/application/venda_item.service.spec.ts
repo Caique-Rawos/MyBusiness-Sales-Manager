@@ -5,6 +5,7 @@ import { VendaItemService } from './venda_item.service';
 let repository: any;
 let vendaQueue: any;
 let estoqueQueue: any;
+let tenantContext: any;
 let service: VendaItemService;
 
 describe('VendaItemService', () => {
@@ -20,7 +21,8 @@ describe('VendaItemService', () => {
     };
     vendaQueue = { add: jest.fn().mockResolvedValue(undefined) };
     estoqueQueue = { add: jest.fn().mockResolvedValue(undefined) };
-    service = new VendaItemService(repository, vendaQueue, estoqueQueue);
+    tenantContext = { getTenant: jest.fn().mockReturnValue({ schema: 'public', tenantId: 0 }) };
+    service = new VendaItemService(repository, vendaQueue, estoqueQueue, tenantContext);
   });
 
   it('should create and emit queue jobs', async () => {
@@ -29,12 +31,18 @@ describe('VendaItemService', () => {
     repository.create.mockResolvedValue(expected);
     await expect(service.create(dto)).resolves.toBe(expected);
     expect(repository.create).toHaveBeenCalledWith(dto);
-    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: 1 });
+    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, {
+      idVenda: 1,
+      schema: 'public',
+      tenantId: 0,
+    });
     expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.SAIDA, {
       idProduto: 2,
       quantidade: 3,
       idVenda: 1,
       idVendaItem: 10,
+      schema: 'public',
+      tenantId: 0,
     });
   });
 
@@ -75,8 +83,16 @@ describe('VendaItemService', () => {
     repository.findById.mockResolvedValue({ id: 1, idVenda: 5 } as any);
     await expect(service.delete(1)).resolves.toBeUndefined();
     expect(repository.delete).toHaveBeenCalledWith(1);
-    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: 1 });
-    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, { idVenda: 5 });
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, {
+      idVendaItem: 1,
+      schema: 'public',
+      tenantId: 0,
+    });
+    expect(vendaQueue.add).toHaveBeenCalledWith(JOB_NAMES.VENDA.CALCULAR_TOTAL, {
+      idVenda: 5,
+      schema: 'public',
+      tenantId: 0,
+    });
   });
 
   it('should throw NotFoundException when delete entity does not exist', async () => {

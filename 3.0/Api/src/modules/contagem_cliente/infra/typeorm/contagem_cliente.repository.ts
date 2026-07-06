@@ -1,16 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { ContagemCliente } from '../../domain/contagem_cliente';
 import { ContagemClienteRepository } from '../../domain/contagem_cliente.repository';
 import { ContagemClienteOrmEntity } from './contagem_cliente.entity';
 
 @Injectable()
 export class ClienteTypeOrmRepository implements ContagemClienteRepository {
-  constructor(
-    @InjectRepository(ContagemClienteOrmEntity)
-    private readonly repository: Repository<ContagemClienteOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<ContagemClienteOrmEntity> {
+    return this.tenantContext.getRepository(ContagemClienteOrmEntity);
+  }
 
   async findToday(): Promise<ContagemCliente | null> {
     const start = new Date();

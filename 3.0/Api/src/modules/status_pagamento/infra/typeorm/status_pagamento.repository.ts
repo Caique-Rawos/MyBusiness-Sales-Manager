@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreateStatusPagamentoDto } from '../../application/dto/create-status_pagamento.dto';
 import { UpdateStatusPagamentoDto } from '../../application/dto/update-status_pagamento.dto';
 import { StatusPagamento } from '../../domain/status_pagamento';
@@ -9,10 +9,11 @@ import { StatusPagamentoOrmEntity } from './status_pagamento.entity';
 
 @Injectable()
 export class StatusPagamentoTypeOrmRepository implements StatusPagamentoRepository {
-  constructor(
-    @InjectRepository(StatusPagamentoOrmEntity)
-    private readonly repository: Repository<StatusPagamentoOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<StatusPagamentoOrmEntity> {
+    return this.tenantContext.getRepository(StatusPagamentoOrmEntity);
+  }
 
   async create(data: CreateStatusPagamentoDto): Promise<StatusPagamento> {
     const object = this.repository.create(data);

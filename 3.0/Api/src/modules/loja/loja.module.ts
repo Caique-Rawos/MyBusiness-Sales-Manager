@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { LojaService } from './application/loja.service';
 import { LOJA_REPOSITORY } from './domain/loja.repository';
-import { LojaOrmEntity } from './infra/typeorm/loja.entity';
 import { LojaTypeOrmRepository } from './infra/typeorm/loja.repository';
 import { LojaController } from './presentation/loja.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LojaOrmEntity])],
+  imports: [],
   controllers: [LojaController],
   providers: [
     LojaService,

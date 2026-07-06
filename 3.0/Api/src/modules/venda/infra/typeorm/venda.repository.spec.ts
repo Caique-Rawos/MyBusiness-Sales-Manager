@@ -15,7 +15,8 @@ describe('VendaTypeOrmRepository', () => {
       getCupomItens: jest.fn(),
       createQueryBuilder: jest.fn(),
     };
-    repository = new VendaTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new VendaTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {

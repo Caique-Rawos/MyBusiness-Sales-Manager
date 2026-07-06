@@ -1,0 +1,62 @@
+import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { buildTypeOrmOptions } from '../database/typeorm-options';
+import { tenantEntities } from '../entities/tenant-entities';
+import { DEFAULT_SCHEMA } from './tenant-store';
+
+@Injectable()
+export class TenantConnectionRegistryService implements OnModuleInit, OnModuleDestroy {
+  private readonly dataSources = new Map<string, DataSource>();
+  private readonly pending = new Map<string, Promise<DataSource>>();
+
+  async onModuleInit(): Promise<void> {
+    await this.ensureDataSource(DEFAULT_SCHEMA);
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await Promise.all([...this.dataSources.values()].map((dataSource) => dataSource.destroy()));
+  }
+
+  async ensureDataSource(schema: string): Promise<DataSource> {
+    const existing = this.dataSources.get(schema);
+    if (existing) {
+      return existing;
+    }
+
+    const inFlight = this.pending.get(schema);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const creation = this.createDataSource(schema);
+    this.pending.set(schema, creation);
+    try {
+      const dataSource = await creation;
+      this.dataSources.set(schema, dataSource);
+      return dataSource;
+    } finally {
+      this.pending.delete(schema);
+    }
+  }
+
+  getDataSource(schema: string): DataSource {
+    const dataSource = this.dataSources.get(schema);
+    if (!dataSource) {
+      throw new Error(
+        `Nenhum DataSource inicializado para o schema "${schema}". Chame ensureDataSource() antes de usar o contexto de tenant.`,
+      );
+    }
+    return dataSource;
+  }
+
+  private createDataSource(schema: string): Promise<DataSource> {
+    const dataSource = new DataSource({
+      ...buildTypeOrmOptions(),
+      schema,
+      entities: tenantEntities,
+      synchronize: false,
+      extra: { max: 5 },
+    });
+    return dataSource.initialize();
+  }
+}

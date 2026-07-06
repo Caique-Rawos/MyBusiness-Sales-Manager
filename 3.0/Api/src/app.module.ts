@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { buildTypeOrmOptions } from './shared/database/typeorm-options';
 import { catalogEntities } from './shared/entities/catalog-entities';
 import { tenantEntities } from './shared/entities/tenant-entities';
+import { TenantModule } from './shared/tenant/tenant.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ContasPagarModule } from './modules/contas_pagar/contas_pagar.module';
@@ -41,6 +42,7 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
       migrations: [__dirname + '/migrations/*{.js,.ts}'],
       migrationsRun: true,
     } as TypeOrmModuleOptions),
+    TenantModule,
     PaginasModule,
     EstoqueModule,
     ProdutoModule,

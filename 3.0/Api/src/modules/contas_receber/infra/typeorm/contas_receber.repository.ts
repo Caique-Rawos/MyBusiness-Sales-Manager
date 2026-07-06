@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreateContasReceberDto } from '../../application/dto/create-contas_receber.dto';
 import { UpdateContasReceberDto } from '../../application/dto/update-contas_receber.dto';
 import { ContasReceber } from '../../domain/contas_receber';
@@ -9,10 +9,11 @@ import { ContasReceberOrmEntity } from './contas_receber.entity';
 
 @Injectable()
 export class ContasReceberTypeOrmRepository implements ContasReceberRepository {
-  constructor(
-    @InjectRepository(ContasReceberOrmEntity)
-    private readonly repository: Repository<ContasReceberOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<ContasReceberOrmEntity> {
+    return this.tenantContext.getRepository(ContasReceberOrmEntity);
+  }
 
   async create(data: CreateContasReceberDto): Promise<ContasReceber> {
     const object = this.repository.create(data);

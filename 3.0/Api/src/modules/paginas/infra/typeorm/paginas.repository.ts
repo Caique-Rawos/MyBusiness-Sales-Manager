@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreatePaginasDto } from '../../application/dto/create-paginas.dto';
 import { UpdatePaginasDto } from '../../application/dto/update-paginas.dto';
 import { Paginas } from '../../domain/paginas';
@@ -9,10 +9,11 @@ import { PaginasOrmEntity } from './paginas.entity';
 
 @Injectable()
 export class PaginasTypeOrmRepository implements PaginasRepository {
-  constructor(
-    @InjectRepository(PaginasOrmEntity)
-    private readonly repository: Repository<PaginasOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<PaginasOrmEntity> {
+    return this.tenantContext.getRepository(PaginasOrmEntity);
+  }
 
   async create(data: CreatePaginasDto): Promise<Paginas> {
     const object = this.repository.create(data);

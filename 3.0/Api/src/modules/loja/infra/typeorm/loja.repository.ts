@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreateLojaDto } from '../../application/dto/create-loja.dto';
 import { UpdateLojaDto } from '../../application/dto/update-loja.dto';
 import { Loja } from '../../domain/loja';
@@ -9,10 +9,11 @@ import { LojaOrmEntity } from './loja.entity';
 
 @Injectable()
 export class LojaTypeOrmRepository implements LojaRepository {
-  constructor(
-    @InjectRepository(LojaOrmEntity)
-    private readonly repository: Repository<LojaOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<LojaOrmEntity> {
+    return this.tenantContext.getRepository(LojaOrmEntity);
+  }
 
   async create(data: CreateLojaDto): Promise<Loja> {
     const object = this.repository.create(data);

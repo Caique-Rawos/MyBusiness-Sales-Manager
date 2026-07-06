@@ -4,6 +4,7 @@ import { Queue } from 'bullmq';
 import axios from 'axios';
 import { VendaItemService } from 'src/modules/venda_item/application/venda_item.service';
 import { JOB_NAMES, QUEUE_NAMES } from 'src/shared/queue-names';
+import { TenantContextService } from 'src/shared/tenant/tenant-context.service';
 import { Venda } from '../domain/venda';
 import { IVendaPrevisao } from '../domain/venda_previsao';
 import { VENDA_REPOSITORY, VendaRepository } from '../domain/venda.repository';
@@ -18,15 +19,19 @@ export class VendaService {
     private readonly vendaItemService: VendaItemService,
     @InjectQueue(QUEUE_NAMES.ESTOQUE) private readonly estoqueQueue: Queue,
     @InjectQueue(QUEUE_NAMES.CONTAS_RECEBER) private readonly contasReceberQueue: Queue,
+    private readonly tenantContext: TenantContextService,
   ) {}
 
   async create(data: CreateVendaDto): Promise<Venda> {
     const venda = await this.repository.create(data);
+    const { schema, tenantId } = this.tenantContext.getTenant();
     await this.contasReceberQueue.add(JOB_NAMES.CONTAS_RECEBER.CRIAR, {
       idVenda: venda.id,
       descricao: 'Lançamento de Venda',
       idPagamento: 1,
       idStatusPagamento: 1,
+      schema,
+      tenantId,
     });
     return venda;
   }
@@ -58,8 +63,9 @@ export class VendaService {
     }
 
     const items = await this.vendaItemService.findByIdVenda(id);
+    const { schema, tenantId } = this.tenantContext.getTenant();
     for (const item of items) {
-      await this.estoqueQueue.add(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: item.id });
+      await this.estoqueQueue.add(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: item.id, schema, tenantId });
     }
 
     await this.repository.delete(id);

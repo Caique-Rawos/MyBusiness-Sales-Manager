@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Between, FindOptionsWhere, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { MovimentoEstoque, TipoMovimento } from '../../domain/movimento_estoque';
 import {
   MovimentoEstoqueFiltro,
@@ -11,10 +11,11 @@ import { MovimentoEstoqueOrmEntity } from './movimento_estoque.entity';
 
 @Injectable()
 export class MovimentoEstoqueTypeOrmRepository implements MovimentoEstoqueRepository {
-  constructor(
-    @InjectRepository(MovimentoEstoqueOrmEntity)
-    private readonly repository: Repository<MovimentoEstoqueOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<MovimentoEstoqueOrmEntity> {
+    return this.tenantContext.getRepository(MovimentoEstoqueOrmEntity);
+  }
 
   async registrar(data: RegistrarMovimentoDto): Promise<MovimentoEstoque> {
     return this.repository.save(data);

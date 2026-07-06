@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Between, Repository } from 'typeorm';
+import { TenantContextService } from 'src/shared/tenant/tenant-context.service';
 import { IFiltroRelatorio } from '../../domain/filtro_relatorio';
 import {
   IVendaClienteRelatorio,
@@ -15,10 +15,11 @@ import { ContagemClienteOrmEntity } from 'src/modules/contagem_cliente/infra/typ
 export class VendaRelatorioTypeOrmRepository
   implements VendaRelatorioRepository
 {
-  constructor(
-    @InjectRepository(VendaOrmEntity)
-    private readonly repository: Repository<VendaOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<VendaOrmEntity> {
+    return this.tenantContext.getRepository(VendaOrmEntity);
+  }
 
   async findAll(filtro: IFiltroRelatorio): Promise<Venda[]> {
     return this.repository.find({
