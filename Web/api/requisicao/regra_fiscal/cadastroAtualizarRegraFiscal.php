@@ -1,7 +1,7 @@
 <?php
 
 require_once  '../../../api/path/api-path.php';
-$url = API_PATH . 'regra-fiscal/';
+$url = API_PATH . 'regra_fiscal/';
 
 function msgHttpCode($httpcode, $msg){
 http_response_code($httpcode);

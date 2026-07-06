@@ -1,7 +1,7 @@
 <?php
 
 require_once  '../../../api/path/api-path.php';
-$url = API_PATH . 'status-pagamento/';
+$url = API_PATH . 'status_pagamento/';
 
 function msgHttpCode($httpcode, $msg){
 http_response_code($httpcode);

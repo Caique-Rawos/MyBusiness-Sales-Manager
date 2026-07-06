@@ -1,7 +1,7 @@
 <?php
 
 require_once  '../../../api/path/api-path.php';
-$url = API_PATH . 'contas-receber/';
+$url = API_PATH . 'contas_receber/';
 
 function msgHttpCode($httpcode, $msg){
 http_response_code($httpcode);
