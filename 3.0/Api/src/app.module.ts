@@ -4,6 +4,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { buildTypeOrmOptions } from './shared/database/typeorm-options';
+import { catalogEntities } from './shared/entities/catalog-entities';
+import { tenantEntities } from './shared/entities/tenant-entities';
 import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ContasPagarModule } from './modules/contas_pagar/contas_pagar.module';
@@ -32,14 +35,11 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
       },
     }),
     TypeOrmModule.forRoot({
-      type: process.env.TYPEORM_TYPE,
-      host: process.env.TYPEORM_HOST,
-      port: process.env.TYPEORM_PORT,
-      username: process.env.TYPEORM_USERNAME,
-      password: process.env.TYPEORM_PASSWORD,
-      database: process.env.TYPEORM_DATABASE,
-      entities: [__dirname + '/modules/**/infra/typeorm/*.entity{.js,.ts}'],
-      synchronize: true,
+      ...buildTypeOrmOptions(),
+      entities: [...catalogEntities, ...tenantEntities],
+      synchronize: false,
+      migrations: [__dirname + '/migrations/*{.js,.ts}'],
+      migrationsRun: true,
     } as TypeOrmModuleOptions),
     PaginasModule,
     EstoqueModule,

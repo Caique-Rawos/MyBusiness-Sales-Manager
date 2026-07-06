@@ -453,9 +453,18 @@ REDIS_PORT = 6379
 
 ## Decisões de Projeto
 
-### TypeORM `synchronize: true`
+### TypeORM Migrations
 
-Configurado em `app.module.ts`. Cria/atualiza o schema automaticamente. Adequado para desenvolvimento — avaliar migração para `migrations` em produção.
+`synchronize: false` em `app.module.ts` — schema versionado via migrations (`src/migrations/`), não mais alterado automaticamente. `entities` é um array explícito (`catalogEntities` + `tenantEntities`, em `src/shared/entities/`), não mais um glob, já que agora existem dois grupos de entidades sob `modules/**` (catálogo central multi-tenant vs. dados de negócio).
+
+CLI (usa `src/data-source.ts`):
+```bash
+npm run migration:generate -- src/migrations/NomeDaMigration
+npm run migration:run
+npm run migration:revert
+```
+
+`migrationsRun: true` roda as migrations pendentes automaticamente no boot.
 
 ### CORS
 
@@ -500,7 +509,6 @@ Estas são lacunas identificadas em relação às melhores práticas de DDD. **N
 | Melhoria | Descrição |
 |---|---|
 | Value Objects | Encapsular `Money`, `Quantidade`, `Percentual` como classes com validação própria |
-| Migrations | Substituir `synchronize: true` por migrations TypeORM em ambientes de produção |
 | Filtros de exceção | Criar `HttpExceptionFilter` global para padronizar respostas de erro |
 | URL do serviço ML | Mover URL hardcoded do forecasting para variável de ambiente |
 | Testes e2e | Expandir cobertura além do health check |
