@@ -6,3 +6,4 @@
 - [Fila para evitar dep circular](project_queue_circular_dep_pattern.md) — Módulos que não podem se importar mutuamente comunicam via BullMQ; nomes centralizados em `src/shared/queue-names.ts`
 - [Entrada de estoque no cadastro](project_estoque_entrada_record_only.md) — `registrarEntrada` só grava movimento, não ajusta estoque; campo `motivo` identifica a origem
 - [Multi-tenant + Auth](project_multi_tenant_auth.md) — Schema-per-tenant, roteamento de conexão, JWT/RBAC, gotchas de search_path e filas BullMQ
+- [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível

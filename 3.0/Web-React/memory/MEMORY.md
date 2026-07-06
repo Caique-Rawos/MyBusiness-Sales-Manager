@@ -9,3 +9,4 @@
 - [Cupom fiscal — detalhes](project_cupom_fiscal.md) — Endpoint, campos da loja, QR code bitcoin, pacote `qrcode` (não qrcode.react)
 - [Independência entre features no frontend](feedback_feature_independence.md) — Não usar hook de feature A para enriquecer display de feature B, nem mesmo em runtime
 - [Print CSS global](project_print_css.md) — @media print em index.css oculta aside e reseta main; telas só precisam de print:hidden nos controles
+- [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
