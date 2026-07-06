@@ -8,3 +8,4 @@
 - [Multi-tenant + Auth](project_multi_tenant_auth.md) — Schema-per-tenant, roteamento de conexão, JWT/RBAC, gotchas de search_path e filas BullMQ
 - [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
 - [PENDÊNCIA: aplicar @RequirePermission](project_pending_permission_enforcement.md) — RBAC existe mas não trava nenhuma rota ainda; atacar assim que possível após o frontend
+- [PENDÊNCIA: tela de gestão de usuários](project_pending_user_management_ui.md) — Falta UI+endpoints pra cadastrar novos e-mails/papéis por tenant; criador do tenant é admin permanente, não pode ser alterado
