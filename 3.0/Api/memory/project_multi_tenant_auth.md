@@ -32,18 +32,18 @@ Arrays explícitos em `src/shared/entities/{catalog,tenant}-entities.ts` — **t
 
 Access token JWT (15min, payload `{sub, tenantId, schema, permissions[]}`) + refresh token opaco (7 dias, hash sha256 em `refresh_token`, cookie httpOnly em `/auth/*`, sempre rotacionado a cada uso). `@Public()` isenta rotas do guard global; sem isso, toda rota exige token válido.
 
-## RBAC: aplicado nos 15 controllers de negócio
+## RBAC: aplicado nos 15 controllers de negócio + gestão de usuário/papel
 
-`PermissionGuard` + `@RequirePermission(PERMISSOES.MODULO.acao)` (`src/modules/auth/application/permission-catalog.ts`) travam cada rota dos 15 módulos pela permissão certa. 60 permissões (`{criar,listar,editar,deletar}` × 15 módulos) seedadas no boot (`PermissionSeedService`). `PermissaoChave` é um template literal type derivado das mesmas listas — digitar uma chave inválida quebra o build.
+`PermissionGuard` + `@RequirePermission(PERMISSOES.MODULO.acao)` (`src/modules/auth/application/permission-catalog.ts`) travam cada rota. 68 permissões (`{criar,listar,editar,deletar}` × 17 módulos, incluindo `USUARIO` e `PAPEL`) seedadas no boot (`PermissionSeedService`). `PermissaoChave` é um template literal type derivado das mesmas listas — digitar uma chave inválida quebra o build.
 
-**Gotcha de design a lembrar (RBAC ainda não implementado, ver `project_pending_user_management_ui.md`)**: o papel "Administrador" criado no signup é uma fotografia das permissões que existiam naquele momento — permissão nova adicionada depois (feature nova) não chega automaticamente pros tenants já existentes. A solução decidida é um bypass via flag `isOwner` no usuário (não sincronizar `papel_permissao` retroativamente), a implementar na Task de gestão de usuários.
+**`isOwner` (implementado, Task 8 concluída)**: coluna `isOwner` no `usuario`, `true` só pra quem faz o signup, nunca editável depois. `PermissionGuard.canActivate` checa `request.user?.isOwner` **antes** de olhar `permissions[]` — se `true`, libera direto. Resolve o problema de o papel "Administrador" ser só uma fotografia das permissões do momento do signup (feature nova = permissão nova que o admin de um tenant já existente não ganha automaticamente via `papel_permissao`). Endpoints de gestão (`/usuarios`, `/papeis`, `/permissoes`, todos em `src/modules/auth/presentation/`) protegem exclusão do próprio dono (`BadRequestException`) e auto-exclusão, além do vínculo papel↔usuário (ver `project_delete_validation_patterns.md`).
 
 ## Signup self-service
 
-`POST /tenants/signup` (público): valida e-mail único → cria `tenant` → `CREATE SCHEMA` → migra → cria a primeira `Loja` (reaproveita `LojaService.create()` sem nenhuma mudança, rodando dentro do contexto do novo schema) → cria usuário + papel "Administrador" com todas as permissões → devolve já logado.
+`POST /tenants/signup` (público): valida e-mail único → cria `tenant` → `CREATE SCHEMA` → migra → cria a primeira `Loja` (reaproveita `LojaService.create()` sem nenhuma mudança, rodando dentro do contexto do novo schema) → cria usuário (`isOwner: true`) + papel "Administrador" com todas as permissões → devolve já logado.
 
 ## Onde as coisas vivem
 
 - `src/shared/tenant/` — `TenantConnectionRegistryService`, `TenantContextService`, `TenantConnectionModule` (infra de roteamento)
-- `src/modules/auth/` — login/refresh/logout, guards, decorators, papel/permissão/refresh-token, seed, provisionamento
+- `src/modules/auth/` — login/refresh/logout, guards, decorators, papel/permissão/usuário/refresh-token, seed, provisionamento, gestão de usuário e papel por tenant
 - `src/modules/tenant/` — registro fino do tenant (schema, ativo) — não confundir com a `Loja` de negócio, que continua em `src/modules/loja/` sem mudanças
