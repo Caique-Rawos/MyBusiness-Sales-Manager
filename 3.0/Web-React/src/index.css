@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #f9fafb;
+}
+
+@media print {
+  aside {
+    display: none !important;
+  }
+
+  main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}
