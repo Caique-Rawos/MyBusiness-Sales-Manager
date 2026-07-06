@@ -37,6 +37,14 @@ export class UsuarioTypeOrmRepository implements UsuarioRepository {
     return this.toUsuarioComPermissoes(usuario);
   }
 
+  async attachPapel(usuarioId: number, papelId: number): Promise<void> {
+    await this.repository
+      .createQueryBuilder()
+      .relation(UsuarioOrmEntity, 'papeis')
+      .of(usuarioId)
+      .add(papelId);
+  }
+
   private toUsuarioComPermissoes(
     usuario: UsuarioOrmEntity | null,
   ): UsuarioComPermissoes | null {

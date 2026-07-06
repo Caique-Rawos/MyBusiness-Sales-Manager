@@ -13,4 +13,5 @@ export interface UsuarioRepository {
   findById(id: number): Promise<Usuario | null>;
   findByEmailComPermissoes(email: string): Promise<UsuarioComPermissoes | null>;
   findByIdComPermissoes(id: number): Promise<UsuarioComPermissoes | null>;
+  attachPapel(usuarioId: number, papelId: number): Promise<void>;
 }
