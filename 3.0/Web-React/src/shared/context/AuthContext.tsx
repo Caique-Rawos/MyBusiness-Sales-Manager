@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import http from '../api/http'
 import {
   clearSession,
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSessionState] = useState<AuthSession | null>(getSession())
   const [isLoading, setIsLoading] = useState(true)
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     refreshSession()
@@ -37,12 +39,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await http.post<AuthSession>('/auth/login', { email, senha })
     setSession(res.data)
     setSessionState(res.data)
+    // Cache do React Query e por chave de query, sem escopo de tenant --
+    // sem isso, trocar de sessao sem reload mostra dado em cache do tenant anterior.
+    queryClient.clear()
   }
 
   async function logout() {
     await http.post('/auth/logout').catch(() => undefined)
     clearSession()
     setSessionState(null)
+    queryClient.clear()
   }
 
   const value: AuthContextValue = {
