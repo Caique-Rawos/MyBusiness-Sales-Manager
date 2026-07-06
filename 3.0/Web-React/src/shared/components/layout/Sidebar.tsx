@@ -1,30 +1,31 @@
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Users, Package, ShoppingCart,
   TrendingDown, TrendingUp, CreditCard, CheckSquare,
   FileText, Store, ShoppingBag, ChevronDown, ChevronRight,
-  Boxes, Wallet, Tag, WarehouseIcon,
+  Boxes, Wallet, Tag, WarehouseIcon, LogOut,
 } from 'lucide-react'
 import { cn } from '../../lib/utils'
+import { useAuth } from '../../context/AuthContext'
 
 const topNav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', exact: true },
-  { to: '/clientes', icon: Users, label: 'Clientes' },
+  { to: '/clientes', icon: Users, label: 'Clientes', permission: 'cliente:listar' },
 ]
 
 const produtosNav = [
-  { to: '/produtos', icon: Package, label: 'Produtos' },
-  { to: '/categorias', icon: Tag, label: 'Categorias' },
-  { to: '/estoque', icon: WarehouseIcon, label: 'Estoque' },
-  { to: '/regras-fiscais', icon: FileText, label: 'Regras Fiscais' },
+  { to: '/produtos', icon: Package, label: 'Produtos', permission: 'produto:listar' },
+  { to: '/categorias', icon: Tag, label: 'Categorias', permission: 'categoria:listar' },
+  { to: '/estoque', icon: WarehouseIcon, label: 'Estoque', permission: 'estoque:listar' },
+  { to: '/regras-fiscais', icon: FileText, label: 'Regras Fiscais', permission: 'regra-fiscal:listar' },
 ]
 
 const financeiroNav = [
-  { to: '/contas-pagar', icon: TrendingDown, label: 'Contas a Pagar' },
-  { to: '/contas-receber', icon: TrendingUp, label: 'Contas a Receber' },
-  { to: '/pagamentos', icon: CreditCard, label: 'Formas de Pagamento' },
-  { to: '/status-pagamento', icon: CheckSquare, label: 'Status de Pagamento' },
+  { to: '/contas-pagar', icon: TrendingDown, label: 'Contas a Pagar', permission: 'contas-pagar:listar' },
+  { to: '/contas-receber', icon: TrendingUp, label: 'Contas a Receber', permission: 'contas-receber:listar' },
+  { to: '/pagamentos', icon: CreditCard, label: 'Formas de Pagamento', permission: 'pagamento:listar' },
+  { to: '/status-pagamento', icon: CheckSquare, label: 'Status de Pagamento', permission: 'status-pagamento:listar' },
 ]
 
 function NavItem({ to, icon: Icon, label, exact }: { to: string; icon: React.ElementType; label: string; exact?: boolean }) {
@@ -55,6 +56,8 @@ interface NavGroupProps {
 function NavGroup({ label, icon: Icon, items, defaultOpen = false }: NavGroupProps) {
   const [open, setOpen] = useState(defaultOpen)
 
+  if (items.length === 0) return null
+
   return (
     <div>
       <button
@@ -77,6 +80,20 @@ function NavGroup({ label, icon: Icon, items, defaultOpen = false }: NavGroupPro
 }
 
 export function Sidebar() {
+  const { user, hasPermission, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const visibleTopNav = topNav.filter(item => !item.permission || hasPermission(item.permission))
+  const visibleProdutosNav = produtosNav.filter(item => hasPermission(item.permission))
+  const visibleFinanceiroNav = financeiroNav.filter(item => hasPermission(item.permission))
+  const showVendas = hasPermission('venda:listar')
+  const showLoja = hasPermission('loja:listar')
+
+  async function handleLogout() {
+    await logout()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-gray-900">
       <div className="flex h-16 items-center gap-2 border-b border-gray-800 px-4">
@@ -91,14 +108,24 @@ export function Sidebar() {
 
       <nav className="flex flex-col flex-1 overflow-y-auto p-3">
         <div className="space-y-1 flex-1">
-          {topNav.map(item => <NavItem key={item.to} {...item} />)}
-          <NavGroup label="Produtos" icon={Boxes} items={produtosNav} />
-          <NavItem to="/vendas" icon={ShoppingCart} label="Vendas" />
-          <NavGroup label="Financeiro" icon={Wallet} items={financeiroNav} />
+          {visibleTopNav.map(item => <NavItem key={item.to} {...item} />)}
+          <NavGroup label="Produtos" icon={Boxes} items={visibleProdutosNav} />
+          {showVendas && <NavItem to="/vendas" icon={ShoppingCart} label="Vendas" />}
+          <NavGroup label="Financeiro" icon={Wallet} items={visibleFinanceiroNav} />
         </div>
 
-        <div className="pt-3 border-t border-gray-800 mt-3">
-          <NavItem to="/loja" icon={Store} label="Loja" />
+        <div className="space-y-1 border-t border-gray-800 pt-3 mt-3">
+          {showLoja && <NavItem to="/loja" icon={Store} label="Loja" />}
+          <div className="px-3 py-1 text-xs text-gray-500 truncate" title={user?.email}>
+            {user?.email}
+          </div>
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"
+          >
+            <LogOut size={18} />
+            Sair
+          </button>
         </div>
       </nav>
     </aside>
