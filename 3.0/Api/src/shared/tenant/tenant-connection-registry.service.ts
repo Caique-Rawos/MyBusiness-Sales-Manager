@@ -1,17 +1,12 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { buildTypeOrmOptions } from '../database/typeorm-options';
 import { tenantEntities } from '../entities/tenant-entities';
-import { DEFAULT_SCHEMA } from './tenant-store';
 
 @Injectable()
-export class TenantConnectionRegistryService implements OnModuleInit, OnModuleDestroy {
+export class TenantConnectionRegistryService implements OnModuleDestroy {
   private readonly dataSources = new Map<string, DataSource>();
   private readonly pending = new Map<string, Promise<DataSource>>();
-
-  async onModuleInit(): Promise<void> {
-    await this.ensureDataSource(DEFAULT_SCHEMA);
-  }
 
   async onModuleDestroy(): Promise<void> {
     await Promise.all([...this.dataSources.values()].map((dataSource) => dataSource.destroy()));
