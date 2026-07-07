@@ -8,6 +8,6 @@ export interface ContasReceber {
   valorPago: string
   dataVencimento: string
   idVenda?: number
-  pagamento: Pagamento
-  statusPagamento: StatusPagamento
+  pagamento?: Pagamento | null
+  statusPagamento?: StatusPagamento | null
 }
