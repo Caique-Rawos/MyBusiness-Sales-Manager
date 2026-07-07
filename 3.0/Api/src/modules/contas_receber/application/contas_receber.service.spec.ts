@@ -11,6 +11,7 @@ describe('ContasReceberService', () => {
       findAll: jest.fn(),
       findById: jest.fn(),
       update: jest.fn(),
+      updateValorTotal: jest.fn(),
       delete: jest.fn(),
       findByVendaId: jest.fn(),
       existsByPagamentoId: jest.fn(),
@@ -118,12 +119,12 @@ describe('ContasReceberService', () => {
 
   it('should update total when contas receber exists', async () => {
     repository.findByVendaId.mockResolvedValue({ id: 1 } as any);
-    repository.update.mockResolvedValue({} as any);
+    repository.updateValorTotal.mockResolvedValue(undefined);
     await expect(
       service.atualizaTotal({ id_venda: 1, total: 50 }),
     ).resolves.toBeUndefined();
     expect(repository.findByVendaId).toHaveBeenCalledWith(1);
-    expect(repository.update).toHaveBeenCalledWith(1, { valorTotal: 50 });
+    expect(repository.updateValorTotal).toHaveBeenCalledWith(1, 50);
   });
 
   it('should throw NotFoundException when contas receber is not found', async () => {

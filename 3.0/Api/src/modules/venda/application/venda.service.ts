@@ -28,8 +28,6 @@ export class VendaService {
     await this.contasReceberQueue.add(JOB_NAMES.CONTAS_RECEBER.CRIAR, {
       idVenda: venda.id,
       descricao: 'Lançamento de Venda',
-      idPagamento: 1,
-      idStatusPagamento: 1,
       schema,
       tenantId,
     });

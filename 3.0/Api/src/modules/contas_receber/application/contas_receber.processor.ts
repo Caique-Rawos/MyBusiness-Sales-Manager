@@ -32,8 +32,8 @@ export class ContasReceberProcessor extends WorkerHost {
   private async handleCriar(data: {
     idVenda: number;
     descricao: string;
-    idPagamento: number;
-    idStatusPagamento: number;
+    idPagamento?: number;
+    idStatusPagamento?: number;
   }): Promise<void> {
     await this.contasReceberService.create({
       descricao: data.descricao,

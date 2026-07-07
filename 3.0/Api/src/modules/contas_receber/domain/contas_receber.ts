@@ -8,8 +8,8 @@ export interface ContasReceber {
   valorTotal: number;
   valorPago?: number;
   dataVencimento?: Date;
-  idPagamento: number;
-  idStatusPagamento: number;
+  idPagamento?: number;
+  idStatusPagamento?: number;
   idVenda?: number;
   pagamento?: Pagamento;
   statusPagamento?: StatusPagamento;

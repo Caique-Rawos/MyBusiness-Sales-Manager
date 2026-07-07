@@ -49,9 +49,9 @@ export class ContasReceberOrmEntity {
   @Column({
     name: 'id_pagamento',
     type: 'int',
-    nullable: false,
+    nullable: true,
   })
-  idPagamento!: number;
+  idPagamento?: number;
 
   @ManyToOne(() => PagamentoOrmEntity)
   @JoinColumn({ name: 'id_pagamento' })
@@ -60,9 +60,9 @@ export class ContasReceberOrmEntity {
   @Column({
     name: 'id_status_pagamento',
     type: 'int',
-    nullable: false,
+    nullable: true,
   })
-  idStatusPagamento!: number;
+  idStatusPagamento?: number;
 
   @ManyToOne(() => StatusPagamentoOrmEntity)
   @JoinColumn({ name: 'id_status_pagamento' })

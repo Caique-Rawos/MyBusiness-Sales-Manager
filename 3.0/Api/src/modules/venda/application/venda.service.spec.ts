@@ -48,8 +48,6 @@ describe('VendaService', () => {
     expect(contasReceberQueue.add).toHaveBeenCalledWith(JOB_NAMES.CONTAS_RECEBER.CRIAR, {
       idVenda: 10,
       descricao: 'Lançamento de Venda',
-      idPagamento: 1,
-      idStatusPagamento: 1,
       schema: 'public',
       tenantId: 0,
     });

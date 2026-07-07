@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
-import { CreateContasReceberDto } from '../../application/dto/create-contas_receber.dto';
+import { CreateContasReceberInterno } from '../../application/dto/create-contas_receber.dto';
 import { UpdateContasReceberDto } from '../../application/dto/update-contas_receber.dto';
 import { ContasReceber } from '../../domain/contas_receber';
 import { ContasReceberRepository } from '../../domain/contas_receber.repository';
@@ -15,7 +15,7 @@ export class ContasReceberTypeOrmRepository implements ContasReceberRepository {
     return this.tenantContext.getRepository(ContasReceberOrmEntity);
   }
 
-  async create(data: CreateContasReceberDto): Promise<ContasReceber> {
+  async create(data: CreateContasReceberInterno): Promise<ContasReceber> {
     const object = this.repository.create(data);
     return this.repository.save(object);
   }
@@ -44,6 +44,10 @@ export class ContasReceberTypeOrmRepository implements ContasReceberRepository {
       where: { id },
       relations: ['pagamento', 'statusPagamento', 'venda'],
     });
+  }
+
+  async updateValorTotal(id: number, valorTotal: number): Promise<void> {
+    await this.repository.update(id, { valorTotal });
   }
 
   async existsByPagamentoId(idPagamento: number): Promise<boolean> {
