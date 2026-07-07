@@ -11,3 +11,4 @@
 - [Print CSS global](project_print_css.md) — @media print em index.css oculta aside e reseta main; telas só precisam de print:hidden nos controles
 - [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
 - [Matriz para checkboxes 2D](feedback_permission_matrix_ui.md) — Pra grade item×ação fixa (ex. permissões), usar tabela/matriz, não blocos empilhados de checkbox
+- [Suite de testes (Vitest+RTL)](project_test_suite.md) — 67 arquivos/268 testes cobrindo shared/schemas/hooks/Forms/Tables; useId() em Input/Select não pode ser removido; gotchas de mutationFn/handleSubmit com 2 args e input type=email

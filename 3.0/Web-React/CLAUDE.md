@@ -220,7 +220,20 @@ A separação de concerns em React acontece em outro nível:
 ## Comandos
 
 ```bash
-npm run dev      # Dev server em http://localhost:5173
-npm run build    # Build de produção (gera dist/)
-npm run preview  # Preview do build
+npm run dev       # Dev server em http://localhost:5173
+npm run build     # Build de produção (gera dist/)
+npm run preview   # Preview do build
+npm run test      # Roda a suíte de testes uma vez (CI-friendly)
+npm run test:watch  # Vitest em modo watch
+npm run test:cov    # Roda com coverage (v8)
 ```
+
+## Testes
+
+**Vitest + React Testing Library** (`jsdom`). Config em `vite.config.ts` (bloco `test`), setup global em `src/test/setup.ts` (importa os matchers do `@testing-library/jest-dom`).
+
+- Arquivo de teste fica ao lado do arquivo testado, sufixo `.spec.ts`/`.spec.tsx` (mesma convenção do `../Api`).
+- Componente: renderiza com `render()` e consulta via `screen.getByLabelText`/`getByText`/`getByRole` — nunca `container.querySelector` como primeira opção. Isso só funciona porque `Input`/`Select` (`shared/components/ui/`) geram `id` via `useId()` quando não recebem um explícito, associando `label`/`input` — não remover esse `useId()`, é o que permite `getByLabelText` funcionar em qualquer formulário do app.
+- Hook/contexto (ex: `useAuth`) que um componente depende: mockar com `vi.mock('caminho/do/contexto', () => ({ useAuth: vi.fn() }))` e configurar o retorno por teste com `vi.mocked(useAuth).mockReturnValue(...)`. Evitar `as any` no mock — tipar com `as unknown as ReturnType<typeof useAuth>` (o eslint bloqueia `any` explícito).
+- Schema Zod: testar direto com `schema.safeParse(...)`, sem precisar renderizar nada.
+- `react-router-dom`: componentes com `NavLink`/`useNavigate` precisam de `<MemoryRouter>` por fora; pra espiar `useNavigate` sem perder o `NavLink` real, mockar parcialmente com `importOriginal()`.
