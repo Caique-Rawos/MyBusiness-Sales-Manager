@@ -21,6 +21,7 @@ export default {
     '\\.dto\\.ts$',
     '/src/.*\\.module\\.ts$',
     '/src/main\\.ts$',
+    '/src/migrations/',
   ],
   verbose: false,
 };

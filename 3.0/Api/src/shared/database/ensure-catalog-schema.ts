@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { ensureSchemaExists } from '../shared/database/ensure-schema';
-import { CATALOG_SCHEMA } from '../shared/database/typeorm-options';
+import { ensureSchemaExists } from './ensure-schema';
+import { CATALOG_SCHEMA } from './typeorm-options';
 
 ensureSchemaExists(CATALOG_SCHEMA)
   .then(() => process.exit(0))

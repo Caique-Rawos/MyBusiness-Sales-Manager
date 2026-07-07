@@ -114,4 +114,16 @@ describe('ProdutoService', () => {
     await expect(service.ajustarEstoque(1, -3)).resolves.toBeUndefined();
     expect(repository.updateEstoque).not.toHaveBeenCalled();
   });
+
+  it('should check if regra fiscal is referenced', async () => {
+    repository.existsByRegraFiscalId.mockResolvedValue(true);
+    await expect(service.existsByRegraFiscalId(1)).resolves.toBe(true);
+    expect(repository.existsByRegraFiscalId).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if categoria is referenced', async () => {
+    repository.existsByCategoriaId.mockResolvedValue(false);
+    await expect(service.existsByCategoriaId(1)).resolves.toBe(false);
+    expect(repository.existsByCategoriaId).toHaveBeenCalledWith(1);
+  });
 });

@@ -351,7 +351,7 @@ const module = await Test.createTestingModule({
 
 ### Exclusões do coverage (jest.config.ts)
 
-Não gerar coverage de: entidades ORM, DTOs, arquivos `.module.ts`, `main.ts`.
+Não gerar coverage de: entidades ORM, DTOs, arquivos `.module.ts`, `main.ts`, `src/migrations/**` (validadas rodando de verdade contra um schema, não via unit test).
 
 ---
 
@@ -497,7 +497,7 @@ Nomenclatura em português, espelhando o ubiquitous language do negócio (venda,
 - Documentação OpenAPI disponível em `/api/docs`
 - Delete com `ConflictException` quando entidade tem vínculos ativos
 - Cascade no banco para deleção de `venda_item` e `contas_receber` ao deletar venda
-- 42 arquivos de teste cobrindo services e repositories (272 testes)
+- 72 arquivos de teste cobrindo services, repositories, controllers, guards, processors e roteamento de tenant (421 testes, 100% de coverage em statements/branch/funções/linhas)
 
 ---
 

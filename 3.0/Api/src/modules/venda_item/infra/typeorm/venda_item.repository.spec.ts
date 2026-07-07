@@ -12,6 +12,7 @@ describe('VendaItemTypeOrmRepository', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
       getCupomItens: jest.fn(),
     };
     const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
@@ -61,5 +62,11 @@ describe('VendaItemTypeOrmRepository', () => {
     typeOrmRepository.find.mockResolvedValue(result);
     await expect(repository.findByVendaId(1)).resolves.toBe(result);
     expect(typeOrmRepository.find).toHaveBeenCalled();
+  });
+
+  it('should check if produto is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(1);
+    await expect(repository.existsByProdutoId(1)).resolves.toBe(true);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idProduto: 1 } });
   });
 });
