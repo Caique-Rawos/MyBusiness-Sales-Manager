@@ -15,7 +15,6 @@ import { ContasReceberModule } from './modules/contas_receber/contas_receber.mod
 import { EstoqueModule } from './modules/estoque/estoque.module';
 import { LojaModule } from './modules/loja/loja.module';
 import { PagamentoModule } from './modules/pagamento/pagamento.module';
-import { PaginasModule } from './modules/paginas/paginas.module';
 import { ProdutoModule } from './modules/produto/produto.module';
 import { RegraFiscalModule } from './modules/regra_fiscal/regra_fiscal.module';
 import { StatusPagamentoModule } from './modules/status_pagamento/status_pagamento.module';
@@ -44,7 +43,6 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
     } as TypeOrmModuleOptions),
     TenantConnectionModule,
     AuthModule,
-    PaginasModule,
     EstoqueModule,
     ProdutoModule,
     CategoriaModule,

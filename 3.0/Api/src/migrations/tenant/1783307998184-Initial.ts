@@ -17,7 +17,6 @@ export class Initial1783307998184 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "contas_receber" ("id" SERIAL NOT NULL, "descricao" character varying(150) NOT NULL, "valorTotal" numeric(13,2) NOT NULL, "valorPago" numeric(13,2) DEFAULT '0', "dataVencimento" TIMESTAMP DEFAULT now(), "id_pagamento" integer NOT NULL, "id_status_pagamento" integer NOT NULL, "id_venda" integer, CONSTRAINT "REL_d19878115f9838b45831fc11a6" UNIQUE ("id_venda"), CONSTRAINT "PK_5837d45d5a8b6904175f1e0f56f" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "movimento_estoque" ("id" SERIAL NOT NULL, "tipo" character varying(20) NOT NULL, "quantidade" numeric(13,2) NOT NULL, "id_produto" integer NOT NULL, "motivo" character varying(100), "id_venda" integer, "id_venda_item" integer, "data_movimento" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_089222933c2d3e7c877cb22a659" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "loja" ("id" integer NOT NULL, "nomeFantasia" character varying(60) NOT NULL, "cpfCnpj" character varying(18) NOT NULL, "ie" character varying(15), "endereco" character varying(100) NOT NULL, CONSTRAINT "PK_81ad5d6a90a7a01aa53b334cea9" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "paginas" ("id" SERIAL NOT NULL, "descricao" character varying(100) NOT NULL, "alias" character varying(100) NOT NULL, "arquivo" character varying(255) NOT NULL, "ativo" boolean NOT NULL DEFAULT true, CONSTRAINT "PK_bee7ea3af0c268319010bbc2e4c" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" ADD CONSTRAINT "FK_44199a9b9ad8a0edc72d9ba79d5" FOREIGN KEY ("id_pagamento") REFERENCES "pagamento"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" ADD CONSTRAINT "FK_d1b896850f4d35db617a5e4c8f0" FOREIGN KEY ("id_status_pagamento") REFERENCES "status_pagamento"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "produto" ADD CONSTRAINT "FK_b4b4301786e895495ebff7687a8" FOREIGN KEY ("id_categoria") REFERENCES "categoria"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -43,7 +42,6 @@ export class Initial1783307998184 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "produto" DROP CONSTRAINT "FK_b4b4301786e895495ebff7687a8"`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" DROP CONSTRAINT "FK_d1b896850f4d35db617a5e4c8f0"`);
         await queryRunner.query(`ALTER TABLE "contas_pagar" DROP CONSTRAINT "FK_44199a9b9ad8a0edc72d9ba79d5"`);
-        await queryRunner.query(`DROP TABLE "paginas"`);
         await queryRunner.query(`DROP TABLE "loja"`);
         await queryRunner.query(`DROP TABLE "movimento_estoque"`);
         await queryRunner.query(`DROP TABLE "contas_receber"`);

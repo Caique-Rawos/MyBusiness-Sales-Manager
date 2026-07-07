@@ -34,7 +34,7 @@ Access token JWT (15min, payload `{sub, tenantId, schema, permissions[]}`) + ref
 
 ## RBAC: aplicado nos 15 controllers de negócio + gestão de usuário/papel
 
-`PermissionGuard` + `@RequirePermission(PERMISSOES.MODULO.acao)` (`src/modules/auth/application/permission-catalog.ts`) travam cada rota. 68 permissões (`{criar,listar,editar,deletar}` × 17 módulos, incluindo `USUARIO` e `PAPEL`) seedadas no boot (`PermissionSeedService`). `PermissaoChave` é um template literal type derivado das mesmas listas — digitar uma chave inválida quebra o build.
+`PermissionGuard` + `@RequirePermission(PERMISSOES.MODULO.acao)` (`src/modules/auth/application/permission-catalog.ts`) travam cada rota. 64 permissões (`{criar,listar,editar,deletar}` × 16 módulos, incluindo `USUARIO` e `PAPEL`; módulo `paginas` removido — comportamento do 2.0, sem uso no 3.0/front) seedadas no boot (`PermissionSeedService`). `PermissaoChave` é um template literal type derivado das mesmas listas — digitar uma chave inválida quebra o build.
 
 **`isOwner` (implementado, Task 8 concluída)**: coluna `isOwner` no `usuario`, `true` só pra quem faz o signup, nunca editável depois. `PermissionGuard.canActivate` checa `request.user?.isOwner` **antes** de olhar `permissions[]` — se `true`, libera direto. Resolve o problema de o papel "Administrador" ser só uma fotografia das permissões do momento do signup (feature nova = permissão nova que o admin de um tenant já existente não ganha automaticamente via `papel_permissao`). Endpoints de gestão (`/usuarios`, `/papeis`, `/permissoes`, todos em `src/modules/auth/presentation/`) protegem exclusão do próprio dono (`BadRequestException`) e auto-exclusão, além do vínculo papel↔usuário (ver `project_delete_validation_patterns.md`).
 

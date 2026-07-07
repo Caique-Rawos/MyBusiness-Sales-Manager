@@ -13,7 +13,6 @@ const MODULOS = [
   { id: 'ESTOQUE', chave: 'estoque', nome: 'Estoque' },
   { id: 'LOJA', chave: 'loja', nome: 'Loja' },
   { id: 'PAGAMENTO', chave: 'pagamento', nome: 'Pagamento' },
-  { id: 'PAGINAS', chave: 'paginas', nome: 'Páginas' },
   { id: 'PAPEL', chave: 'papel', nome: 'Papel' },
   { id: 'PRODUTO', chave: 'produto', nome: 'Produto' },
   { id: 'REGRA_FISCAL', chave: 'regra-fiscal', nome: 'Regra fiscal' },

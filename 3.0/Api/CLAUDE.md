@@ -257,7 +257,6 @@ export class VendaItemModule {}
 | `estoque` | Movimentação de estoque | TypeORM direto (ProdutoOrmEntity) |
 | `loja` | Dados da loja | — |
 | `pagamento` | Formas de pagamento | — |
-| `paginas` | Conteúdo web | — |
 | `produto` | Estoque de produtos | categoria, regra_fiscal, venda_item (delete check) |
 | `regra_fiscal` | Regras tributárias (ICMS, PIS, COFINS, IPI) | — |
 | `status_pagamento` | Status de pagamento | — |
@@ -498,7 +497,7 @@ Nomenclatura em português, espelhando o ubiquitous language do negócio (venda,
 - Documentação OpenAPI disponível em `/api/docs`
 - Delete com `ConflictException` quando entidade tem vínculos ativos
 - Cascade no banco para deleção de `venda_item` e `contas_receber` ao deletar venda
-- 43 arquivos de teste cobrindo services e repositories (271 testes)
+- 42 arquivos de teste cobrindo services e repositories (272 testes)
 
 ---
 

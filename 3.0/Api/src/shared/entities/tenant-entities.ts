@@ -7,7 +7,6 @@ import { ContasReceberOrmEntity } from '../../modules/contas_receber/infra/typeo
 import { MovimentoEstoqueOrmEntity } from '../../modules/estoque/infra/typeorm/movimento_estoque.entity';
 import { LojaOrmEntity } from '../../modules/loja/infra/typeorm/loja.entity';
 import { PagamentoOrmEntity } from '../../modules/pagamento/infra/typeorm/pagamento.entity';
-import { PaginasOrmEntity } from '../../modules/paginas/infra/typeorm/paginas.entity';
 import { ProdutoOrmEntity } from '../../modules/produto/infra/typeorm/produto.entity';
 import { RegraFiscalOrmEntity } from '../../modules/regra_fiscal/infra/typeorm/regra_fiscal.entity';
 import { StatusPagamentoOrmEntity } from '../../modules/status_pagamento/infra/typeorm/status_pagamento.entity';
@@ -23,7 +22,6 @@ export const tenantEntities: (Function | string | EntitySchema)[] = [
   MovimentoEstoqueOrmEntity,
   LojaOrmEntity,
   PagamentoOrmEntity,
-  PaginasOrmEntity,
   ProdutoOrmEntity,
   RegraFiscalOrmEntity,
   StatusPagamentoOrmEntity,
