@@ -5,7 +5,7 @@
 - [Padrões de delete com vínculo](project_delete_validation_patterns.md) — ConflictException quando vínculo tem valor de negócio; CASCADE quando filho deve sumir junto com o pai; BadRequestException pra invariante de negócio (isOwner, auto-exclusão)
 - [Fila para evitar dep circular](project_queue_circular_dep_pattern.md) — Módulos que não podem se importar mutuamente comunicam via BullMQ; nomes centralizados em `src/shared/queue-names.ts`
 - [Entrada de estoque no cadastro](project_estoque_entrada_record_only.md) — `registrarEntrada` só grava movimento, não ajusta estoque; campo `motivo` identifica a origem
-- [Multi-tenant + Auth](project_multi_tenant_auth.md) — Schema-per-tenant, roteamento de conexão, JWT/RBAC (68 permissões), bypass `isOwner` implementado, gotchas de search_path e filas BullMQ
+- [Multi-tenant + Auth](project_multi_tenant_auth.md) — Schema-per-tenant, catalog em schema próprio (não mais `public`, liberado pro 2.0), JWT/RBAC, bypass `isOwner`, gotchas de search_path e filas BullMQ
 - [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
 - [TypeORM .set() quebra em many-to-many](project_typeorm_many_to_many_set_bug.md) — RelationQueryBuilder.set() só funciona em many-to-one/one-to-one; usar diff + add()/remove()
 - [Vazamento de campo sensível via spread de entidade ORM](project_orm_response_leak_prevention.md) — senhaHash vazou em GET /usuarios; sempre desestruturar e descartar segredo no controller antes de responder

@@ -4,7 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { buildTypeOrmOptions } from './shared/database/typeorm-options';
+import { buildTypeOrmOptions, CATALOG_SCHEMA } from './shared/database/typeorm-options';
 import { catalogEntities } from './shared/entities/catalog-entities';
 import { TenantConnectionModule } from './shared/tenant/tenant.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -36,7 +36,7 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
       },
     }),
     TypeOrmModule.forRoot({
-      ...buildTypeOrmOptions(),
+      ...buildTypeOrmOptions(CATALOG_SCHEMA),
       entities: catalogEntities,
       synchronize: false,
       migrations: [__dirname + '/migrations/catalog/*{.js,.ts}'],

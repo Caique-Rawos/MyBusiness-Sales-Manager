@@ -9,14 +9,14 @@ Loja = tenant. Cada loja tem seu próprio schema Postgres, criado no signup. Log
 
 ## Dois grupos de dados, duas conexões
 
-- **Catalog** (schema `public`, conexão default do `app.module.ts`): `tenant`, `usuario`, `papel`, `permissao`, `papel_permissao`, `usuario_papel`, `refresh_token`. Entidades em `src/modules/auth/` e `src/modules/tenant/`. Nunca é roteado por tenant — sempre a mesma conexão.
+- **Catalog** (schema `catalog` — configurável via `TYPEORM_CATALOG_SCHEMA`, default `catalog`; conexão default do `app.module.ts`): `tenant`, `usuario`, `papel`, `permissao`, `papel_permissao`, `usuario_papel`, `refresh_token`. Entidades em `src/modules/auth/` e `src/modules/tenant/`. Nunca é roteado por tenant — sempre a mesma conexão. Movido de `public` pra liberar `public` pro sistema 2.0 legado rodar no mesmo banco durante a migração (ver `CATALOG_SCHEMA` em `src/shared/database/typeorm-options.ts`, mesmo gotcha de search_path do item abaixo — `ensureSchemaExists` roda no boot do `main.ts` e antes das migrations de catalog via CLI, já que `CREATE SCHEMA` não acontece sozinho).
 - **Negócio** (schema por tenant, ex. `tenant_3`): os 15 módulos existentes (categoria, cliente, venda, etc). Roteado dinamicamente por `TenantContextService`.
 
 Arrays explícitos em `src/shared/entities/{catalog,tenant}-entities.ts` — **todo entity novo precisa ser adicionado no array certo manualmente** (não é mais glob automático).
 
 ## Migrations: duas streams, não uma
 
-`src/migrations/catalog/` (rodada uma vez, contra `public`) e `src/migrations/tenant/` (rodada sob demanda, uma vez por schema de tenant real — `tenant_1`, `tenant_2`...). CLIs: `npm run migration:generate:catalog` / `:tenant`. **Nunca gerar uma migration combinada** — cada stream tem seu próprio `data-source-{catalog,tenant}.ts`. `public` recebe **só** as migrations de catalog — não é tratado como tenant (isso já foi assim numa versão inicial, e foi removido; ver `TenantConnectionRegistryService`, sem `onModuleInit`).
+`src/migrations/catalog/` (rodada uma vez, contra o schema `catalog`) e `src/migrations/tenant/` (rodada sob demanda, uma vez por schema de tenant real — `tenant_1`, `tenant_2`...). CLIs: `npm run migration:generate:catalog` / `:tenant` (ambos chamam `db:ensure-catalog-schema` antes, via `&&`). **Nunca gerar uma migration combinada** — cada stream tem seu próprio `data-source-{catalog,tenant}.ts`. `public` não recebe mais nada do 3.0 — é tratado como território do sistema 2.0 legado enquanto os dois convivem no mesmo banco.
 
 ## Roteamento de conexão (o coração do isolamento)
 
