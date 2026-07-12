@@ -1,3 +1,5 @@
+import type { Produto } from '../produto/types'
+
 export type TipoMovimento = 'SAIDA' | 'ESTORNO_SAIDA' | 'ENTRADA'
 
 export interface MovimentoEstoque {
@@ -5,7 +7,7 @@ export interface MovimentoEstoque {
   tipo: TipoMovimento
   quantidade: number
   idProduto: number
-  produto?: { id: number; descricao: string }
+  produto?: Pick<Produto, 'id' | 'descricao'> & Partial<Omit<Produto, 'id' | 'descricao'>>
   idVenda?: number
   idVendaItem?: number
   dataMovimento: string

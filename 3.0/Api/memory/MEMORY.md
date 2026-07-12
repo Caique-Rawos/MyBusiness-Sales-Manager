@@ -9,3 +9,4 @@
 - [Evitar comentários inline](feedback_no_inline_comments.md) — Só comentar em código crítico/sensível, e mesmo assim o mais breve possível
 - [TypeORM .set() quebra em many-to-many](project_typeorm_many_to_many_set_bug.md) — RelationQueryBuilder.set() só funciona em many-to-one/one-to-one; usar diff + add()/remove()
 - [Vazamento de campo sensível via spread de entidade ORM](project_orm_response_leak_prevention.md) — senhaHash vazou em GET /usuarios; sempre desestruturar e descartar segredo no controller antes de responder
+- [contas_receber: brecha só no create interno](project_contas_receber_interno_create.md) — DTO público (`idPagamento`/`idStatusPagamento`) continua obrigatório; opcional só via `CreateContasReceberInterno`, usado pela fila. `update` não muda
