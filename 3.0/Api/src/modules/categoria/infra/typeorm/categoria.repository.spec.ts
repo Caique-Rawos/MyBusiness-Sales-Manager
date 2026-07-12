@@ -14,7 +14,8 @@ describe('CategoriaTypeOrmRepository', () => {
       delete: jest.fn(),
       getCupomItens: jest.fn(),
     };
-    repository = new CategoriaTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new CategoriaTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {

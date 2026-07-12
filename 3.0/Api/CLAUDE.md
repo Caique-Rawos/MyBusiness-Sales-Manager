@@ -257,7 +257,6 @@ export class VendaItemModule {}
 | `estoque` | Movimentação de estoque | TypeORM direto (ProdutoOrmEntity) |
 | `loja` | Dados da loja | — |
 | `pagamento` | Formas de pagamento | — |
-| `paginas` | Conteúdo web | — |
 | `produto` | Estoque de produtos | categoria, regra_fiscal, venda_item (delete check) |
 | `regra_fiscal` | Regras tributárias (ICMS, PIS, COFINS, IPI) | — |
 | `status_pagamento` | Status de pagamento | — |
@@ -352,7 +351,7 @@ const module = await Test.createTestingModule({
 
 ### Exclusões do coverage (jest.config.ts)
 
-Não gerar coverage de: entidades ORM, DTOs, arquivos `.module.ts`, `main.ts`.
+Não gerar coverage de: entidades ORM, DTOs, arquivos `.module.ts`, `main.ts`, `src/migrations/**` (validadas rodando de verdade contra um schema, não via unit test).
 
 ---
 
@@ -453,9 +452,18 @@ REDIS_PORT = 6379
 
 ## Decisões de Projeto
 
-### TypeORM `synchronize: true`
+### TypeORM Migrations
 
-Configurado em `app.module.ts`. Cria/atualiza o schema automaticamente. Adequado para desenvolvimento — avaliar migração para `migrations` em produção.
+`synchronize: false` em `app.module.ts` — schema versionado via migrations (`src/migrations/`), não mais alterado automaticamente. `entities` é um array explícito (`catalogEntities` + `tenantEntities`, em `src/shared/entities/`), não mais um glob, já que agora existem dois grupos de entidades sob `modules/**` (catálogo central multi-tenant vs. dados de negócio).
+
+CLI (usa `src/data-source.ts`):
+```bash
+npm run migration:generate -- src/migrations/NomeDaMigration
+npm run migration:run
+npm run migration:revert
+```
+
+`migrationsRun: true` roda as migrations pendentes automaticamente no boot.
 
 ### CORS
 
@@ -489,7 +497,7 @@ Nomenclatura em português, espelhando o ubiquitous language do negócio (venda,
 - Documentação OpenAPI disponível em `/api/docs`
 - Delete com `ConflictException` quando entidade tem vínculos ativos
 - Cascade no banco para deleção de `venda_item` e `contas_receber` ao deletar venda
-- 43 arquivos de teste cobrindo services e repositories (271 testes)
+- 72 arquivos de teste cobrindo services, repositories, controllers, guards, processors e roteamento de tenant (421 testes, 100% de coverage em statements/branch/funções/linhas)
 
 ---
 
@@ -500,7 +508,6 @@ Estas são lacunas identificadas em relação às melhores práticas de DDD. **N
 | Melhoria | Descrição |
 |---|---|
 | Value Objects | Encapsular `Money`, `Quantidade`, `Percentual` como classes com validação própria |
-| Migrations | Substituir `synchronize: true` por migrations TypeORM em ambientes de produção |
 | Filtros de exceção | Criar `HttpExceptionFilter` global para padronizar respostas de erro |
 | URL do serviço ML | Mover URL hardcoded do forecasting para variável de ambiente |
 | Testes e2e | Expandir cobertura além do health check |

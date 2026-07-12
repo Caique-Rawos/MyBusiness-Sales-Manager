@@ -12,9 +12,11 @@ describe('ProdutoTypeOrmRepository', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
       getCupomItens: jest.fn(),
     };
-    repository = new ProdutoTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new ProdutoTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {
@@ -53,5 +55,23 @@ describe('ProdutoTypeOrmRepository', () => {
     typeOrmRepository.delete.mockResolvedValue(undefined);
     await expect(repository.delete(1)).resolves.toBeUndefined();
     expect(typeOrmRepository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if regra fiscal is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(1);
+    await expect(repository.existsByRegraFiscalId(1)).resolves.toBe(true);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idRegraFiscal: 1 } });
+  });
+
+  it('should check if categoria is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(0);
+    await expect(repository.existsByCategoriaId(1)).resolves.toBe(false);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idCategoria: 1 } });
+  });
+
+  it('should update estoque', async () => {
+    typeOrmRepository.update.mockResolvedValue(undefined);
+    await repository.updateEstoque(1, 42);
+    expect(typeOrmRepository.update).toHaveBeenCalledWith(1, { estoque: 42 });
   });
 });

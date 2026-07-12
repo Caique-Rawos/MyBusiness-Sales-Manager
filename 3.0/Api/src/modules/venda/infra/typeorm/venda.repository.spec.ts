@@ -12,10 +12,12 @@ describe('VendaTypeOrmRepository', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
       getCupomItens: jest.fn(),
       createQueryBuilder: jest.fn(),
     };
-    repository = new VendaTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new VendaTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {
@@ -54,6 +56,18 @@ describe('VendaTypeOrmRepository', () => {
     typeOrmRepository.delete.mockResolvedValue(undefined);
     await expect(repository.delete(1)).resolves.toBeUndefined();
     expect(typeOrmRepository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if cliente is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(1);
+    await expect(repository.existsByClienteId(1)).resolves.toBe(true);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idCliente: 1 } });
+  });
+
+  it('should update the venda total', async () => {
+    typeOrmRepository.update.mockResolvedValue(undefined);
+    await repository.updateTotal(1, 150);
+    expect(typeOrmRepository.update).toHaveBeenCalledWith(1, { totalVenda: 150 });
   });
 
   it('should get future sales base data', async () => {

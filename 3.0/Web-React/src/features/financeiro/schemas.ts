@@ -5,8 +5,8 @@ export const contaSchema = z.object({
   valorTotal: z.string(),
   valorPago: z.string(),
   dataVencimento: z.string().min(1, 'Data é obrigatória'),
-  idPagamento: z.string().min(1),
-  idStatusPagamento: z.string().min(1),
+  idPagamento: z.string().min(1, 'Selecione a forma de pagamento'),
+  idStatusPagamento: z.string().min(1, 'Selecione o status de pagamento'),
 })
 
 export const pagamentoSchema = z.object({

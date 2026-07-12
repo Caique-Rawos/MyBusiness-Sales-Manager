@@ -1,4 +1,4 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDate, IsInt, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
@@ -28,19 +28,17 @@ export class UpdateContasReceberDto {
   @IsOptional()
   dataVencimento?: Date;
 
-  @ApiPropertyOptional({ example: 1 })
+  @ApiProperty({ example: 1 })
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  @IsOptional()
-  idPagamento?: number;
+  idPagamento: number;
 
-  @ApiPropertyOptional({ example: 1 })
+  @ApiProperty({ example: 1 })
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  @IsOptional()
-  idStatusPagamento?: number;
+  idStatusPagamento: number;
 
   @ApiPropertyOptional({ example: 1 })
   @Type(() => Number)

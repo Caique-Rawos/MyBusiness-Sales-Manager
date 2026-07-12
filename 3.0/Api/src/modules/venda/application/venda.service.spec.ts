@@ -10,6 +10,7 @@ let repository: any;
 let vendaItemService: any;
 let estoqueQueue: any;
 let contasReceberQueue: any;
+let tenantContext: any;
 let service: VendaService;
 
 describe('VendaService', () => {
@@ -28,7 +29,14 @@ describe('VendaService', () => {
     };
     estoqueQueue = { add: jest.fn().mockResolvedValue(undefined) };
     contasReceberQueue = { add: jest.fn().mockResolvedValue(undefined) };
-    service = new VendaService(repository, vendaItemService, estoqueQueue, contasReceberQueue);
+    tenantContext = { getTenant: jest.fn().mockReturnValue({ schema: 'public', tenantId: 0 }) };
+    service = new VendaService(
+      repository,
+      vendaItemService,
+      estoqueQueue,
+      contasReceberQueue,
+      tenantContext,
+    );
   });
 
   it('should create venda and emit contas_receber criar job', async () => {
@@ -40,8 +48,8 @@ describe('VendaService', () => {
     expect(contasReceberQueue.add).toHaveBeenCalledWith(JOB_NAMES.CONTAS_RECEBER.CRIAR, {
       idVenda: 10,
       descricao: 'Lançamento de Venda',
-      idPagamento: 1,
-      idStatusPagamento: 1,
+      schema: 'public',
+      tenantId: 0,
     });
   });
 
@@ -83,8 +91,16 @@ describe('VendaService', () => {
     vendaItemService.findByIdVenda.mockResolvedValue([{ id: 10 }, { id: 20 }] as any);
     await expect(service.delete(1)).resolves.toBeUndefined();
     expect(vendaItemService.findByIdVenda).toHaveBeenCalledWith(1);
-    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: 10 });
-    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, { idVendaItem: 20 });
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, {
+      idVendaItem: 10,
+      schema: 'public',
+      tenantId: 0,
+    });
+    expect(estoqueQueue.add).toHaveBeenCalledWith(JOB_NAMES.ESTOQUE.ESTORNO, {
+      idVendaItem: 20,
+      schema: 'public',
+      tenantId: 0,
+    });
     expect(repository.delete).toHaveBeenCalledWith(1);
   });
 

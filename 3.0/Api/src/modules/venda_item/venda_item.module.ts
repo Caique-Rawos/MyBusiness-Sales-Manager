@@ -1,16 +1,13 @@
 import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { QUEUE_NAMES } from 'src/shared/queue-names';
 import { VendaItemService } from './application/venda_item.service';
 import { VENDA_ITEM_REPOSITORY } from './domain/venda_item.repository';
-import { VendaItemOrmEntity } from './infra/typeorm/venda_item.entity';
 import { VendaItemTypeOrmRepository } from './infra/typeorm/venda_item.repository';
 import { VendaItemController } from './presentation/venda_item.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([VendaItemOrmEntity]),
     BullModule.registerQueue({ name: QUEUE_NAMES.VENDA }),
     BullModule.registerQueue({ name: QUEUE_NAMES.ESTOQUE }),
   ],

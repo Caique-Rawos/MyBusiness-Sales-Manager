@@ -5,6 +5,7 @@ import { ProdutoService } from './produto.service';
 let repository: any;
 let vendaItemService: any;
 let estoqueQueue: any;
+let tenantContext: any;
 let service: ProdutoService;
 
 describe('ProdutoService', () => {
@@ -23,7 +24,8 @@ describe('ProdutoService', () => {
       existsByProdutoId: jest.fn().mockResolvedValue(false),
     };
     estoqueQueue = { add: jest.fn().mockResolvedValue(undefined) };
-    service = new ProdutoService(repository as any, vendaItemService, estoqueQueue);
+    tenantContext = { getTenant: jest.fn().mockReturnValue({ schema: 'public', tenantId: 0 }) };
+    service = new ProdutoService(repository as any, vendaItemService, estoqueQueue, tenantContext);
   });
 
   it('should create produto without emitting entry when estoque is 0', async () => {
@@ -43,6 +45,8 @@ describe('ProdutoService', () => {
       idProduto: 5,
       quantidade: 10,
       motivo: 'Cadastro de produto',
+      schema: 'public',
+      tenantId: 0,
     });
   });
 
@@ -109,5 +113,17 @@ describe('ProdutoService', () => {
     repository.findById.mockResolvedValue(null);
     await expect(service.ajustarEstoque(1, -3)).resolves.toBeUndefined();
     expect(repository.updateEstoque).not.toHaveBeenCalled();
+  });
+
+  it('should check if regra fiscal is referenced', async () => {
+    repository.existsByRegraFiscalId.mockResolvedValue(true);
+    await expect(service.existsByRegraFiscalId(1)).resolves.toBe(true);
+    expect(repository.existsByRegraFiscalId).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if categoria is referenced', async () => {
+    repository.existsByCategoriaId.mockResolvedValue(false);
+    await expect(service.existsByCategoriaId(1)).resolves.toBe(false);
+    expect(repository.existsByCategoriaId).toHaveBeenCalledWith(1);
   });
 });

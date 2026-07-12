@@ -1,14 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import cookieParser = require('cookie-parser');
 import { AppModule } from './app.module';
+import { ensureSchemaExists } from './shared/database/ensure-schema';
+import { CATALOG_SCHEMA } from './shared/database/typeorm-options';
 
 async function bootstrap() {
+  await ensureSchemaExists(CATALOG_SCHEMA);
   const app = await NestFactory.create(AppModule);
   const corsOrigin = process.env.CORS_ORIGIN?.split(',').map((origin) => origin.trim()) ?? [
     'http://localhost:5173',
   ];
-  app.enableCors({ origin: corsOrigin });
+  app.enableCors({ origin: corsOrigin, credentials: true });
+  app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()

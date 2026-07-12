@@ -3,6 +3,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { VendaItemService } from 'src/modules/venda_item/application/venda_item.service';
 import { JOB_NAMES, QUEUE_NAMES } from 'src/shared/queue-names';
+import { TenantContextService } from 'src/shared/tenant/tenant-context.service';
 import { PRODUTO_REPOSITORY, ProdutoRepository } from '../domain/produto.repository';
 import { CreateProdutoDto } from './dto/create-produto.dto';
 import { UpdateProdutoDto } from './dto/update-produto.dto';
@@ -15,15 +16,19 @@ export class ProdutoService {
     private readonly repository: ProdutoRepository,
     private readonly vendaItemService: VendaItemService,
     @InjectQueue(QUEUE_NAMES.ESTOQUE) private readonly estoqueQueue: Queue,
+    private readonly tenantContext: TenantContextService,
   ) {}
 
   async create(data: CreateProdutoDto): Promise<Produto> {
     const produto = await this.repository.create(data);
     if (Number(produto.estoque) > 0) {
+      const { schema, tenantId } = this.tenantContext.getTenant();
       await this.estoqueQueue.add(JOB_NAMES.ESTOQUE.ENTRADA, {
         idProduto: produto.id,
         quantidade: produto.estoque,
         motivo: 'Cadastro de produto',
+        schema,
+        tenantId,
       });
     }
     return produto;

@@ -12,9 +12,11 @@ describe('ContasPagarTypeOrmRepository', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
       getCupomItens: jest.fn(),
     };
-    repository = new ContasPagarTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new ContasPagarTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {
@@ -53,5 +55,17 @@ describe('ContasPagarTypeOrmRepository', () => {
     typeOrmRepository.delete.mockResolvedValue(undefined);
     await expect(repository.delete(1)).resolves.toBeUndefined();
     expect(typeOrmRepository.delete).toHaveBeenCalledWith(1);
+  });
+
+  it('should check if pagamento is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(1);
+    await expect(repository.existsByPagamentoId(1)).resolves.toBe(true);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idPagamento: 1 } });
+  });
+
+  it('should check if status pagamento is referenced', async () => {
+    typeOrmRepository.count.mockResolvedValue(0);
+    await expect(repository.existsByStatusPagamentoId(1)).resolves.toBe(false);
+    expect(typeOrmRepository.count).toHaveBeenCalledWith({ where: { idStatusPagamento: 1 } });
   });
 });

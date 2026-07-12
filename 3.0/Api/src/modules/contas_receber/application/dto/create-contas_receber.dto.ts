@@ -46,3 +46,12 @@ export class CreateContasReceberDto {
   @IsOptional()
   idVenda?: number;
 }
+
+// idPagamento/idStatusPagamento só ficam opcionais aqui -- usado pelo ContasReceberProcessor
+// pra criar a conta ainda sem forma de pagamento/status definidos. Nunca exposto via HTTP:
+// o controller usa CreateContasReceberDto (ambos obrigatórios), validado pelo ValidationPipe.
+export type CreateContasReceberInterno = Omit<
+  CreateContasReceberDto,
+  'idPagamento' | 'idStatusPagamento'
+> &
+  Partial<Pick<CreateContasReceberDto, 'idPagamento' | 'idStatusPagamento'>>;

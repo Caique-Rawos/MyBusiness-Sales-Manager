@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { TenantContextService } from '../../../../shared/tenant/tenant-context.service';
 import { CreateRegraFiscalDto } from '../../application/dto/create-regra_fiscal.dto';
 import { UpdateRegraFiscalDto } from '../../application/dto/update-regra_fiscal.dto';
 import { RegraFiscal } from '../../domain/regra_fiscal';
@@ -9,10 +9,11 @@ import { RegraFiscalOrmEntity } from './regra_fiscal.entity';
 
 @Injectable()
 export class RegraFiscalTypeOrmRepository implements RegraFiscalRepository {
-  constructor(
-    @InjectRepository(RegraFiscalOrmEntity)
-    private readonly repository: Repository<RegraFiscalOrmEntity>,
-  ) {}
+  constructor(private readonly tenantContext: TenantContextService) {}
+
+  private get repository(): Repository<RegraFiscalOrmEntity> {
+    return this.tenantContext.getRepository(RegraFiscalOrmEntity);
+  }
 
   async create(data: CreateRegraFiscalDto): Promise<RegraFiscal> {
     const object = this.repository.create(data);

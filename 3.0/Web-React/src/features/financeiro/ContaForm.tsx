@@ -27,11 +27,16 @@ export function ContaForm({ title, formasPagamento, statusList, onSubmit, isPend
   })
 
   const valorTotalBloqueado = !!(editing && (editing as ContasReceber).idVenda)
-  const optionsReady = formasPagamento.length > 0 && statusList.length > 0
+
+  // Só espera o catálogo carregar quando a conta realmente tem forma/status vinculados --
+  // senão, com o catálogo vazio (nada cadastrado ainda), o reset nunca dispararia e o
+  // formulário inteiro ficaria em branco na edição.
+  const aguardandoPagamento = !!editing?.pagamento?.id && formasPagamento.length === 0
+  const aguardandoStatus = !!editing?.statusPagamento?.id && statusList.length === 0
 
   useEffect(() => {
     if (editing) {
-      if (!optionsReady) return
+      if (aguardandoPagamento || aguardandoStatus) return
       reset({
         descricao: editing.descricao,
         valorTotal: editing.valorTotal,
@@ -43,9 +48,9 @@ export function ContaForm({ title, formasPagamento, statusList, onSubmit, isPend
     } else {
       reset({ descricao: '', valorTotal: '', valorPago: '', dataVencimento: '', idPagamento: '', idStatusPagamento: '' })
     }
-  // optionsReady é booleano (false→true uma vez); editing?.id detecta troca de registro sem re-disparar por refetch
+  // editing?.id detecta troca de registro sem re-disparar por refetch do restante do objeto
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editing?.id, reset, optionsReady])
+  }, [editing?.id, reset, aguardandoPagamento, aguardandoStatus])
 
   function handleFormSubmit(data: ContaFormData) {
     onSubmit(data)

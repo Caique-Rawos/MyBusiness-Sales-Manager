@@ -10,7 +10,7 @@ import {
   CONTAS_RECEBER_REPOSITORY,
   ContasReceberRepository,
 } from '../domain/contas_receber.repository';
-import { CreateContasReceberDto } from './dto/create-contas_receber.dto';
+import { CreateContasReceberInterno } from './dto/create-contas_receber.dto';
 import { UpdateContasReceberDto } from './dto/update-contas_receber.dto';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class ContasReceberService {
     private readonly repository: ContasReceberRepository,
   ) {}
 
-  create(data: CreateContasReceberDto): Promise<ContasReceber> {
+  create(data: CreateContasReceberInterno): Promise<ContasReceber> {
     return this.repository.create(data);
   }
 
@@ -83,8 +83,6 @@ export class ContasReceberService {
     if (!receber) {
       throw new NotFoundException('ContasReceber not found');
     }
-    await this.repository.update(receber.id, {
-      valorTotal: vendaUpdateDto.total,
-    });
+    await this.repository.updateValorTotal(receber.id, vendaUpdateDto.total);
   }
 }

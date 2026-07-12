@@ -4,6 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { buildTypeOrmOptions, CATALOG_SCHEMA } from './shared/database/typeorm-options';
+import { catalogEntities } from './shared/entities/catalog-entities';
+import { TenantConnectionModule } from './shared/tenant/tenant.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ContasPagarModule } from './modules/contas_pagar/contas_pagar.module';
@@ -11,7 +15,6 @@ import { ContasReceberModule } from './modules/contas_receber/contas_receber.mod
 import { EstoqueModule } from './modules/estoque/estoque.module';
 import { LojaModule } from './modules/loja/loja.module';
 import { PagamentoModule } from './modules/pagamento/pagamento.module';
-import { PaginasModule } from './modules/paginas/paginas.module';
 import { ProdutoModule } from './modules/produto/produto.module';
 import { RegraFiscalModule } from './modules/regra_fiscal/regra_fiscal.module';
 import { StatusPagamentoModule } from './modules/status_pagamento/status_pagamento.module';
@@ -32,16 +35,14 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
       },
     }),
     TypeOrmModule.forRoot({
-      type: process.env.TYPEORM_TYPE,
-      host: process.env.TYPEORM_HOST,
-      port: process.env.TYPEORM_PORT,
-      username: process.env.TYPEORM_USERNAME,
-      password: process.env.TYPEORM_PASSWORD,
-      database: process.env.TYPEORM_DATABASE,
-      entities: [__dirname + '/modules/**/infra/typeorm/*.entity{.js,.ts}'],
-      synchronize: true,
+      ...buildTypeOrmOptions(CATALOG_SCHEMA),
+      entities: catalogEntities,
+      synchronize: false,
+      migrations: [__dirname + '/migrations/catalog/*{.js,.ts}'],
+      migrationsRun: true,
     } as TypeOrmModuleOptions),
-    PaginasModule,
+    TenantConnectionModule,
+    AuthModule,
     EstoqueModule,
     ProdutoModule,
     CategoriaModule,

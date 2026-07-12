@@ -14,7 +14,8 @@ describe('LojaTypeOrmRepository', () => {
       delete: jest.fn(),
       getCupomItens: jest.fn(),
     };
-    repository = new LojaTypeOrmRepository(typeOrmRepository as any);
+    const tenantContext: any = { getRepository: jest.fn().mockReturnValue(typeOrmRepository) };
+    repository = new LojaTypeOrmRepository(tenantContext);
   });
 
   it('should create an entity', async () => {
