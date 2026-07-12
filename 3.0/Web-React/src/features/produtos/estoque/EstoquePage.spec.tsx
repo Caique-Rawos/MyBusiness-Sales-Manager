@@ -15,7 +15,23 @@ const movimento: MovimentoEstoque = {
   tipo: 'SAIDA',
   quantidade: 2,
   idProduto: 1,
-  produto: { id: 1, descricao: 'Produto A' },
+  produto: {
+    id: 1,
+    descricao: 'Produto A',
+    valorCusto: '10.00',
+    valorVenda: '15.00',
+    estoque: 8,
+    categoria: { id: 1, descricao: 'Categoria A' },
+    regraFiscal: {
+      id: 1,
+      descricao: 'Regra A',
+      ncm: '1234.56.78',
+      icms: 0,
+      pis: 0,
+      cofins: 0,
+      ipi: 0,
+    },
+  },
   idVenda: 5,
   dataMovimento: '2026-01-01T00:00:00.000Z',
 }
@@ -75,7 +91,25 @@ describe('EstoquePage', () => {
 
   it('should refetch when the "Produto" filter changes and is cleared', async () => {
     vi.mocked(estoqueApi.getAll).mockResolvedValue([])
-    vi.mocked(produtoApi.getAll).mockResolvedValue([{ id: 1, descricao: 'Produto A' }])
+    vi.mocked(produtoApi.getAll).mockResolvedValue([
+      {
+        id: 1,
+        descricao: 'Produto A',
+        valorCusto: '10.00',
+        valorVenda: '15.00',
+        estoque: 8,
+        categoria: { id: 1, descricao: 'Categoria A' },
+        regraFiscal: {
+          id: 1,
+          descricao: 'Regra A',
+          ncm: '1234.56.78',
+          icms: 0,
+          pis: 0,
+          cofins: 0,
+          ipi: 0,
+        },
+      },
+    ])
     renderPage()
 
     await waitFor(() => expect(estoqueApi.getAll).toHaveBeenCalledWith({}))
