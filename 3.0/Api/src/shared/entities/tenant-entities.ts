@@ -4,6 +4,8 @@ import { ClienteOrmEntity } from '../../modules/cliente/infra/typeorm/cliente.en
 import { ContagemClienteOrmEntity } from '../../modules/contagem_cliente/infra/typeorm/contagem_cliente.entity';
 import { ContasPagarOrmEntity } from '../../modules/contas_pagar/infra/typeorm/contas_pagar.entity';
 import { ContasReceberOrmEntity } from '../../modules/contas_receber/infra/typeorm/contas_receber.entity';
+import { ControlePontoOrmEntity } from '../../modules/controle_ponto/infra/typeorm/controle_ponto.entity';
+import { CrachaRfidOrmEntity } from '../../modules/cracha_rfid/infra/typeorm/cracha_rfid.entity';
 import { MovimentoEstoqueOrmEntity } from '../../modules/estoque/infra/typeorm/movimento_estoque.entity';
 import { LojaOrmEntity } from '../../modules/loja/infra/typeorm/loja.entity';
 import { PagamentoOrmEntity } from '../../modules/pagamento/infra/typeorm/pagamento.entity';
@@ -19,6 +21,8 @@ export const tenantEntities: (Function | string | EntitySchema)[] = [
   ContagemClienteOrmEntity,
   ContasPagarOrmEntity,
   ContasReceberOrmEntity,
+  ControlePontoOrmEntity,
+  CrachaRfidOrmEntity,
   MovimentoEstoqueOrmEntity,
   LojaOrmEntity,
   PagamentoOrmEntity,

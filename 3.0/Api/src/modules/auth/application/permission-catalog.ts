@@ -10,6 +10,8 @@ const MODULOS = [
   { id: 'CONTAGEM_CLIENTE', chave: 'contagem-cliente', nome: 'Contagem de clientes' },
   { id: 'CONTAS_PAGAR', chave: 'contas-pagar', nome: 'Contas a pagar' },
   { id: 'CONTAS_RECEBER', chave: 'contas-receber', nome: 'Contas a receber' },
+  { id: 'CONTROLE_PONTO', chave: 'controle-ponto', nome: 'Controle de ponto' },
+  { id: 'CRACHA_RFID', chave: 'cracha-rfid', nome: 'Crachá RFID' },
   { id: 'ESTOQUE', chave: 'estoque', nome: 'Estoque' },
   { id: 'LOJA', chave: 'loja', nome: 'Loja' },
   { id: 'PAGAMENTO', chave: 'pagamento', nome: 'Pagamento' },
