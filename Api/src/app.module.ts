@@ -7,6 +7,8 @@ import { CategoriaModule } from './modules/categoria/categoria.module';
 import { ClienteModule } from './modules/cliente/cliente.module';
 import { ContasPagarModule } from './modules/contas_pagar/contas_pagar.module';
 import { ContasReceberModule } from './modules/contas_receber/contas_receber.module';
+import { CrachaRfidModule } from './modules/cracha_rfid/cracha_rfid.module';
+import { ControlePontoModule } from './modules/controle_ponto/controle_ponto.module';
 import { LojaModule } from './modules/loja/loja.module';
 import { PagamentoModule } from './modules/pagamento/pagamento.module';
 import { PaginasModule } from './modules/paginas/paginas.module';
@@ -36,6 +38,8 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
     CategoriaModule,
     ClienteModule,
     ContagemClienteModule,
+    CrachaRfidModule,
+    ControlePontoModule,
     VendaModule,
     VendaItemModule,
     PagamentoModule,
