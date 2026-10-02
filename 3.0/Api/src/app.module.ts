@@ -22,6 +22,8 @@ import { VendaModule } from './modules/venda/venda.module';
 import { VendaItemModule } from './modules/venda_item/venda_item.module';
 import { VendaRelatorioModule } from './modules/venda_relatorio/venda_relatorio.module';
 import { ContagemClienteModule } from './modules/contagem_cliente/contagem_cliente.module';
+import { ControlePontoModule } from './modules/controle_ponto/controle_ponto.module';
+import { CrachaRfidModule } from './modules/cracha_rfid/cracha_rfid.module';
 
 @Module({
   imports: [
@@ -57,6 +59,8 @@ import { ContagemClienteModule } from './modules/contagem_cliente/contagem_clien
     VendaRelatorioModule,
     RegraFiscalModule,
     LojaModule,
+    CrachaRfidModule,
+    ControlePontoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
