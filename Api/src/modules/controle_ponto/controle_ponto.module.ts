@@ -6,11 +6,13 @@ import { CONTROLE_PONTO_REPOSITORY } from './domain/controle_ponto.repository';
 import { ControlePontoOrmEntity } from './infra/typeorm/controle_ponto.entity';
 import { ControlePontoTypeOrmRepository } from './infra/typeorm/controle_ponto.repository';
 import { ControlePontoController } from './presentation/controle_ponto.controller';
+import { ContagemClienteModule } from '../contagem_cliente/contagem_cliente.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ControlePontoOrmEntity]),
     CrachaRfidModule,
+    ContagemClienteModule,
   ],
   controllers: [ControlePontoController],
   providers: [

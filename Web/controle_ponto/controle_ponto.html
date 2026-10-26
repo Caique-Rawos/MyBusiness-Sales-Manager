@@ -1,0 +1,346 @@
+<style>
+  .ponto-calendar-container {
+    overflow-x: auto;
+  }
+
+  .ponto-calendar {
+    min-width: 760px;
+    min-height: 380px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    border: 1px solid #d6d6d6;
+    border-radius: 0.25rem;
+  }
+
+  .ponto-calendar-day {
+    padding: 1.25rem 0.75rem;
+    border-right: 1px solid #e8e8e8;
+    text-align: center;
+  }
+
+  .ponto-calendar-day:last-child {
+    border-right: 0;
+  }
+
+  .ponto-calendar-day-name {
+    margin-bottom: 0.25rem;
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+  }
+
+  .ponto-calendar-date {
+    margin-bottom: 0;
+    font-weight: 700;
+  }
+
+  .ponto-calendar-records {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    align-items: center;
+    margin-top: 0.75rem;
+  }
+
+  .ponto-calendar-record {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+
+  .ponto-calendar-record i {
+    width: 1.2em;
+    text-align: center;
+  }
+
+  .ponto-calendar-record-saida i {
+    font-size: 1.25em;
+  }
+
+  .ponto-calendar-record-entrada {
+    color: #198754;
+  }
+
+  .ponto-calendar-record-saida {
+    color: #0d6efd;
+  }
+
+  @media (max-width: 576px) {
+    .ponto-calendar-day {
+      padding: 1rem 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  function mensagemErroControlePonto(msg) {
+    Swal.fire({
+      title: "Erro!",
+      text: msg || "Não foi possível carregar os dados do controle de ponto.",
+      icon: "error",
+      confirmButtonText: "Ok",
+    });
+  }
+
+  function chaveDataControlePonto(data) {
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const dia = String(data.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function montarCalendarioControlePonto(registros) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+
+    const dias = Array.from({ length: 7 }, (_, indice) => {
+      const data = new Date(hoje);
+      data.setDate(hoje.getDate() - 6 + indice);
+      return data;
+    });
+
+    const dataInicial = dias[0].toLocaleDateString("pt-BR");
+    const dataFinal = dias[6].toLocaleDateString("pt-BR");
+    $("#periodoPonto").text(`${dataInicial} a ${dataFinal}`);
+
+    const registrosPorDia = new Map(
+      dias.map((data) => [chaveDataControlePonto(data), []]),
+    );
+
+    registros.forEach((registro) => {
+      const data = new Date(registro.timestamp);
+      registrosPorDia.get(chaveDataControlePonto(data))?.push(data);
+    });
+
+    const calendario = $("#calendarioPonto").empty();
+    dias.forEach((data) => {
+      const registrosDoDia =
+        registrosPorDia.get(chaveDataControlePonto(data)) || [];
+      registrosDoDia.sort((a, b) => a - b);
+
+      const diaElement = $("<section>", {
+        class: "ponto-calendar-day",
+      });
+      const dataFormatada = `${String(data.getDate()).padStart(2, "0")}/${data
+        .toLocaleDateString("pt-BR", { month: "short" })
+        .replace(".", "")}`;
+
+      diaElement.append(
+        $("<p>", {
+          class: "ponto-calendar-date",
+          text: dataFormatada,
+        }),
+        $("<p>", {
+          class: "ponto-calendar-day-name",
+          text: data.toLocaleDateString("pt-BR", { weekday: "long" }),
+        }),
+      );
+
+      const listaRegistros = $("<div>", {
+        class: "ponto-calendar-records",
+      });
+
+      if (registrosDoDia.length > 0) {
+        registrosDoDia.forEach((registro, indice) => {
+          const entrada = indice % 2 === 0;
+          const tipo = entrada ? "Entrada" : "Saída";
+          const icone = entrada
+            ? "fa-building-circle-check"
+            : "fa-person-walking";
+          const classeTipo = entrada
+            ? "ponto-calendar-record-entrada"
+            : "ponto-calendar-record-saida";
+
+          listaRegistros.append(
+            $("<span>", {
+              class: `ponto-calendar-record ${classeTipo}`,
+              title: tipo,
+              "aria-label": `${tipo} às ${registro.toLocaleTimeString(
+                "pt-BR",
+                { hour: "2-digit", minute: "2-digit" },
+              )}`,
+            }).append(
+              $("<i>", {
+                class: `fa-solid ${icone}`,
+                "aria-hidden": "true",
+              }),
+              $("<span>", {
+                text: registro.toLocaleTimeString("pt-BR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              }),
+            ),
+          );
+        });
+      }
+
+      diaElement.append(listaRegistros);
+      calendario.append(diaElement);
+    });
+  }
+
+  function carregarPontosFuncionario(idCracha) {
+    $("#calendarioPonto").empty();
+    $("#periodoPonto").text("Carregando...");
+
+    $.ajax({
+      type: "GET",
+      url: "./api/requisicao/controle_ponto/buscaPontos.php",
+      data: { idCracha: idCracha },
+      dataType: "json",
+      success: function (registros) {
+        try {
+          registros = JSON.parse(registros);
+        } catch (error) {
+          mensagemErroControlePonto(
+            "A resposta de registros de ponto está em um formato inválido.",
+          );
+          return;
+        }
+
+        if (
+          !Array.isArray(registros) ||
+          registros.some(
+            (registro) =>
+              !registro ||
+              typeof registro.timestamp !== "string" ||
+              Number.isNaN(Date.parse(registro.timestamp)),
+          )
+        ) {
+          mensagemErroControlePonto(
+            "A resposta de registros de ponto está em um formato inválido.",
+          );
+          return;
+        }
+
+        montarCalendarioControlePonto(registros);
+      },
+      error: function (xhr, textStatus) {
+        $("#periodoPonto").text("Não foi possível carregar os registros.");
+        mensagemErroControlePonto(`Erro ao carregar os registros de ponto.`);
+      },
+    });
+  }
+
+  function carregarFuncionariosControlePonto() {
+    const selecionarFuncionario = $("#selecionarFuncionario");
+    selecionarFuncionario.prop("disabled", true);
+
+    $.ajax({
+      type: "GET",
+      url: "./api/requisicao/controle_ponto/buscaFuncionarios.php",
+      dataType: "json",
+      success: function (funcionarios) {
+        try {
+          funcionarios = JSON.parse(funcionarios);
+        } catch (error) {
+          mensagemErroControlePonto(
+            "A resposta de funcionários está em um formato inválido.",
+          );
+          return;
+        }
+
+        if (
+          !Array.isArray(funcionarios) ||
+          funcionarios.some(
+            (funcionario) =>
+              !funcionario ||
+              funcionario.id == null ||
+              typeof funcionario.nome !== "string",
+          )
+        ) {
+          mensagemErroControlePonto(
+            "A resposta de funcionários está em um formato inválido.",
+          );
+          return;
+        }
+
+        selecionarFuncionario.empty();
+        $("#calendarioPonto").empty();
+        if (funcionarios.length === 0) {
+          selecionarFuncionario.append(
+            $("<option>", {
+              value: "",
+              text: "Nenhum funcionário cadastrado",
+            }),
+          );
+          $("#periodoPonto").text("Cadastre um funcionário para consultar.");
+          return;
+        }
+
+        selecionarFuncionario.append(
+          $("<option>", {
+            value: "",
+            text: "Selecione um funcionário",
+            selected: true,
+            disabled: true,
+          }),
+        );
+
+        funcionarios.forEach((funcionario) => {
+          selecionarFuncionario.append(
+            $("<option>", {
+              value: funcionario.id,
+              text: funcionario.nome,
+            }),
+          );
+        });
+
+        selecionarFuncionario.prop("disabled", false);
+        $("#periodoPonto").text("Selecione um funcionário para consultar.");
+      },
+      error: function (xhr, textStatus) {
+        $("#periodoPonto").text("Não foi possível carregar os funcionários.");
+        mensagemErroControlePonto(`Erro ao carregar os funcionários.`);
+      },
+    });
+  }
+
+  $(document).ready(function () {
+    carregarFuncionariosControlePonto();
+
+    $("#selecionarFuncionario").on("change", function () {
+      if (this.value) {
+        carregarPontosFuncionario(this.value);
+      }
+    });
+  });
+</script>
+
+<div class="container-fluid px-4 px-md-5">
+  <h1 class="text-center mt-3 page-title">Controle de Ponto</h1>
+
+  <div class="row mt-4">
+    <div class="col-sm-12 col-md-4 col-lg-3">
+      <div class="mb-3 form-group">
+        <label for="selecionarFuncionario" class="form-label"
+          >Funcionário</label
+        >
+        <select
+          class="form-select"
+          id="selecionarFuncionario"
+          aria-label="Selecionar funcionário"
+        >
+          <option value="">Carregando funcionários...</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <section class="mt-3 border rounded">
+    <div class="px-3 py-2 border-bottom bg-light">
+      <strong>Semana de</strong>
+      <span id="periodoPonto" class="ms-1">Carregando...</span>
+    </div>
+    <div class="ponto-calendar-container">
+      <div id="calendarioPonto" class="ponto-calendar" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <p class="text-muted small mt-3">
+    Exibindo as marcações registradas nos últimos 7 dias.
+  </p>
+</div>

@@ -5,6 +5,7 @@ import {
   CONTROLE_PONTO_REPOSITORY,
   ControlePontoRepository,
 } from '../domain/controle_ponto.repository';
+import { ContagemClienteService } from 'src/modules/contagem_cliente/application/contagem_cliente.service';
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -14,11 +15,16 @@ export class ControlePontoService {
     @Inject(CONTROLE_PONTO_REPOSITORY)
     private readonly repository: ControlePontoRepository,
     private readonly crachaRfidService: CrachaRfidService,
+    private readonly contagemClienteService: ContagemClienteService,
   ) {}
 
   async baterPonto(hash: string): Promise<ControlePonto> {
     const cracha = await this.crachaRfidService.findByHash(hash);
-    return this.repository.create(cracha.id);
+    const result = await this.repository.create(cracha.id);
+    if (!(await this.contagemClienteService.subtract())) {
+      console.error('Error occurred while subtracting contagem cliente');
+    }
+    return result;
   }
 
   async findUltimos7Dias(idCracha: number): Promise<ControlePonto[]> {

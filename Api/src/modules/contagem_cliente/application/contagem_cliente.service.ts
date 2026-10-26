@@ -27,6 +27,18 @@ export class ContagemClienteService {
     return false;
   }
 
+  async subtract(): Promise<boolean> {
+    const contagemAtual = await this.repository.findToday();
+
+    if (contagemAtual?.contagem > 0) {
+      contagemAtual.contagem -= 1;
+      this.repository.update(contagemAtual);
+      return true;
+    }
+
+    return false;
+  }
+
   findToday(): Promise<ContagemCliente | null> {
     return this.repository.findToday();
   }
