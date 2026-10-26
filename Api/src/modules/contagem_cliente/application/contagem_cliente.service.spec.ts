@@ -43,6 +43,35 @@ describe('ContagemClienteService', () => {
     );
   });
 
+  it('should subtract one from today entry when the count is greater than zero', async () => {
+    const todayEntry = { contagem: 2, id: 1 };
+    repository.findToday.mockResolvedValue(todayEntry);
+
+    await expect(service.subtract()).resolves.toBe(true);
+
+    expect(repository.findToday).toHaveBeenCalled();
+    expect(todayEntry.contagem).toBe(1);
+    expect(repository.update).toHaveBeenCalledWith(todayEntry);
+  });
+
+  it('should return false and not update when today entry has no count', async () => {
+    repository.findToday.mockResolvedValue({ contagem: 0, id: 1 });
+
+    await expect(service.subtract()).resolves.toBe(false);
+
+    expect(repository.findToday).toHaveBeenCalled();
+    expect(repository.update).not.toHaveBeenCalled();
+  });
+
+  it('should return false and not update when today entry does not exist', async () => {
+    repository.findToday.mockResolvedValue(null);
+
+    await expect(service.subtract()).resolves.toBe(false);
+
+    expect(repository.findToday).toHaveBeenCalled();
+    expect(repository.update).not.toHaveBeenCalled();
+  });
+
   it('should find today entry', async () => {
     const expected = {} as any;
     repository.findToday.mockResolvedValue(expected);
